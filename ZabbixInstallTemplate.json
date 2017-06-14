@@ -499,6 +499,7 @@
         "ZabbixLoadBalancer": {
             "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
             "Properties": {
+                "LoadBalancerName": { "Fn::Join": ["-", ["ZABBIX", { "Ref": "VPCID" }]] },
                 "SecurityGroups": [{
                     "Ref": "ZabbixELBSecurityGroup"
                 }],
