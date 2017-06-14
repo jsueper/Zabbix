@@ -611,7 +611,7 @@
                                     "Ref": "AWS::Region"
                                 },
                                 "\n",
-                                "/tmp/bootstrapZabbix.sh -v --params_file /tmp/zabbix-setup.txt &>> /tmp/bootstrap.log\n",
+                                "/tmp/bootstrapZabbix.sh --v --params_file /tmp/zabbix-setup.txt &>> /tmp/bootstrap.log\n",
                                 "/usr/bin/cfn-signal -e $? ",
                                 "         --stack ",
                                 {

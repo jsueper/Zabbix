@@ -37,7 +37,12 @@ function chkstatus() {
     fi
 }
 
-
+function configRHEL72HVM() {
+    sed -i 's/4096/16384/g' /etc/security/limits.d/20-nproc.conf
+    sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
+    yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional
+    setenforce Permissive
+}
 
 function install_packages() {
     echo "[INFO] Calling: yum install -y $@"
@@ -48,7 +53,7 @@ function install_packages() {
 # Call checkos to ensure platform is Linux
 checkos
 
-ARGS=`getopt -o hv -l help,verbose,params_file:-n $0 -- "$@"`
+ARGS=`getopt -o hv -l help,verbose,params_file: -n $0 -- "$@"`
 eval set -- "${ARGS}"
 
 if [ $# == 1 ]; then
@@ -138,7 +143,8 @@ sed -i 's/requiretty/!requiretty/g' /etc/sudoers
 
 #Since we are using RHEL7.x we need to enable optional repos for the below pacakages to install
 echo QS_Zabbix_Enabling_Optional_RHEL_Repos
-sudo yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional
+configRHEL72HVM
+#sudo yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional
 
 # Install packages needed to run Zabbix
 YUM_PACKAGES=(
@@ -202,9 +208,9 @@ echo ${DBPASS}
 
 echo ${DATABASE_PASS}
 
-echo "\n"
-echo "\n"
-echo "\n"
+echo ""
+echo ""
+echo ""
 echo "###############################"
 
 
