@@ -15,4 +15,4 @@ key=zabbix/setup/latest
 
 
 
-aws cloudformation create-stack --template-url https://s3.amazonaws.com/"${bucket}/${key}"/ZabbixInstallTemplate.json --stack-name ZABBIX-DEPLOY1 --parameters file://params.json --disable-rollback --capabilities CAPABILITY_IAM
+aws cloudformation create-stack --template-url https://s3.amazonaws.com/"${bucket}/${key}"/ZabbixInstallTemplate.json --stack-name ZABBIX-DEPLOY --parameters file://params.json --disable-rollback --capabilities CAPABILITY_IAM
