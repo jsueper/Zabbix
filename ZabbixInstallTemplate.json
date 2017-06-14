@@ -499,9 +499,9 @@
         "ZabbixLoadBalancer": {
             "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
             "Properties": {
-                "SecurityGroups": {
+                "SecurityGroups": [{
                     "Ref": "ZabbixELBSecurityGroup"
-                },
+                }],
                 "Subnets": [{
                     "Ref": "PrivateSubnetID"
                 }],
