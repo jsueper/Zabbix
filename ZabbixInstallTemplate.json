@@ -587,7 +587,6 @@
                         "Fn::Join": [
                             "", [
                                 "#!/bin/bash \n",
-                                "cd /etc/yum.repos.d \n",
                                 "cd /tmp \n",
                                 "curl -O https://bootstrap.pypa.io/get-pip.py\n",
                                 "python get-pip.py\n",

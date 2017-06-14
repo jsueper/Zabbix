@@ -172,25 +172,25 @@ sudo yum -y install mysql-community-server
 
 
 sudo service httpd start 
-echo "\n"
-echo "\n"
+echo ""
+echo ""
 echo "###############################"
 sleep 30
 
 sudo service mysqld start
-echo "\n"
-echo "\n"
+echo ""
+echo ""
 echo "###############################"
 sleep 30
 
 sudo service mysqld status 
-echo "\n"
-echo "\n"
+echo ""
+echo ""
 echo "###############################"
 
 sudo mysql --version 
-echo "\n"
-echo "\n"
+echo ""
+echo ""
 echo "###############################"
 
 
