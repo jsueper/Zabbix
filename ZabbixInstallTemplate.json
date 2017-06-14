@@ -171,7 +171,11 @@
     },
 
     "Conditions": {
-        "IsAZLinux": { "Fn::Equals": [{ "Ref": "ZabbixAMIOS" }, "AmazonLinux"] }
+        "IsAZLinux": {
+            "Fn::Equals": [{
+                "Ref": "ZabbixAMIOS"
+            }, "AmazonLinux"]
+        }
 
     },
 
@@ -361,7 +365,9 @@
                     ]
                 },
                 "Type": "A",
-                "ResourceRecords": [{ "Fn::GetAtt": ["ZabbixInstance", "PrivateIp"] }],
+                "ResourceRecords": [{
+                    "Fn::GetAtt": ["ZabbixInstance", "PrivateIp"]
+                }],
                 "TTL": "60"
             }
         },
@@ -413,13 +419,47 @@
                 "GroupName": "Zabbix Server Security Group",
                 "GroupDescription": "Zabbix server management and access ports",
                 "SecurityGroupIngress": [{
-                    "IpProtocol": "tcp",
-                    "FromPort": "22",
-                    "ToPort": "22",
-                    "SourceSecurityGroupId": {
-                        "Ref": "ZabbixServerAccessSecurityGroup"
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "SourceSecurityGroupId": {
+                            "Ref": "ZabbixServerAccessSecurityGroup"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "SourceSecurityGroupId": {
+                            "Ref": "ZabbixELBSecurityGroup"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "SourceSecurityGroupId": {
+                            "Ref": "ZabbixELBSecurityGroup"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "10050",
+                        "ToPort": "10050",
+                        "SourceSecurityGroupId": {
+                            "Ref": "ZabbixAgentsSecurityGroup"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "10051",
+                        "ToPort": "10051",
+                        "SourceSecurityGroupId": {
+                            "Ref": "ZabbixAgentsSecurityGroup"
+                        }
                     }
-                }]
+
+                ]
             }
         },
         "ZabbixAgentsSecurityGroup": {
@@ -429,22 +469,29 @@
                     "Ref": "VPCID"
                 },
                 "GroupName": "Zabbix Agents Security Group",
-                "GroupDescription": "Zabbix inter-agent communication and management ports",
+                "GroupDescription": "Zabbix inter-agent communication and management ports"
+
+            }
+        },
+        "ZabbixELBSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPCID"
+                },
+                "GroupName": "Zabbix ELB Security Group",
+                "GroupDescription": "Zabbix ELB http, https communication and management ports",
                 "SecurityGroupIngress": [{
                         "IpProtocol": "tcp",
-                        "FromPort": "10050",
-                        "ToPort": "10050",
-                        "SourceSecurityGroupId": {
-                            "Ref": "ZabbixServerSecurityGroup"
-                        }
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "CidrIp": "0.0.0.0/0"
                     },
                     {
                         "IpProtocol": "tcp",
-                        "FromPort": "10051",
-                        "ToPort": "10051",
-                        "SourceSecurityGroupId": {
-                            "Ref": "ZabbixServerSecurityGroup"
-                        }
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
                     }
                 ]
             }
@@ -452,10 +499,15 @@
         "ZabbixLoadBalancer": {
             "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
             "Properties": {
-                "Subnets": [{ "Ref": "PrivateSubnetID" }],
-                "Instances": [
-                    { "Ref": "ZabbixInstance" }
-                ],
+                "SecurityGroups": {
+                    "Ref": "ZabbixELBSecurityGroup"
+                },
+                "Subnets": [{
+                    "Ref": "PrivateSubnetID"
+                }],
+                "Instances": [{
+                    "Ref": "ZabbixInstance"
+                }],
                 "Listeners": [{
                     "LoadBalancerPort": "80",
                     "InstancePort": "80",
@@ -464,7 +516,7 @@
                 }],
 
                 "HealthCheck": {
-                    "Target": "HTTP:80/",
+                    "Target": "TCP:80",
                     "HealthyThreshold": "3",
                     "UnhealthyThreshold": "5",
                     "Interval": "30",
@@ -569,7 +621,11 @@
                         }
                     ]
                 },
-                "SecurityGroupIds": [{ "Ref": "ZabbixServerSecurityGroup" }, { "Ref": "ZabbixAgentsSecurityGroup" }],
+                "SecurityGroupIds": [{
+                    "Ref": "ZabbixServerSecurityGroup"
+                }, {
+                    "Ref": "ZabbixAgentsSecurityGroup"
+                }],
 
 
                 "SubnetId": {
@@ -652,34 +708,21 @@
         },
         "ZabbixPrivateIPAddress": {
             "Value": {
-                "Fn::Join": [
-                    " ", [
-                        "IP address",
-                        {
-                            "Fn::GetAtt": ["ZabbixInstance", "PrivateIp"]
 
-                        },
-                        "on subnet",
-                        {
-                            "Ref": "PrivateSubnetID"
-                        }
-                    ]
-                ]
+                "Fn::GetAtt": ["ZabbixInstance", "PrivateIp"]
+
             },
             "Description": "Zabbix Instance private IP address"
         },
+
         "ZabbixServerURl": {
             "Value": {
-                "Fn::Join": [
-                    " ", [
-                        "Zabbix ELB URL",
-                        {
-                            "Fn::GetAtt": ["ZabbixLoadBalancer", "DNSName"]
-                        }
-                    ]
-                ]
+
+                "Fn::GetAtt": ["ZabbixLoadBalancer", "DNSName"]
             },
+
             "Description": "Zabbix WEB URL"
         }
+
     }
 }
