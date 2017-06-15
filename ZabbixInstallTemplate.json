@@ -503,7 +503,7 @@
                 "Scheme": "internet-facing",
                 "SecurityGroups": [{ "Ref": "ZabbixELBSecurityGroup" }],
                 "Subnets": [{
-                    "Ref": "PrivateSubnetID"
+                    "Ref": "PublicSubnetID"
                 }],
                 "Instances": [{
                     "Ref": "ZabbixInstance"
