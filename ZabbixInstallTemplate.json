@@ -745,14 +745,27 @@
       },
       "Description": "Zabbix Instance private IP address"
     },
-    "ZabbixServerURl": {
+    "ZabbixWebURl": {
       "Value": {
-        "Fn::GetAtt": [
-          "ZabbixLoadBalancer",
-          "DNSName"
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": [
+                "ZabbixLoadBalancer",
+                "DNSName"
+              ]
+            },
+            "zabbix"
+          ]
         ]
       },
-      "Description": "Zabbix WEB URL"
+      "Description": "Zabbix Web  URL"
     }
   }
 }
+
+
+
+
+

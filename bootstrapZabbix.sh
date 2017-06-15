@@ -48,6 +48,8 @@ function install_packages() {
     echo "[INFO] Calling: yum install -y $@"
     yum install -y $@ > /dev/null
 }
+
+
 ##################################### Functions
 
 # Call checkos to ensure platform is Linux
@@ -242,7 +244,8 @@ echo QS_END_Install_Zabbix_Packages
 
 
 #Need to set timezone as Zabbix install depends on it.
-echo 'date.timezone America/Denver' >> /etc/php.ini
+
+sed -i -e 's/# php_value date.timezone Europe/Riga/date.timezone America/Denver/g' /etc/zabbix/apache.conf
 
 sudo service httpd restart 
 
