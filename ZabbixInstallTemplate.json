@@ -160,6 +160,7 @@
       "Type": "String"
     },
     "ZabbixServerName": {
+      "AllowedPattern": "([A-Za-z0-9_]{3,50})",
       "Default": "Zabbix",
       "Description": "Name for EC2 Instance/Tag.",
       "Type": "String"

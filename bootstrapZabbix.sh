@@ -204,11 +204,7 @@ echo "###############################"
 
 #Get Temporary DB Password from mysqld.log
 echo QS_BEGIN_Get_Temp_MySql_Password
-DBPASS=$(sudo awk '/temporary password/ {print $11}' /var/log/mysqld.log) 
-
-echo ${DBPASS}
-
-echo ${DATABASE_PASS}
+DBPASS=$(sudo awk '/temporary password/ {print $11}' /var/log/mysqld.log)
 
 echo ""
 echo ""
@@ -245,7 +241,8 @@ echo QS_END_Install_Zabbix_Packages
 
 #Need to set timezone as Zabbix install depends on it.
 
-sed -i -e 's/# php_value date.timezone Europe/Riga/date.timezone America/Denver/g' /etc/zabbix/apache.conf
+sed -e 's/# php_value date.timezone Europe\/Riga/php_value date.timezone America\/Denver/g' /etc/httpd/conf.d/zabbix.conf > /etc/httpd/conf.d/zabbix_new.conf
+sudo mv /etc/httpd/conf.d/zabbix_new.conf /etc/httpd/conf.d/zabbix.conf
 
 sudo service httpd restart 
 
@@ -270,7 +267,7 @@ echo QS_END_Apply_Zabbix_Schema
 sudo service zabbix-server start 
 
 # Remove passwords from files
-sed -i s/${DATABASE_PASS}/xxxxx/g  /var/log/cloud-init.log 
+sed -i s/${DATABASE_PASS}/xxxxx/g  /var/log/cloud-init.log
 
 echo "QS_END_OF_SETUP_ZABBIX"
 # END SETUP script

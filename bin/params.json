@@ -23,7 +23,7 @@
 
     {
         "ParameterKey": "ZabbixServerName",
-        "ParameterValue": "All Mighty Zabbix"
+        "ParameterValue": "Zabbix"
     },
     {
         "ParameterKey": "KeyPairName",
