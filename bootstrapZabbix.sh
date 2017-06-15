@@ -143,10 +143,9 @@ sed -i 's/requiretty/!requiretty/g' /etc/sudoers
 
 
 
-#Since we are using RHEL7.x we need to enable optional repos for the below pacakages to install
+#Since we are using RHEL7.x we need to enable optional repos for the below packages to install
 echo QS_Zabbix_Enabling_Optional_RHEL_Repos
 configRHEL72HVM
-#sudo yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional
 
 # Install packages needed to run Zabbix
 YUM_PACKAGES=(
@@ -244,12 +243,49 @@ echo QS_END_Install_Zabbix_Packages
 sed -e 's/# php_value date.timezone Europe\/Riga/php_value date.timezone America\/Denver/g' /etc/httpd/conf.d/zabbix.conf > /etc/httpd/conf.d/zabbix_new.conf
 sudo mv /etc/httpd/conf.d/zabbix_new.conf /etc/httpd/conf.d/zabbix.conf
 
+echo QS_BEGIN_Update_Zabbix_Server_Conf
+sudo echo 'DBPassword='${DATABASE_PASS} >>/etc/zabbix/zabbix_server.conf
+
+
+
+
+#Creating Web Conf So User Doesn't have to go through web setup
+
+echo QS_BEGIN_Create_Zabbix_Web_Conf_File
+
+sudo touch /etc/zabbix/web/zabbix.conf.php
+sudo chown root:zabbix /etc/zabbix/web/zabbix.conf.php
+
+sudo echo '<?php' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '// Zabbix GUI configuration file.' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo 'global $DB;' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
+
+sudo echo '$DB['TYPE']     = ''MYSQL'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['SERVER']   = ''localhost'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['PORT']     = ''0'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['DATABASE'] = ''zabbix'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['USER']     = ''zabbix'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['PASSWORD'] = ''${DATABASE_PASS}'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
+
+sudo echo '// Schema name. Used for IBM DB2 and PostgreSQL.' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['SCHEMA'] = '';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$ZBX_SERVER      = ''localhost'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$ZBX_SERVER_PORT = ''10051'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$ZBX_SERVER_NAME = ''ZABBIX'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;' >>/etc/zabbix/web/zabbix.conf.php
+
+echo QS_END_Create_Zabbix_Web_Conf_File
+
 sudo service httpd restart 
 
 #Create the Zabbix database
 echo QS_BEGIN_Create_Zabbix_Database
-mysql -u root --password="${DATABASE_PASS}" -e "CREATE DATABASE zabbixdb CHARACTER SET UTF8;"
-mysql -u root --password="${DATABASE_PASS}" -e "GRANT ALL PRIVILEGES on zabbixdb.* to zabbix@localhost IDENTIFIED BY '${DATABASE_PASS}';"
+mysql -u root --password="${DATABASE_PASS}" -e "CREATE DATABASE zabbix CHARACTER SET UTF8;"
+mysql -u root --password="${DATABASE_PASS}" -e "GRANT ALL PRIVILEGES on zabbix.* to zabbix@localhost IDENTIFIED BY '${DATABASE_PASS}';"
 mysql -u root --password="${DATABASE_PASS}" -e "FLUSH PRIVILEGES;"
 echo QS_END_Create_Zabbix_Database
 
@@ -261,10 +297,10 @@ cd /usr/share/doc/zabbix-server-mysql-3.2.6/
 #Run create.sql file against zabbixdb we created above to create schema and data.
 echo QS_BEGIN_Apply_Zabbix_Schema
 gunzip *.gz
-mysql -u zabbix --password="${DATABASE_PASS}" zabbixdb < create.sql 
+mysql -u zabbix --password="${DATABASE_PASS}" zabbix < create.sql
 echo QS_END_Apply_Zabbix_Schema
 
-sudo service zabbix-server start 
+sudo service zabbix-server restart
 
 # Remove passwords from files
 sed -i s/${DATABASE_PASS}/xxxxx/g  /var/log/cloud-init.log

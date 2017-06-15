@@ -746,7 +746,7 @@
       },
       "Description": "Zabbix Instance private IP address"
     },
-    "ZabbixWebURl": {
+    "ZabbixWebURL": {
       "Value": {
         "Fn::Join": [
           "/",
