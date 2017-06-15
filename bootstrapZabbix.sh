@@ -261,20 +261,20 @@ sudo echo '// Zabbix GUI configuration file.' >>/etc/zabbix/web/zabbix.conf.php
 sudo echo 'global $DB;' >>/etc/zabbix/web/zabbix.conf.php
 sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
 
-sudo echo '$DB['TYPE']     = ''MYSQL'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['SERVER']   = ''localhost'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['PORT']     = ''0'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['DATABASE'] = ''zabbix'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['USER']     = ''zabbix'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['PASSWORD'] = ''${DATABASE_PASS}'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['\'TYPE\'']     = '\'MYSQL\'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['\'SERVER\'']   = '\'localhost\'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['\'PORT\'']     = '\'0\'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['\'DATABASE\''] = '\'zabbix\'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['\'USER\'']     = '\'zabbix\'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['\'PASSWORD\''] = '\'${DATABASE_PASS}\'';' >>/etc/zabbix/web/zabbix.conf.php
 sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
 
 sudo echo '// Schema name. Used for IBM DB2 and PostgreSQL.' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['SCHEMA'] = '';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$DB['\'SCHEMA\''] = '\'\'';' >>/etc/zabbix/web/zabbix.conf.php
 sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$ZBX_SERVER      = ''localhost'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$ZBX_SERVER_PORT = ''10051'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$ZBX_SERVER_NAME = ''ZABBIX'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$ZBX_SERVER      = '\'localhost\'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$ZBX_SERVER_PORT = '\'10051\'';' >>/etc/zabbix/web/zabbix.conf.php
+sudo echo '$ZBX_SERVER_NAME = '\'ZABBIX\'';' >>/etc/zabbix/web/zabbix.conf.php
 sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
 sudo echo '$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;' >>/etc/zabbix/web/zabbix.conf.php
 
