@@ -499,10 +499,9 @@
         "ZabbixLoadBalancer": {
             "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
             "Properties": {
-                "LoadBalancerName": { "Fn::Join": ["-", ["ZABBIX", { "Ref": "VPCID" }]] },
-                "SecurityGroups": [{
-                    "Ref": "ZabbixELBSecurityGroup"
-                }],
+
+                "Scheme": "internet-facing",
+                "SecurityGroups": [{ "Ref": "ZabbixELBSecurityGroup" }],
                 "Subnets": [{
                     "Ref": "PrivateSubnetID"
                 }],
@@ -515,7 +514,6 @@
                     "Protocol": "HTTP"
 
                 }],
-
                 "HealthCheck": {
                     "Target": "TCP:80",
                     "HealthyThreshold": "3",

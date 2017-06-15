@@ -275,4 +275,9 @@ echo "QS_END_OF_SETUP_ZABBIX"
 # Remove files used in bootstrapping
 rm ${PARAMS_FILE}
 
+#Ensure all services survive reboot
+sudo systemctl enable mysqld.service
+sudo systemctl enable httpd.service
+sudo systemctl enable zabbix-server.service
+
 echo "Finished AWS Zabbix Quick Start Bootstrapping"
