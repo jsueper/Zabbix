@@ -14,7 +14,7 @@
     },
     {
         "ParameterKey": "PublicSubnetID",
-        "ParameterValue": "subnet-d101928a"
+        "ParameterValue": "subnet-87da92ce"
     },
     {
         "ParameterKey": "VPCID",

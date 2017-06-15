@@ -1,727 +1,758 @@
 {
-    "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "This is template deploys a Zabbix server in an existing VPC environment.",
-    "Metadata": {
-        "AWS::CloudFormation::Interface": {
-            "ParameterGroups": [{
-                    "Label": {
-                        "default": "Network Configuration"
-                    },
-                    "Parameters": [
-                        "VPCID",
-                        "PrivateSubnetID",
-                        "PublicSubnetID"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Amazon Custom EC2 Configuration"
-                    },
-                    "Parameters": [
-                        "KeyPairName",
-                        "ZabbixAMIOS",
-                        "ZabbixInstanceType",
-                        "ZabbixServerName"
-                    ]
-                },
-
-                {
-                    "Label": {
-                        "default": "Zabbix Mysql Database Configuration"
-                    },
-                    "Parameters": [
-                        "DomainName",
-                        "DatabasePass"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "AWS QS Configuration"
-                    },
-                    "Parameters": [
-                        "QSS3BucketName",
-                        "QSS3KeyPrefix"
-                    ]
-                }
-            ],
-            "ParameterLabels": {
-
-                "ZabbixServerName": {
-                    "default": "DNS/Tag Name for Server"
-                },
-                "DatabasePass": {
-                    "default": "Zabbix Database Password"
-                },
-                "DomainName": {
-                    "default": "Domain Name"
-                },
-                "ZabbixInstanceType": {
-                    "default": "Zabbix Custom Instance Type"
-                },
-                "PrivateSubnetID": {
-                    "default": "Private Subnet ID"
-                },
-                "PublicSubnetID": {
-                    "default": "Public Subnet ID"
-                },
-                "QSS3BucketName": {
-                    "default": "Quick Start S3 Bucket Name"
-                },
-                "QSS3KeyPrefix": {
-                    "default": "Quick Start S3 Key Prefix"
-                },
-                "VPCID": {
-                    "default": "VPC ID"
-                },
-                "ZabbixAMIOS": {
-                    "default": "Zabbix Operating System"
-                }
-            }
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "This is template deploys a Zabbix server in an existing VPC environment.",
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Network Configuration"
+          },
+          "Parameters": [
+            "VPCID",
+            "PrivateSubnetID",
+            "PublicSubnetID"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Amazon Custom EC2 Configuration"
+          },
+          "Parameters": [
+            "KeyPairName",
+            "ZabbixAMIOS",
+            "ZabbixInstanceType",
+            "ZabbixServerName"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Zabbix Mysql Database Configuration"
+          },
+          "Parameters": [
+            "DomainName",
+            "DatabasePass"
+          ]
+        },
+        {
+          "Label": {
+            "default": "AWS QS Configuration"
+          },
+          "Parameters": [
+            "QSS3BucketName",
+            "QSS3KeyPrefix"
+          ]
         }
-    },
-    "Parameters": {
-
+      ],
+      "ParameterLabels": {
+        "ZabbixServerName": {
+          "default": "DNS/Tag Name for Server"
+        },
         "DatabasePass": {
-            "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{3,50})",
-            "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
-            "Description": "Enter your Database Password, Min 8, maximum of 30 characters. This password is used for the admin user of Zabbix Mysql Database.",
-            "NoEcho": "true",
-            "Type": "String",
-            "Default": "dgGGk.juki78$$"
+          "default": "Zabbix Database Password"
         },
-
         "DomainName": {
-            "ConstraintDescription": "String domain name.",
-            "Default": "mon",
-            "Description": "Name of Domain to reach your Zabbix Endpoint after setup.",
-            "Type": "String"
-        },
-
-        "KeyPairName": {
-            "ConstraintDescription": "must be the name of an existing EC2 KeyPair.",
-            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
-            "Type": "AWS::EC2::KeyPair::KeyName"
+          "default": "Domain Name"
         },
         "ZabbixInstanceType": {
-            "AllowedValues": [
-                "t2.medium",
-                "t2.large",
-                "m3.medium",
-                "m3.large",
-                "m3.xlarge",
-                "m3.2xlarge",
-                "m4.large",
-                "m4.xlarge",
-                "m4.2xlarge",
-                "m4.4xlarge",
-                "m4.10xlarge",
-                "r3.large",
-                "r3.xlarge",
-                "r3.2xlarge",
-                "r3.4xlarge",
-                "r3.8xlarge",
-                "r4.8xlarge",
-                "r4.16xlarge"
-            ],
-            "ConstraintDescription": "Must be a valid EC2 instance type.",
-            "Default": "m3.2xlarge",
-            "Description": "Choose your Custom Instance type for Zabbix Server",
-            "Type": "String"
+          "default": "Zabbix Custom Instance Type"
         },
         "PrivateSubnetID": {
-            "Description": "ID of the private subnet aka Availability Zone(e.g., subnet-a0246dcd)",
-            "Type": "AWS::EC2::Subnet::Id"
+          "default": "Private Subnet ID"
         },
         "PublicSubnetID": {
-            "Description": "ID of the public subnet aka Availability Zone for the LoadBalancer(e.g., subnet-a0246dcd)",
-            "Type": "AWS::EC2::Subnet::Id"
+          "default": "Public Subnet ID"
         },
         "QSS3BucketName": {
-            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
-            "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
-            "Default": "quickstart-reference-as",
-            "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
-            "Type": "String"
+          "default": "Quick Start S3 Bucket Name"
         },
         "QSS3KeyPrefix": {
-            "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
-            "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
-            "Default": "zabbix/setup/latest",
-            "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
-            "Type": "String"
+          "default": "Quick Start S3 Key Prefix"
         },
         "VPCID": {
-            "Description": "ID of the VPC (e.g., vpc-0343606e)",
-            "Default": "vpc-77e23811",
-            "Type": "AWS::EC2::VPC::Id"
+          "default": "VPC ID"
         },
         "ZabbixAMIOS": {
-            "AllowedValues": [
-                "RHEL72HVM"
-            ],
-            "Default": "RHEL72HVM",
-            "Description": "Operating system and version for Zabbix Server.",
-            "Type": "String"
-        },
-        "ZabbixServerName": {
-            "Default": "Zabbix",
-            "Description": "Name for EC2 Instance/Tag.",
-            "Type": "String"
+          "default": "Zabbix Operating System"
         }
-    },
-
-    "Conditions": {
-        "IsAZLinux": {
-            "Fn::Equals": [{
-                "Ref": "ZabbixAMIOS"
-            }, "AmazonLinux"]
-        }
-
-    },
-
-    "Rules": {
-        "SubnetsInVPC": {
-            "Assertions": [{
-                "Assert": {
-                    "Fn::EachMemberIn": [{
-                            "Fn::ValueOfAll": [
-                                "AWS::EC2::Subnet::Id",
-                                "VpcId"
-                            ]
-                        },
-                        {
-                            "Fn::RefAll": "AWS::EC2::VPC::Id"
-                        }
-                    ]
-                },
-                "AssertDescription": "All subnets must in the VPC"
-            }]
-        }
-    },
-    "Mappings": {
-        "AWSAMIRegionMap": {
-            "AMI": {
-
-                "RHEL72HVM": "RHEL-7.2_HVM-20161025-x86_64-1-Hourly2-GP2"
-            },
-            "ap-northeast-1": {
-
-                "RHEL72HVM": "ami-2265c543"
-            },
-            "ap-northeast-2": {
-
-                "RHEL72HVM": "ami-a9e532c7"
-            },
-            "ap-south-1": {
-
-                "RHEL72HVM": "ami-917205fe"
-            },
-            "ap-southeast-1": {
-
-                "RHEL72HVM": "ami-22953841"
-            },
-            "ap-southeast-2": {
-
-                "RHEL72HVM": "ami-91cdf0f2"
-            },
-            "eu-central-1": {
-
-                "RHEL72HVM": "ami-7def1712"
-            },
-            "eu-west-1": {
-
-                "RHEL72HVM": "ami-b22961c1"
-            },
-            "sa-east-1": {
-
-                "RHEL72HVM": "ami-28f66a44"
-            },
-            "us-east-1": {
-
-                "RHEL72HVM": "ami-873e6190"
-            },
-            "us-east-2": {
-
-                "RHEL72HVM": "ami-873e6190"
-            },
-            "us-west-1": {
-
-                "RHEL72HVM": "ami-f88fc498"
-            },
-            "us-west-2": {
-
-                "RHEL72HVM": "ami-5dd3743d"
-            }
-        },
-        "AWSInfoRegionMap": {
-            "ap-northeast-1": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            },
-            "ap-northeast-2": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            },
-            "ap-south-1": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            },
-            "ap-southeast-1": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            },
-            "ap-southeast-2": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            },
-            "eu-central-1": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            },
-            "eu-west-1": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            },
-            "sa-east-1": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            },
-            "us-east-1": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            },
-            "us-east-2": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            },
-            "us-gov-west-1": {
-                "Partition": "aws-us-gov",
-                "QuickStartS3URL": "https://s3-us-gov-west-1.amazonaws.com"
-            },
-            "us-west-1": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            },
-            "us-west-2": {
-                "Partition": "aws",
-                "QuickStartS3URL": "https://s3.amazonaws.com"
-            }
-        },
-        "ZabbixAMINameMap": {
-            "RHEL72HVM": {
-                "Code": "RHEL72HVM",
-                "repo": ""
-            },
-            "AZLinux": {
-                "Code": "AZLinux",
-                "repo": ""
-            }
-        }
-    },
-    "Resources": {
-
-        "Route53PrivateHostedZone": {
-            "Type": "AWS::Route53::HostedZone",
-            "Properties": {
-                "HostedZoneConfig": {
-                    "Comment": "Private Hosted Zone for Zabbix Domain"
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "", [{
-                                "Ref": "DomainName"
-                            },
-                            "."
-                        ]
-                    ]
-                },
-                "VPCs": [{
-                    "VPCId": {
-                        "Ref": "VPCID"
-                    },
-                    "VPCRegion": {
-                        "Ref": "AWS::Region"
-                    }
-                }]
-            }
-        },
-        "Route53RecordSetZabbix": {
-            "Type": "AWS::Route53::RecordSet",
-            "Properties": {
-                "HostedZoneId": {
-                    "Ref": "Route53PrivateHostedZone"
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "", [{
-                                "Ref": "ZabbixServerName"
-                            },
-                            ".",
-                            {
-                                "Ref": "DomainName"
-                            },
-                            "."
-                        ]
-                    ]
-                },
-                "Type": "A",
-                "ResourceRecords": [{
-                    "Fn::GetAtt": ["ZabbixInstance", "PrivateIp"]
-                }],
-                "TTL": "60"
-            }
-        },
-        "InstanceRoleZabbix": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Statement": [{
-                        "Effect": "Allow",
-                        "Principal": {
-                            "Service": [
-                                "ec2.amazonaws.com"
-                            ]
-                        },
-                        "Action": [
-                            "sts:AssumeRole"
-                        ]
-                    }]
-                },
-                "Path": "/"
-            }
-        },
-
-        "InstanceProfileZabbix": {
-            "Type": "AWS::IAM::InstanceProfile",
-            "Properties": {
-                "Path": "/",
-                "Roles": [{
-                    "Ref": "InstanceRoleZabbix"
-                }]
-            }
-        },
-        "ZabbixServerAccessSecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VPCID"
-                },
-                "GroupName": "Zabbix Server Access Security Group",
-                "GroupDescription": "Instances with management access to Zabbix server"
-            }
-        },
-        "ZabbixServerSecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VPCID"
-                },
-                "GroupName": "Zabbix Server Security Group",
-                "GroupDescription": "Zabbix server management and access ports",
-                "SecurityGroupIngress": [{
-                        "IpProtocol": "tcp",
-                        "FromPort": "22",
-                        "ToPort": "22",
-                        "SourceSecurityGroupId": {
-                            "Ref": "ZabbixServerAccessSecurityGroup"
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "80",
-                        "ToPort": "80",
-                        "SourceSecurityGroupId": {
-                            "Ref": "ZabbixELBSecurityGroup"
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "443",
-                        "ToPort": "443",
-                        "SourceSecurityGroupId": {
-                            "Ref": "ZabbixELBSecurityGroup"
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "10050",
-                        "ToPort": "10050",
-                        "SourceSecurityGroupId": {
-                            "Ref": "ZabbixAgentsSecurityGroup"
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "10051",
-                        "ToPort": "10051",
-                        "SourceSecurityGroupId": {
-                            "Ref": "ZabbixAgentsSecurityGroup"
-                        }
-                    }
-
-                ]
-            }
-        },
-        "ZabbixAgentsSecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VPCID"
-                },
-                "GroupName": "Zabbix Agents Security Group",
-                "GroupDescription": "Zabbix inter-agent communication and management ports"
-
-            }
-        },
-        "ZabbixELBSecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VPCID"
-                },
-                "GroupName": "Zabbix ELB Security Group",
-                "GroupDescription": "Zabbix ELB http, https communication and management ports",
-                "SecurityGroupIngress": [{
-                        "IpProtocol": "tcp",
-                        "FromPort": "443",
-                        "ToPort": "443",
-                        "CidrIp": "0.0.0.0/0"
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "80",
-                        "ToPort": "80",
-                        "CidrIp": "0.0.0.0/0"
-                    }
-                ]
-            }
-        },
-        "ZabbixLoadBalancer": {
-            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
-            "Properties": {
-
-                "Scheme": "internet-facing",
-                "SecurityGroups": [{ "Ref": "ZabbixELBSecurityGroup" }],
-                "Subnets": [{
-                    "Ref": "PublicSubnetID"
-                }],
-                "Instances": [{
-                    "Ref": "ZabbixInstance"
-                }],
-                "Listeners": [{
-                    "LoadBalancerPort": "80",
-                    "InstancePort": "80",
-                    "Protocol": "HTTP"
-
-                }],
-                "HealthCheck": {
-                    "Target": "TCP:80",
-                    "HealthyThreshold": "3",
-                    "UnhealthyThreshold": "5",
-                    "Interval": "30",
-                    "Timeout": "5"
-                }
-
-            }
-        },
-
-        "ZabbixInstance": {
-            "Type": "AWS::EC2::Instance",
-            "Metadata": {
-                "AWS::CloudFormation::Init": {
-                    "config": {
-                        "files": {
-                            "/tmp/zabbix-setup.txt": {
-                                "content": {
-                                    "Fn::Join": [
-                                        "", [
-                                            "QuickStartS3URL|",
-                                            {
-                                                "Fn::FindInMap": [
-                                                    "AWSInfoRegionMap",
-                                                    {
-                                                        "Ref": "AWS::Region"
-                                                    },
-                                                    "QuickStartS3URL"
-                                                ]
-                                            },
-                                            "\n",
-                                            "QSS3BucketName|",
-                                            {
-                                                "Ref": "QSS3BucketName"
-                                            },
-                                            "\n",
-                                            "QSS3KeyPrefix|",
-                                            {
-                                                "Ref": "QSS3KeyPrefix"
-                                            },
-                                            "\n",
-                                            "DatabasePass|",
-                                            {
-                                                "Ref": "DatabasePass"
-                                            },
-                                            "\n"
-
-                                        ]
-                                    ]
-                                },
-                                "mode": "000440",
-                                "owner": "root",
-                                "group": "root"
-                            },
-                            "/tmp/bootstrapZabbix.sh": {
-                                "source": {
-                                    "Fn::Join": [
-                                        "/", [{
-                                                "Fn::FindInMap": [
-                                                    "AWSInfoRegionMap",
-                                                    {
-                                                        "Ref": "AWS::Region"
-                                                    },
-                                                    "QuickStartS3URL"
-                                                ]
-                                            },
-                                            {
-                                                "Ref": "QSS3BucketName"
-                                            },
-                                            {
-                                                "Ref": "QSS3KeyPrefix"
-                                            },
-                                            "Scripts/bootstrapZabbix.sh"
-                                        ]
-                                    ]
-                                },
-                                "mode": "000777",
-                                "owner": "root",
-                                "group": "root"
-                            }
-                        }
-                    }
-                }
-            },
-            "Properties": {
-                "IamInstanceProfile": {
-                    "Ref": "InstanceProfileZabbix"
-                },
-                "ImageId": {
-                    "Fn::FindInMap": [
-                        "AWSAMIRegionMap",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        {
-                            "Fn::FindInMap": [
-                                "ZabbixAMINameMap",
-                                {
-                                    "Ref": "ZabbixAMIOS"
-                                },
-                                "Code"
-                            ]
-                        }
-                    ]
-                },
-                "SecurityGroupIds": [{
-                    "Ref": "ZabbixServerSecurityGroup"
-                }, {
-                    "Ref": "ZabbixAgentsSecurityGroup"
-                }],
-
-
-                "SubnetId": {
-                    "Ref": "PrivateSubnetID"
-                },
-                "InstanceType": {
-                    "Ref": "ZabbixInstanceType"
-                },
-                "KeyName": {
-                    "Ref": "KeyPairName"
-                },
-
-                "UserData": {
-                    "Fn::Base64": {
-                        "Fn::Join": [
-                            "", [
-                                "#!/bin/bash \n",
-                                "cd /tmp \n",
-                                "curl -O https://bootstrap.pypa.io/get-pip.py\n",
-                                "python get-pip.py\n",
-                                "echo DEBUGPipInstalled &> /tmp/bootstrap.log\n",
-                                "pip install awscli\n",
-                                "curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
-                                "gunzip aws-cfn-bootstrap-latest.tar.gz\n",
-                                "tar -xvf aws-cfn-bootstrap-latest.tar\n",
-                                "cd aws-cfn-bootstrap*\n",
-                                "python setup.py build\n",
-                                "python setup.py install\n",
-                                "yum install -y zip\n",
-                                "yum install -y unzip\n",
-                                "/usr/bin/cfn-init -v ",
-                                "         --stack ",
-                                {
-                                    "Ref": "AWS::StackName"
-                                },
-                                "         --resource ZabbixInstance ",
-                                "         --region ",
-                                {
-                                    "Ref": "AWS::Region"
-                                },
-                                "\n",
-                                "/tmp/bootstrapZabbix.sh --v --params_file /tmp/zabbix-setup.txt &>> /tmp/bootstrap.log\n",
-                                "/usr/bin/cfn-signal -e $? ",
-                                "         --stack ",
-                                {
-                                    "Ref": "AWS::StackName"
-                                },
-                                "         --resource ZabbixInstance ",
-                                "         --region ",
-                                {
-                                    "Ref": "AWS::Region"
-                                },
-                                "\n"
-                            ]
-                        ]
-                    }
-                },
-                "Tags": [{
-                    "Key": "Name",
-                    "Value": {
-                        "Ref": "ZabbixServerName"
-                    }
-                }]
-            },
-            "CreationPolicy": {
-                "ResourceSignal": {
-                    "Timeout": "PT90M"
-                }
-            }
-        }
-
-    },
-    "Outputs": {
-
-        "ZabbixServerName": {
-            "Value": {
-                "Ref": "ZabbixServerName"
-            },
-            "Description": "Zabbix Server Name"
-        },
-        "ZabbixPrivateIPAddress": {
-            "Value": {
-
-                "Fn::GetAtt": ["ZabbixInstance", "PrivateIp"]
-
-            },
-            "Description": "Zabbix Instance private IP address"
-        },
-
-        "ZabbixServerURl": {
-            "Value": {
-
-                "Fn::GetAtt": ["ZabbixLoadBalancer", "DNSName"]
-            },
-
-            "Description": "Zabbix WEB URL"
-        }
-
+      }
     }
+  },
+  "Parameters": {
+    "DatabasePass": {
+      "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{3,50})",
+      "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
+      "Description": "Enter your Database Password, Min 8, maximum of 30 characters. This password is used for the admin user of Zabbix Mysql Database.",
+      "NoEcho": "true",
+      "Type": "String",
+      "Default": "dgGGk.juki78$$"
+    },
+    "DomainName": {
+      "ConstraintDescription": "String domain name.",
+      "Default": "mon",
+      "Description": "Name of Domain to reach your Zabbix Endpoint after setup.",
+      "Type": "String"
+    },
+    "KeyPairName": {
+      "ConstraintDescription": "must be the name of an existing EC2 KeyPair.",
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "ZabbixInstanceType": {
+      "AllowedValues": [
+        "t2.medium",
+        "t2.large",
+        "m3.medium",
+        "m3.large",
+        "m3.xlarge",
+        "m3.2xlarge",
+        "m4.large",
+        "m4.xlarge",
+        "m4.2xlarge",
+        "m4.4xlarge",
+        "m4.10xlarge",
+        "r3.large",
+        "r3.xlarge",
+        "r3.2xlarge",
+        "r3.4xlarge",
+        "r3.8xlarge",
+        "r4.8xlarge",
+        "r4.16xlarge"
+      ],
+      "ConstraintDescription": "Must be a valid EC2 instance type.",
+      "Default": "m3.2xlarge",
+      "Description": "Choose your Custom Instance type for Zabbix Server",
+      "Type": "String"
+    },
+    "PrivateSubnetID": {
+      "Description": "ID of the private subnet aka Availability Zone(e.g., subnet-a0246dcd)",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "PublicSubnetID": {
+      "Description": "ID of the public subnet aka Availability Zone for the LoadBalancer(e.g., subnet-a0246dcd)",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "QSS3BucketName": {
+      "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+      "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Default": "quickstart-reference-as",
+      "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Type": "String"
+    },
+    "QSS3KeyPrefix": {
+      "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
+      "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+      "Default": "zabbix/setup/latest",
+      "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+      "Type": "String"
+    },
+    "VPCID": {
+      "Description": "ID of the VPC (e.g., vpc-0343606e)",
+      "Default": "vpc-77e23811",
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "ZabbixAMIOS": {
+      "AllowedValues": [
+        "RHEL72HVM"
+      ],
+      "Default": "RHEL72HVM",
+      "Description": "Operating system and version for Zabbix Server.",
+      "Type": "String"
+    },
+    "ZabbixServerName": {
+      "Default": "Zabbix",
+      "Description": "Name for EC2 Instance/Tag.",
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "IsAZLinux": {
+      "Fn::Equals": [
+        {
+          "Ref": "ZabbixAMIOS"
+        },
+        "AmazonLinux"
+      ]
+    }
+  },
+  "Rules": {
+    "SubnetsInVPC": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::EachMemberIn": [
+              {
+                "Fn::ValueOfAll": [
+                  "AWS::EC2::Subnet::Id",
+                  "VpcId"
+                ]
+              },
+              {
+                "Fn::RefAll": "AWS::EC2::VPC::Id"
+              }
+            ]
+          },
+          "AssertDescription": "All subnets must in the VPC"
+        }
+      ]
+    },
+    "PrivateandPublicSameAZ": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Equals": [
+              {
+                "Fn::ValueOf": [
+                  "PrivateSubnetID",
+                  "AvailabilityZone"
+                ]
+              },
+              {
+                "Fn::ValueOf": [
+                  "PublicSubnetID",
+                  "AvailabilityZone"
+                ]
+              }
+            ]
+          },
+          "AssertDescription": "Must have the ELB (Public Subnet) in the same AZ as the Private Subnet."
+        }
+      ]
+    }
+  },
+  "Mappings": {
+    "AWSAMIRegionMap": {
+      "AMI": {
+        "RHEL72HVM": "RHEL-7.2_HVM-20161025-x86_64-1-Hourly2-GP2"
+      },
+      "ap-northeast-1": {
+        "RHEL72HVM": "ami-2265c543"
+      },
+      "ap-northeast-2": {
+        "RHEL72HVM": "ami-a9e532c7"
+      },
+      "ap-south-1": {
+        "RHEL72HVM": "ami-917205fe"
+      },
+      "ap-southeast-1": {
+        "RHEL72HVM": "ami-22953841"
+      },
+      "ap-southeast-2": {
+        "RHEL72HVM": "ami-91cdf0f2"
+      },
+      "eu-central-1": {
+        "RHEL72HVM": "ami-7def1712"
+      },
+      "eu-west-1": {
+        "RHEL72HVM": "ami-b22961c1"
+      },
+      "sa-east-1": {
+        "RHEL72HVM": "ami-28f66a44"
+      },
+      "us-east-1": {
+        "RHEL72HVM": "ami-873e6190"
+      },
+      "us-east-2": {
+        "RHEL72HVM": "ami-873e6190"
+      },
+      "us-west-1": {
+        "RHEL72HVM": "ami-f88fc498"
+      },
+      "us-west-2": {
+        "RHEL72HVM": "ami-5dd3743d"
+      }
+    },
+    "AWSInfoRegionMap": {
+      "ap-northeast-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-northeast-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-south-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-southeast-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-southeast-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "eu-central-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "eu-west-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "sa-east-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-east-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-east-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-gov-west-1": {
+        "Partition": "aws-us-gov",
+        "QuickStartS3URL": "https://s3-us-gov-west-1.amazonaws.com"
+      },
+      "us-west-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-west-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      }
+    },
+    "ZabbixAMINameMap": {
+      "RHEL72HVM": {
+        "Code": "RHEL72HVM",
+        "repo": ""
+      },
+      "AZLinux": {
+        "Code": "AZLinux",
+        "repo": ""
+      }
+    }
+  },
+  "Resources": {
+    "Route53PrivateHostedZone": {
+      "Type": "AWS::Route53::HostedZone",
+      "Properties": {
+        "HostedZoneConfig": {
+          "Comment": "Private Hosted Zone for Zabbix Domain"
+        },
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "DomainName"
+              },
+              "."
+            ]
+          ]
+        },
+        "VPCs": [
+          {
+            "VPCId": {
+              "Ref": "VPCID"
+            },
+            "VPCRegion": {
+              "Ref": "AWS::Region"
+            }
+          }
+        ]
+      }
+    },
+    "Route53RecordSetZabbix": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "Route53PrivateHostedZone"
+        },
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "ZabbixServerName"
+              },
+              ".",
+              {
+                "Ref": "DomainName"
+              },
+              "."
+            ]
+          ]
+        },
+        "Type": "A",
+        "ResourceRecords": [
+          {
+            "Fn::GetAtt": [
+              "ZabbixInstance",
+              "PrivateIp"
+            ]
+          }
+        ],
+        "TTL": "60"
+      }
+    },
+    "InstanceRoleZabbix": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/"
+      }
+    },
+    "InstanceProfileZabbix": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "InstanceRoleZabbix"
+          }
+        ]
+      }
+    },
+    "ZabbixServerAccessSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "GroupName": "Zabbix Server Access Security Group",
+        "GroupDescription": "Instances with management access to Zabbix server"
+      }
+    },
+    "ZabbixServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "GroupName": "Zabbix Server Security Group",
+        "GroupDescription": "Zabbix server management and access ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixServerAccessSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixELBSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixELBSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "10050",
+            "ToPort": "10050",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixAgentsSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "10051",
+            "ToPort": "10051",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixAgentsSecurityGroup"
+            }
+          }
+        ]
+      }
+    },
+    "ZabbixAgentsSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "GroupName": "Zabbix Agents Security Group",
+        "GroupDescription": "Zabbix inter-agent communication and management ports"
+      }
+    },
+    "ZabbixELBSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "GroupName": "Zabbix ELB Security Group",
+        "GroupDescription": "Zabbix ELB http, https communication and management ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "ZabbixLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Ref": "ZabbixELBSecurityGroup"
+          }
+        ],
+        "Subnets": [
+          {
+            "Ref": "PublicSubnetID"
+          }
+        ],
+        "Instances": [
+          {
+            "Ref": "ZabbixInstance"
+          }
+        ],
+        "Listeners": [
+          {
+            "LoadBalancerPort": "80",
+            "InstancePort": "80",
+            "Protocol": "HTTP"
+          }
+        ],
+        "HealthCheck": {
+          "Target": "TCP:80",
+          "HealthyThreshold": "3",
+          "UnhealthyThreshold": "5",
+          "Interval": "30",
+          "Timeout": "5"
+        }
+      }
+    },
+    "ZabbixInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "config": {
+            "files": {
+              "/tmp/zabbix-setup.txt": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "QuickStartS3URL|",
+                      {
+                        "Fn::FindInMap": [
+                          "AWSInfoRegionMap",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "QuickStartS3URL"
+                        ]
+                      },
+                      "\n",
+                      "QSS3BucketName|",
+                      {
+                        "Ref": "QSS3BucketName"
+                      },
+                      "\n",
+                      "QSS3KeyPrefix|",
+                      {
+                        "Ref": "QSS3KeyPrefix"
+                      },
+                      "\n",
+                      "DatabasePass|",
+                      {
+                        "Ref": "DatabasePass"
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000440",
+                "owner": "root",
+                "group": "root"
+              },
+              "/tmp/bootstrapZabbix.sh": {
+                "source": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Fn::FindInMap": [
+                          "AWSInfoRegionMap",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "QuickStartS3URL"
+                        ]
+                      },
+                      {
+                        "Ref": "QSS3BucketName"
+                      },
+                      {
+                        "Ref": "QSS3KeyPrefix"
+                      },
+                      "Scripts/bootstrapZabbix.sh"
+                    ]
+                  ]
+                },
+                "mode": "000777",
+                "owner": "root",
+                "group": "root"
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "IamInstanceProfile": {
+          "Ref": "InstanceProfileZabbix"
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "AWSAMIRegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            {
+              "Fn::FindInMap": [
+                "ZabbixAMINameMap",
+                {
+                  "Ref": "ZabbixAMIOS"
+                },
+                "Code"
+              ]
+            }
+          ]
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "ZabbixServerSecurityGroup"
+          },
+          {
+            "Ref": "ZabbixAgentsSecurityGroup"
+          }
+        ],
+        "SubnetId": {
+          "Ref": "PrivateSubnetID"
+        },
+        "InstanceType": {
+          "Ref": "ZabbixInstanceType"
+        },
+        "KeyName": {
+          "Ref": "KeyPairName"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash \n",
+                "cd /tmp \n",
+                "curl -O https://bootstrap.pypa.io/get-pip.py\n",
+                "python get-pip.py\n",
+                "echo DEBUGPipInstalled &> /tmp/bootstrap.log\n",
+                "pip install awscli\n",
+                "curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                "gunzip aws-cfn-bootstrap-latest.tar.gz\n",
+                "tar -xvf aws-cfn-bootstrap-latest.tar\n",
+                "cd aws-cfn-bootstrap*\n",
+                "python setup.py build\n",
+                "python setup.py install\n",
+                "yum install -y zip\n",
+                "yum install -y unzip\n",
+                "/usr/bin/cfn-init -v ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ZabbixInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "/tmp/bootstrapZabbix.sh --v --params_file /tmp/zabbix-setup.txt &>> /tmp/bootstrap.log\n",
+                "/usr/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ZabbixInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Ref": "ZabbixServerName"
+            }
+          }
+        ]
+      },
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Timeout": "PT90M"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ZabbixServerName": {
+      "Value": {
+        "Ref": "ZabbixServerName"
+      },
+      "Description": "Zabbix Server Name"
+    },
+    "ZabbixPrivateIPAddress": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ZabbixInstance",
+          "PrivateIp"
+        ]
+      },
+      "Description": "Zabbix Instance private IP address"
+    },
+    "ZabbixServerURl": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ZabbixLoadBalancer",
+          "DNSName"
+        ]
+      },
+      "Description": "Zabbix WEB URL"
+    }
+  }
 }
