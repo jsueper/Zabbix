@@ -10,7 +10,8 @@
           },
           "Parameters": [
             "VPCID",
-            "PrivateSubnetID",
+            "PrivateSubnetID1",
+            "PrivateSubnetID2",
             "PublicSubnetID"
           ]
         },
@@ -27,11 +28,13 @@
         },
         {
           "Label": {
-            "default": "Zabbix Mysql Database Configuration"
+            "default": "Zabbix Mysql/Aurora Database Configuration"
           },
           "Parameters": [
             "DomainName",
-            "DatabasePass"
+            "MasterUser",
+            "MasterPassword",
+            "ZabbixDatabaseType"
           ]
         },
         {
@@ -48,8 +51,11 @@
         "ZabbixServerName": {
           "default": "DNS/Tag Name for Server"
         },
-        "DatabasePass": {
-          "default": "Zabbix Database Password"
+        "MasterPassword": {
+          "default": "Zabbix Database Master Password"
+        },
+        "MasterUser": {
+          "default": "Zabbix Database Master User"
         },
         "DomainName": {
           "default": "Domain Name"
@@ -57,8 +63,11 @@
         "ZabbixInstanceType": {
           "default": "Zabbix Custom Instance Type"
         },
-        "PrivateSubnetID": {
-          "default": "Private Subnet ID"
+        "PrivateSubnetID1": {
+          "default": "Private Subnet ID1"
+        },
+        "PrivateSubnetID2": {
+          "default": "Private Subnet ID2"
         },
         "PublicSubnetID": {
           "default": "Public Subnet ID"
@@ -74,12 +83,15 @@
         },
         "ZabbixAMIOS": {
           "default": "Zabbix Operating System"
+        },
+        "ZabbixDatabaseType": {
+          "default": "Zabbix Database Engine Type"
         }
       }
     }
   },
   "Parameters": {
-    "DatabasePass": {
+    "MasterPassword": {
       "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{3,50})",
       "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
       "Description": "Enter your Database Password, Min 8, maximum of 30 characters. This password is used for the admin user of Zabbix Mysql Database.",
@@ -87,10 +99,17 @@
       "Type": "String",
       "Default": "dgGGk.juki78$$"
     },
+    "MasterUser": {
+      "AllowedPattern": "([A-Za-z0-9]{3,50})",
+      "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
+      "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Zabbix Mysql/Aurora Database.",
+      "Type": "String",
+      "Default": "zabbix"
+    },
     "DomainName": {
       "ConstraintDescription": "String domain name.",
       "Default": "mon",
-      "Description": "Name of Domain to reach your Zabbix Endpoint after setup.",
+      "Description": "Name of Private Route53 Domain to reach your Zabbix Endpoint after setup.",
       "Type": "String"
     },
     "KeyPairName": {
@@ -124,8 +143,22 @@
       "Description": "Choose your Custom Instance type for Zabbix Server",
       "Type": "String"
     },
-    "PrivateSubnetID": {
-      "Description": "ID of the private subnet aka Availability Zone(e.g., subnet-a0246dcd)",
+    "ZabbixDatabaseType": {
+      "AllowedValues": [
+        "AuroraRDSCluster",
+        "LocalMySql"
+      ],
+      "ConstraintDescription": "Must be a valid Database Engine type.",
+      "Default": "LocalMySql",
+      "Description": "Choose your Database Engine type for Zabbix Server",
+      "Type": "String"
+    },
+    "PrivateSubnetID1": {
+      "Description": "ID of the private subnet aka Availability Zone needed for Zabbix Server and DBSubnet(e.g., subnet-a0246dcd)",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "PrivateSubnetID2": {
+      "Description": "ID of the private subnet aka Availability Zone needed for DBSubnet(e.g., subnet-a0246dcd)",
       "Type": "AWS::EC2::Subnet::Id"
     },
     "PublicSubnetID": {
@@ -174,6 +207,22 @@
         },
         "AmazonLinux"
       ]
+    },
+    "UseAuroraRDS": {
+      "Fn::Equals": [
+        {
+          "Ref": "ZabbixDatabaseType"
+        },
+        "AuroraRDSCluster"
+      ]
+    },
+    "UseLocalMySql": {
+      "Fn::Equals": [
+        {
+          "Ref": "ZabbixDatabaseType"
+        },
+        "LocalMySql"
+      ]
     }
   },
   "Rules": {
@@ -204,7 +253,7 @@
             "Fn::Equals": [
               {
                 "Fn::ValueOf": [
-                  "PrivateSubnetID",
+                  "PrivateSubnetID1",
                   "AvailabilityZone"
                 ]
               },
@@ -358,8 +407,9 @@
         ]
       }
     },
-    "Route53RecordSetZabbix": {
+    "Route53RecordSetZabbixMySql": {
       "Type": "AWS::Route53::RecordSet",
+      "Condition": "UseLocalMySql",
       "Properties": {
         "HostedZoneId": {
           "Ref": "Route53PrivateHostedZone"
@@ -383,7 +433,41 @@
         "ResourceRecords": [
           {
             "Fn::GetAtt": [
-              "ZabbixInstance",
+              "ZabbixMySqlInstance",
+              "PrivateIp"
+            ]
+          }
+        ],
+        "TTL": "60"
+      }
+    },
+    "Route53RecordSetZabbixAurora": {
+      "Type": "AWS::Route53::RecordSet",
+      "Condition": "UseAuroraRDS",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "Route53PrivateHostedZone"
+        },
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "ZabbixServerName"
+              },
+              ".",
+              {
+                "Ref": "DomainName"
+              },
+              "."
+            ]
+          ]
+        },
+        "Type": "A",
+        "ResourceRecords": [
+          {
+            "Fn::GetAtt": [
+              "ZabbixAuroraInstance",
               "PrivateIp"
             ]
           }
@@ -519,8 +603,29 @@
         ]
       }
     },
-    "ZabbixLoadBalancer": {
+    "ZabbixDBSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Condition": "UseAuroraRDS",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "GroupDescription": "Zabbix RDS inter-server communication and management ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "3306",
+            "ToPort": "3306",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixServerSecurityGroup"
+            }
+          }
+        ]
+      }
+    },
+    "ZabbixMySqlLoadBalancer": {
       "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Condition": "UseLocalMySql",
       "Properties": {
         "Scheme": "internet-facing",
         "SecurityGroups": [
@@ -535,7 +640,7 @@
         ],
         "Instances": [
           {
-            "Ref": "ZabbixInstance"
+            "Ref": "ZabbixMySqlInstance"
           }
         ],
         "Listeners": [
@@ -554,8 +659,137 @@
         }
       }
     },
-    "ZabbixInstance": {
+    "ZabbixAuroraLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Condition": "UseAuroraRDS",
+      "Properties": {
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Ref": "ZabbixELBSecurityGroup"
+          }
+        ],
+        "Subnets": [
+          {
+            "Ref": "PublicSubnetID"
+          }
+        ],
+        "Instances": [
+          {
+            "Ref": "ZabbixAuroraInstance"
+          }
+        ],
+        "Listeners": [
+          {
+            "LoadBalancerPort": "80",
+            "InstancePort": "80",
+            "Protocol": "HTTP"
+          }
+        ],
+        "HealthCheck": {
+          "Target": "TCP:80",
+          "HealthyThreshold": "3",
+          "UnhealthyThreshold": "5",
+          "Interval": "30",
+          "Timeout": "5"
+        }
+      }
+    },
+    "ZABBIXDBCluster": {
+      "Type": "AWS::RDS::DBCluster",
+      "Condition": "UseAuroraRDS",
+      "Properties": {
+        "MasterUsername": {
+          "Ref": "MasterUser"
+        },
+        "MasterUserPassword": {
+          "Ref": "MasterPassword"
+        },
+        "Engine": "aurora",
+        "DBSubnetGroupName": {
+          "Ref": "ZABBIXDBSubnetGroup"
+        },
+        "DBClusterParameterGroupName": {
+          "Ref": "ZABBIXDBClusterParameterGroup"
+        },
+        "VpcSecurityGroupIds": [
+          {
+            "Ref": "ZabbixDBSecurityGroup"
+          }
+        ]
+      },
+      "DeletionPolicy": "Snapshot"
+    },
+    "ZABBIXDBSubnetGroup": {
+      "Type": "AWS::RDS::DBSubnetGroup",
+      "Condition": "UseAuroraRDS",
+      "Properties": {
+        "DBSubnetGroupDescription": "description",
+        "SubnetIds": [
+          {
+            "Ref": "PrivateSubnetID1"
+          },
+          {
+            "Ref": "PrivateSubnetID2"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Zabbix DB Subnet Group"
+          }
+        ]
+      }
+    },
+    "ZABBIXDBInstance": {
+      "Type": "AWS::RDS::DBInstance",
+      "Condition": "UseAuroraRDS",
+      "Properties": {
+        "DBInstanceClass": "db.r3.large",
+        "Engine": "aurora",
+        "DBSubnetGroupName": {
+          "Ref": "ZABBIXDBSubnetGroup"
+        },
+        "DBParameterGroupName": {
+          "Ref": "ZABBIXDBParameterGroup"
+        },
+        "DBClusterIdentifier": {
+          "Ref": "ZABBIXDBCluster"
+        },
+        "PubliclyAccessible": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Zabbix Aurora Database"
+          }
+        ]
+      }
+    },
+    "ZABBIXDBClusterParameterGroup": {
+      "Type": "AWS::RDS::DBClusterParameterGroup",
+      "Condition": "UseAuroraRDS",
+      "Properties": {
+        "Description": "Zabbix Aurora Cluster Parameter Group",
+        "Family": "aurora5.6",
+        "Parameters": {
+          "time_zone": "America/Denver"
+        }
+      }
+    },
+    "ZABBIXDBParameterGroup": {
+      "Type": "AWS::RDS::DBParameterGroup",
+      "Condition": "UseAuroraRDS",
+      "Properties": {
+        "Description": "Zabbix Aurora Parameter Group",
+        "Family": "aurora5.6",
+        "Parameters": {
+          "sql_mode": "IGNORE_SPACE"
+        }
+      }
+    },
+    "ZabbixMySqlInstance": {
       "Type": "AWS::EC2::Instance",
+      "Condition": "UseLocalMySql",
       "Metadata": {
         "AWS::CloudFormation::Init": {
           "config": {
@@ -588,7 +822,203 @@
                       "\n",
                       "DatabasePass|",
                       {
-                        "Ref": "DatabasePass"
+                        "Ref": "MasterPassword"
+                      },
+                      "\n",
+                      "DatabaseUser|",
+                      {
+                        "Ref": "MasterUser"
+                      },
+                      "\n",
+                      "DBConnString|NA",
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000440",
+                "owner": "root",
+                "group": "root"
+              },
+              "/tmp/bootstrapZabbix.sh": {
+                "source": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Fn::FindInMap": [
+                          "AWSInfoRegionMap",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "QuickStartS3URL"
+                        ]
+                      },
+                      {
+                        "Ref": "QSS3BucketName"
+                      },
+                      {
+                        "Ref": "QSS3KeyPrefix"
+                      },
+                      "Scripts/bootstrapZabbix.sh"
+                    ]
+                  ]
+                },
+                "mode": "000777",
+                "owner": "root",
+                "group": "root"
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "IamInstanceProfile": {
+          "Ref": "InstanceProfileZabbix"
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "AWSAMIRegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            {
+              "Fn::FindInMap": [
+                "ZabbixAMINameMap",
+                {
+                  "Ref": "ZabbixAMIOS"
+                },
+                "Code"
+              ]
+            }
+          ]
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "ZabbixServerSecurityGroup"
+          },
+          {
+            "Ref": "ZabbixAgentsSecurityGroup"
+          }
+        ],
+        "SubnetId": {
+          "Ref": "PrivateSubnetID1"
+        },
+        "InstanceType": {
+          "Ref": "ZabbixInstanceType"
+        },
+        "KeyName": {
+          "Ref": "KeyPairName"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash \n",
+                "cd /tmp \n",
+                "curl -O https://bootstrap.pypa.io/get-pip.py\n",
+                "python get-pip.py\n",
+                "echo DEBUGPipInstalled &> /tmp/bootstrap.log\n",
+                "pip install awscli\n",
+                "curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                "gunzip aws-cfn-bootstrap-latest.tar.gz\n",
+                "tar -xvf aws-cfn-bootstrap-latest.tar\n",
+                "cd aws-cfn-bootstrap*\n",
+                "python setup.py build\n",
+                "python setup.py install\n",
+                "yum install -y zip\n",
+                "yum install -y unzip\n",
+                "/usr/bin/cfn-init -v ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ZabbixMySqlInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "/tmp/bootstrapZabbix.sh --v --params_file /tmp/zabbix-setup.txt &>> /tmp/bootstrap.log\n",
+                "/usr/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ZabbixMySqlInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Ref": "ZabbixServerName"
+            }
+          }
+        ]
+      },
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Timeout": "PT90M"
+        }
+      }
+    },
+    "ZabbixAuroraInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Condition": "UseAuroraRDS",
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "config": {
+            "files": {
+              "/tmp/zabbix-setup.txt": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "QuickStartS3URL|",
+                      {
+                        "Fn::FindInMap": [
+                          "AWSInfoRegionMap",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "QuickStartS3URL"
+                        ]
+                      },
+                      "\n",
+                      "QSS3BucketName|",
+                      {
+                        "Ref": "QSS3BucketName"
+                      },
+                      "\n",
+                      "QSS3KeyPrefix|",
+                      {
+                        "Ref": "QSS3KeyPrefix"
+                      },
+                      "\n",
+                      "DatabasePass|",
+                      {
+                        "Ref": "MasterPassword"
+                      },
+                      "\n",
+                      "DatabaseUser|",
+                      {
+                        "Ref": "MasterUser"
+                      },
+                      "\n",
+                      "DBConnString|",
+                      {
+                        "Fn::GetAtt": [
+                          "ZABBIXDBCluster",
+                          "Endpoint.Address"
+                        ]
                       },
                       "\n"
                     ]
@@ -660,7 +1090,7 @@
           }
         ],
         "SubnetId": {
-          "Ref": "PrivateSubnetID"
+          "Ref": "PrivateSubnetID1"
         },
         "InstanceType": {
           "Ref": "ZabbixInstanceType"
@@ -692,7 +1122,7 @@
                 {
                   "Ref": "AWS::StackName"
                 },
-                "         --resource ZabbixInstance ",
+                "         --resource ZabbixAuroraInstance ",
                 "         --region ",
                 {
                   "Ref": "AWS::Region"
@@ -704,7 +1134,7 @@
                 {
                   "Ref": "AWS::StackName"
                 },
-                "         --resource ZabbixInstance ",
+                "         --resource ZabbixAuroraInstance ",
                 "         --region ",
                 {
                   "Ref": "AWS::Region"
@@ -727,7 +1157,8 @@
         "ResourceSignal": {
           "Timeout": "PT90M"
         }
-      }
+      },
+      "DependsOn": "ZABBIXDBInstance"
     }
   },
   "Outputs": {
@@ -737,23 +1168,53 @@
       },
       "Description": "Zabbix Server Name"
     },
-    "ZabbixPrivateIPAddress": {
+    "ZabbixMyqlPrivateIPAddress": {
+      "Condition": "UseLocalMySql",
       "Value": {
         "Fn::GetAtt": [
-          "ZabbixInstance",
+          "ZabbixMySqlInstance",
           "PrivateIp"
         ]
       },
-      "Description": "Zabbix Instance private IP address"
+      "Description": "Zabbix  Instance private IP addres that uses local MySql"
     },
-    "ZabbixWebURL": {
+    "ZabbixAuroraPrivateIPAddress": {
+      "Condition": "UseAuroraRDS",
+      "Value": {
+        "Fn::GetAtt": [
+          "ZabbixAuroraInstance",
+          "PrivateIp"
+        ]
+      },
+      "Description": "Zabbix Instance private IP address that uses Aurora Cluster"
+    },
+    "ZabbixMySqlWebURL": {
+      "Condition": "UseLocalMySql",
       "Value": {
         "Fn::Join": [
           "/",
           [
             {
               "Fn::GetAtt": [
-                "ZabbixLoadBalancer",
+                "ZabbixMySqlLoadBalancer",
+                "DNSName"
+              ]
+            },
+            "zabbix"
+          ]
+        ]
+      },
+      "Description": "Zabbix Web  URL"
+    },
+    "ZabbixAuroraWebURL": {
+      "Condition": "UseAuroraRDS",
+      "Value": {
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": [
+                "ZabbixAuroraLoadBalancer",
                 "DNSName"
               ]
             },
