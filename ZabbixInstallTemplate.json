@@ -303,7 +303,7 @@
         "RHEL72HVM": "ami-873e6190"
       },
       "us-east-2": {
-        "RHEL72HVM": "ami-873e6190"
+        "RHEL72HVM": "ami-0a33696f"
       },
       "us-west-1": {
         "RHEL72HVM": "ami-f88fc498"
