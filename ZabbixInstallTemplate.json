@@ -92,8 +92,8 @@
   },
   "Parameters": {
     "MasterPassword": {
-      "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{3,50})",
-      "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
+      "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{8,50})",
+      "ConstraintDescription": "Input your database Password, Min 8, Maximum of 30 characters.",
       "Description": "Enter your Database Password, Min 8, maximum of 30 characters. This password is used for the admin user of Zabbix Mysql Database.",
       "NoEcho": "true",
       "Type": "String",
