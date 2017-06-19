@@ -1,0 +1,58 @@
+[
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "zabbixquickstart"
+  },
+  {
+    "ParameterKey": "QSS3KeyPrefix",
+    "ParameterValue": "zabbix/setup/latest"
+  },
+  {
+    "ParameterKey": "PrivateSubnetID1",
+    "ParameterValue": "subnet-64db932d"
+  },
+  {
+    "ParameterKey": "PrivateSubnetID2",
+    "ParameterValue": "subnet-940192cf"
+  },
+  {
+    "ParameterKey": "PublicSubnetID",
+    "ParameterValue": "subnet-87da92ce"
+  },
+  {
+    "ParameterKey": "ZabbixDatabaseType",
+    "ParameterValue": "AuroraRDSCluster"
+  },
+  {
+    "ParameterKey": "VPCID",
+    "ParameterValue": "vpc-77e23811"
+  },
+  {
+    "ParameterKey": "ZabbixServerName",
+    "ParameterValue": "Zabbix"
+  },
+  {
+    "ParameterKey": "KeyPairName",
+    "ParameterValue": "private-az-key"
+  },
+  {
+    "ParameterKey": "ZabbixAMIOS",
+    "ParameterValue": "RHEL72HVM"
+  },
+  {
+    "ParameterKey": "ZabbixInstanceType",
+    "ParameterValue": "m3.2xlarge"
+  },
+  {
+    "ParameterKey": "DomainName",
+    "ParameterValue": "mon"
+  },
+  {
+    "ParameterKey": "MasterPassword",
+    "ParameterValue": "dgGGk.juki78$$"
+  },
+  {
+    "ParameterKey": "MasterUser",
+    "ParameterValue": "zabbix"
+  }
+]

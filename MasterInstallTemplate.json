@@ -1,0 +1,396 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Master template that includes nested templates for installing a Zabbix, Grafana and RDS Aurora Cluster",
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Network Configuration"
+          },
+          "Parameters": [
+            "VPCID",
+            "PrivateSubnetID1",
+            "PrivateSubnetID2",
+            "PublicSubnetID"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Amazon Custom EC2 Configuration"
+          },
+          "Parameters": [
+            "KeyPairName",
+            "AMIOS",
+            "InstanceType",
+            "ZabbixServerName",
+            "GrafanaServerName"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Zabbix/Grafana Database Configuration"
+          },
+          "Parameters": [
+            "ZabbixDomainName",
+            "GrafanaDomainName",
+            "ZabbixMasterUser",
+            "GrafanaMasterUser",
+            "MasterPassword",
+            "ZabbixDatabaseType",
+            "GrafanaDatabaseType"
+          ]
+        },
+        {
+          "Label": {
+            "default": "AWS QS Configuration"
+          },
+          "Parameters": [
+            "QSS3BucketName",
+            "QSS3KeyPrefix"
+          ]
+        }
+      ],
+      "ParameterLabels": {
+        "ZabbixServerName": {
+          "default": "DNS/Tag Name for Zabbix Server"
+        },
+        "GrafanaServerName": {
+          "default": "DNS/Tag Name for Grafana Server"
+        },
+        "MasterPassword": {
+          "default": "Zabbix/Grafana Database Master Password"
+        },
+        "ZabbixMasterUser": {
+          "default": "Zabbix Database Master User"
+        },
+        "GrafanaMasterUser": {
+          "default": "Grafana Database Master User"
+        },
+        "ZabbixDomainName": {
+          "default": "Zabbix Domain Name"
+        },
+        "GrafanaDomainName": {
+          "default": "Grafana Domain Name"
+        },
+        "InstanceType": {
+          "default": "Zabbix/Grafana Custom Instance Type"
+        },
+        "PrivateSubnetID1": {
+          "default": "Private Subnet ID1"
+        },
+        "PrivateSubnetID2": {
+          "default": "Private Subnet ID2"
+        },
+        "PublicSubnetID": {
+          "default": "Public Subnet ID"
+        },
+        "QSS3BucketName": {
+          "default": "Quick Start S3 Bucket Name"
+        },
+        "QSS3KeyPrefix": {
+          "default": "Quick Start S3 Key Prefix"
+        },
+        "VPCID": {
+          "default": "VPC ID"
+        },
+        "AMIOS": {
+          "default": "Zabbix/Grafana Operating System"
+        },
+        "ZabbixDatabaseType": {
+          "default": "Zabbix Database Engine Type"
+        },
+        "GrafanaDatabaseType": {
+          "default": "Grafana Database Engine Type"
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "MasterPassword": {
+      "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{3,50})",
+      "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
+      "Description": "Enter your Database Password, Min 8, maximum of 30 characters. This password is used for the admin user of Zabbix/Grafana Database.",
+      "NoEcho": "true",
+      "Type": "String",
+      "Default": "dgGGk.juki78$$"
+    },
+    "ZabbixMasterUser": {
+      "AllowedPattern": "([A-Za-z0-9]{3,50})",
+      "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
+      "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Zabbix Mysql/Aurora Database.",
+      "Type": "String",
+      "Default": "zabbix"
+    },
+    "GrafanaMasterUser": {
+      "AllowedPattern": "([A-Za-z0-9]{3,50})",
+      "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
+      "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Grafana Sqlit3/Aurora Database.",
+      "Type": "String",
+      "Default": "grafana"
+    },
+    "ZabbixDomainName": {
+      "ConstraintDescription": "String domain name.",
+      "Default": "monitor",
+      "Description": "Name of Private Route53 Domain to reach your Zabbix Endpoint after setup.",
+      "Type": "String"
+    },
+    "GrafanaDomainName": {
+      "ConstraintDescription": "String domain name.",
+      "Default": "draw",
+      "Description": "Name of Private Route53 Domain to reach your Grafana Endpoint after setup.",
+      "Type": "String"
+    },
+    "KeyPairName": {
+      "ConstraintDescription": "must be the name of an existing EC2 KeyPair.",
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "InstanceType": {
+      "AllowedValues": [
+        "t2.medium",
+        "t2.large",
+        "m3.medium",
+        "m3.large",
+        "m3.xlarge",
+        "m3.2xlarge",
+        "m4.large",
+        "m4.xlarge",
+        "m4.2xlarge",
+        "m4.4xlarge",
+        "m4.10xlarge",
+        "r3.large",
+        "r3.xlarge",
+        "r3.2xlarge",
+        "r3.4xlarge",
+        "r3.8xlarge",
+        "r4.8xlarge",
+        "r4.16xlarge"
+      ],
+      "ConstraintDescription": "Must be a valid EC2 instance type.",
+      "Default": "m3.2xlarge",
+      "Description": "Choose your Custom Instance type for Zabbix/Grafana Server",
+      "Type": "String"
+    },
+    "ZabbixDatabaseType": {
+      "AllowedValues": [
+        "AuroraRDSCluster",
+        "LocalMySql"
+      ],
+      "ConstraintDescription": "Must be a valid Database Engine type.",
+      "Default": "LocalMySql",
+      "Description": "Choose your Database Engine type for Zabbix Server",
+      "Type": "String"
+    },
+    "GrafanaDatabaseType": {
+      "AllowedValues": [
+        "AuroraRDSCluster",
+        "LocalSqlite3"
+      ],
+      "ConstraintDescription": "Must be a valid Database Engine type.",
+      "Default": "LocalMySql",
+      "Description": "Choose your Database Engine type for Grafana Server",
+      "Type": "String"
+    },
+    "PrivateSubnetID1": {
+      "Description": "ID of the private subnet aka Availability Zone needed for Zabbix & Grafana Server and DBSubnet(e.g., subnet-a0246dcd)",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "PrivateSubnetID2": {
+      "Description": "ID of the private subnet aka Availability Zone needed for DBSubnet(e.g., subnet-a0246dcd)",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "PublicSubnetID": {
+      "Description": "ID of the public subnet aka Availability Zone for the LoadBalancer(e.g., subnet-a0246dcd)",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "QSS3BucketName": {
+      "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+      "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Default": "quickstart-reference-as",
+      "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Type": "String"
+    },
+    "QSS3KeyPrefix": {
+      "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
+      "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+      "Default": "zabbixgrafana/setup/latest",
+      "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+      "Type": "String"
+    },
+    "VPCID": {
+      "Description": "ID of the VPC (e.g., vpc-0343606e)",
+      "Default": "vpc-77e23811",
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "AMIOS": {
+      "AllowedValues": [
+        "RHEL72HVM"
+      ],
+      "Default": "RHEL72HVM",
+      "Description": "Operating system and version for Zabbix/Grafana Server.",
+      "Type": "String"
+    },
+    "ZabbixServerName": {
+      "AllowedPattern": "([A-Za-z0-9_]{3,50})",
+      "Default": "Zabbix",
+      "Description": "Name for Zabbix EC2 Instance/Tag.",
+      "Type": "String"
+    },
+    "GrafanaServerName": {
+      "AllowedPattern": "([A-Za-z0-9_]{3,50})",
+      "Default": "Grafana",
+      "Description": "Name for Grafana EC2 Instance/Tag.",
+      "Type": "String"
+    }
+  },
+  "Rules": {
+    "SubnetsInVPC": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::EachMemberIn": [
+              {
+                "Fn::ValueOfAll": [
+                  "AWS::EC2::Subnet::Id",
+                  "VpcId"
+                ]
+              },
+              {
+                "Fn::RefAll": "AWS::EC2::VPC::Id"
+              }
+            ]
+          },
+          "AssertDescription": "All subnets must in the VPC"
+        }
+      ]
+    },
+    "PrivateandPublicSameAZ": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Equals": [
+              {
+                "Fn::ValueOf": [
+                  "PrivateSubnetID1",
+                  "AvailabilityZone"
+                ]
+              },
+              {
+                "Fn::ValueOf": [
+                  "PublicSubnetID",
+                  "AvailabilityZone"
+                ]
+              }
+            ]
+          },
+          "AssertDescription": "Must have the ELB (PublicSubnetID) in the same AZ as the PrivateSubnetID1."
+        }
+      ]
+    }
+  },
+  "Resources": {
+    "ZabbixStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "ZabbixInstallTemplate.json"
+            ]
+          ]
+        },
+        "Parameters": {
+          "VpcId": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.VpcId"
+            ]
+          },
+          "DeployBastion": {
+            "Ref": "DeployBastion"
+          },
+          "SubnetId": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PublicSubnetA"
+            ]
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
+    "GraffanaStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "GrafanaInstallTemplate.json"
+            ]
+          ]
+        },
+        "Parameters": {
+          "VpcId": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.VpcId"
+            ]
+          },
+          "DeployBastion": {
+            "Ref": "DeployBastion"
+          },
+          "SubnetId": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PublicSubnetA"
+            ]
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    }
+  },
+  "Outputs": {
+    "VpcId": {
+      "Value": {
+        "Fn::GetAtt": [
+          "VPCStack",
+          "Outputs.VpcId"
+        ]
+      }
+    }
+  }
+}
