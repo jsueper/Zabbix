@@ -2,7 +2,7 @@
 
 set -o errexit -o xtrace
 
-bucket=zabbixquickstart
+bucket=quickstart-reference-as
 key=zabbixgrafana/setup/latest
 
 
@@ -15,4 +15,4 @@ aws s3 cp ../ZabbixInstallTemplate.json "s3://${bucket}/${key}/ZabbixInstallTemp
 
 
 
-#aws cloudformation create-stack --template-url https://s3.amazonaws.com/"${bucket}/${key}"/ZabbixInstallTemplate.json --stack-name ZABBIX-DEPLOY --parameters file://paramsZabbix.json --disable-rollback --capabilities CAPABILITY_IAM
+aws cloudformation create-stack --template-url https://s3.amazonaws.com/"${bucket}/${key}"/ZabbixInstallTemplate.json --stack-name ZABBIX-DEPLOY --parameters file://paramsZabbix.json --disable-rollback --capabilities CAPABILITY_IAM

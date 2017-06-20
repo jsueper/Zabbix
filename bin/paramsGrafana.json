@@ -1,7 +1,7 @@
 [
   {
     "ParameterKey": "QSS3BucketName",
-    "ParameterValue": "zabbixquickstart"
+    "ParameterValue": "quickstart-reference-as"
   },
   {
     "ParameterKey": "QSS3KeyPrefix",
@@ -41,11 +41,11 @@
   },
   {
     "ParameterKey": "GrafanaInstanceType",
-    "ParameterValue": "m3.2xlarge"
+    "ParameterValue": "m4.xlarge"
   },
   {
     "ParameterKey": "DomainName",
-    "ParameterValue": "mon"
+    "ParameterValue": "graph"
   },
   {
     "ParameterKey": "MasterPassword",

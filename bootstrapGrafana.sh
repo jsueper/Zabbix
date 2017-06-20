@@ -255,14 +255,12 @@ echo QS_END_Install_Grafana_Packages
 
 sudo rpm -Uvh grafana-4.3.1-1.x86_64.rpm
 
+echo QS_BEGIN_Install_Grafana_Zabbix_Plugin
 sudo krafana-cli plugins install alexanderzobnin-zabbix-app
-
+echo QS_END_Install_Grafana_Zabbix_Plugin
 
 #Creating Web Conf So User Doesn't have to go through web setup
 if [[ ${DATABASE_CONN_STRING} == 'NA' ]]; then
-
-echo QS_BEGIN_Create_Grafana_MySql_Web_Conf_File
-
 
 
 #Create the Grafana database
@@ -273,6 +271,24 @@ mysql -u root --password="${DATABASE_PASS}" -e "FLUSH PRIVILEGES;"
 echo QS_END_Create_Grafana_MySql_Database
 
 
+cd /etc/grafana/
+
+grep -A21 "\[database\]" config.ini | sed -i '' 's/sqlite3/mysql/' config.ini
+grep -A21 "\[database\]" config.ini | sed -i '' "s/;user = root/;user = ${DATABASE_USER}/" config.ini
+grep -A21 "\[database\]" config.ini | sed -i '' "s/;password =/;password = ${DATABASE_PASS}/" config.ini
+
+
+
+sudo touch create_grafana_session.sql
+
+chown grafana:dba create_grafana_session.sql
+
+sudo echo "create table 'session' ('key' char(16) not null, 'data' blob, 'expiry' init(11) unsigned not null, primary key ('key'))  ENGINE=MyISAM default charset=uf8;" >> create_grafana_session.sql
+
+#Run create.sql file against Grafanadb we created above to create user session schema.
+
+mysql --user=${DATABASE_USER} --password="${DATABASE_PASS}" grafana < create_grafana_session.sql
+
 
 fi
 
@@ -280,16 +296,18 @@ if [[ ${DATABASE_CONN_STRING} != 'NA' ]]; then
 
 echo QS_BEGIN_Create_Grafana_Aurora_Web_Conf_File
 
-sudo echo 'DBHost='${DATABASE_CONN_STRING} >>/etc/Grafana/Grafana_server.conf
-sudo echo 'DBPort=3306' >>/etc/Grafana/Grafana_server.conf
-
-
-
 #Create the Grafana database
 echo QS_BEGIN_Create_Grafana_Aurora_Database
-
 mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" -e "CREATE DATABASE grafana CHARACTER SET UTF8;"
 echo QS_END_Create_Grafana_Aurora_Database
+
+
+cd /etc/grafana/
+
+grep -A21 "\[database\]" config.ini | sed -i '' 's/sqlite3/mysql/' config.ini
+grep -A21 "\[database\]" config.ini | sed -i '' "s/127.*/${DATABASE_CONN_STRING}:3306/" config.ini
+grep -A21 "\[database\]" config.ini | sed -i '' "s/;user = root/;user = ${DATABASE_USER}/" config.ini
+grep -A21 "\[database\]" config.ini | sed -i '' "s/;password =/;password = ${DATABASE_PASS}/" config.ini
 
 
 cd /tmp

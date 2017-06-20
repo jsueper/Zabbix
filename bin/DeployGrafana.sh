@@ -2,7 +2,7 @@
 
 set -o errexit -o xtrace
 
-bucket=zabbixquickstart
+bucket=quickstart-reference-as
 key=zabbixgrafana/setup/latest
 
 

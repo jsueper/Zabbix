@@ -121,10 +121,6 @@
       "AllowedValues": [
         "t2.medium",
         "t2.large",
-        "m3.medium",
-        "m3.large",
-        "m3.xlarge",
-        "m3.2xlarge",
         "m4.large",
         "m4.xlarge",
         "m4.2xlarge",
@@ -139,7 +135,7 @@
         "r4.16xlarge"
       ],
       "ConstraintDescription": "Must be a valid EC2 instance type.",
-      "Default": "m3.2xlarge",
+      "Default": "m4.2xlarge",
       "Description": "Choose your Custom Instance type for Zabbix Server",
       "Type": "String"
     },
@@ -303,7 +299,7 @@
         "RHEL72HVM": "ami-873e6190"
       },
       "us-east-2": {
-        "RHEL72HVM": "ami-0a33696f"
+        "RHEL72HVM": "ami-873e6190"
       },
       "us-west-1": {
         "RHEL72HVM": "ami-f88fc498"
@@ -724,7 +720,7 @@
       "Type": "AWS::RDS::DBSubnetGroup",
       "Condition": "UseAuroraRDS",
       "Properties": {
-        "DBSubnetGroupDescription": "description",
+        "DBSubnetGroupDescription": "Zabbix Subnet Group",
         "SubnetIds": [
           {
             "Ref": "PrivateSubnetID1"

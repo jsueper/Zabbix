@@ -121,10 +121,6 @@
       "AllowedValues": [
         "t2.medium",
         "t2.large",
-        "m3.medium",
-        "m3.large",
-        "m3.xlarge",
-        "m3.2xlarge",
         "m4.large",
         "m4.xlarge",
         "m4.2xlarge",
@@ -139,7 +135,7 @@
         "r4.16xlarge"
       ],
       "ConstraintDescription": "Must be a valid EC2 instance type.",
-      "Default": "m3.2xlarge",
+      "Default": "m4.xlarge",
       "Description": "Choose your Custom Instance type for Grafana Server",
       "Type": "String"
     },
@@ -552,7 +548,7 @@
           }
         ]
       }
-    }
+    },
     "GrafanaELBSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
@@ -869,9 +865,6 @@
         "SecurityGroupIds": [
           {
             "Ref": "GrafanaServerSecurityGroup"
-          },
-          {
-            "Ref": "GrafanaAgentsSecurityGroup"
           }
         ],
         "SubnetId": {
@@ -1058,9 +1051,6 @@
         "SecurityGroupIds": [
           {
             "Ref": "GrafanaServerSecurityGroup"
-          },
-          {
-            "Ref": "GrafanaAgentsSecurityGroup"
           }
         ],
         "SubnetId": {

@@ -1,11 +1,11 @@
 [
   {
     "ParameterKey": "QSS3BucketName",
-    "ParameterValue": "zabbixquickstart"
+    "ParameterValue": "quickstart-reference-as"
   },
   {
     "ParameterKey": "QSS3KeyPrefix",
-    "ParameterValue": "zabbix/setup/latest"
+    "ParameterValue": "zabbixgrafana/setup/latest"
   },
   {
     "ParameterKey": "PrivateSubnetID1",
