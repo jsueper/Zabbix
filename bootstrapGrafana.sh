@@ -334,8 +334,6 @@ mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --passw
 echo QS_END_Apply_Grafana_Aurora_Schema
 
 
-
-mysql --user=grafana --host=grafana-deploy-grafanadbcluster-1qzocrjnfgxgu.cluster-cdtnc1nr0zsw.us-east-1.rds.amazonaws.com --port=3306 --password='dgGGk.juki78$$' grafana < create_grafana_session.sql
 fi
 
 
