@@ -17,4 +17,4 @@ aws s3 cp ../ZabbixInstallTemplate.json "s3://${bucket}/${key}/ZabbixInstallTemp
 
 
 
-aws cloudformation create-stack --template-url https://s3.amazonaws.com/"${bucket}/${key}"/MasterInstallTemplate.json --stack-name ZABBIX-GRAFANA-DEPLOY --parameters file://paramsZabbixGrafana.json --disable-rollback --capabilities CAPABILITY_IAM
+aws cloudformation create-stack --template-url https://s3.amazonaws.com/"${bucket}/${key}"/ZabbixGrafanaInstallTemplate.json --stack-name ZABBIX-GRAFANA-DEPLOY --parameters file://paramsZabbixGrafana.json --disable-rollback --capabilities CAPABILITY_IAM

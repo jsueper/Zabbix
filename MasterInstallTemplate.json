@@ -131,7 +131,7 @@
     },
     "ZabbixDomainName": {
       "ConstraintDescription": "String domain name.",
-      "Default": "monitor",
+      "Default": "mon",
       "Description": "Name of Private Route53 Domain to reach your Zabbix Endpoint after setup.",
       "Type": "String"
     },
@@ -150,10 +150,6 @@
       "AllowedValues": [
         "t2.medium",
         "t2.large",
-        "m3.medium",
-        "m3.large",
-        "m3.xlarge",
-        "m3.2xlarge",
         "m4.large",
         "m4.xlarge",
         "m4.2xlarge",
@@ -168,7 +164,7 @@
         "r4.16xlarge"
       ],
       "ConstraintDescription": "Must be a valid EC2 instance type.",
-      "Default": "m3.2xlarge",
+      "Default": "m4.xlarge",
       "Description": "Choose your Custom Instance type for Zabbix/Grafana Server",
       "Type": "String"
     },
@@ -188,7 +184,7 @@
         "LocalSqlite3"
       ],
       "ConstraintDescription": "Must be a valid Database Engine type.",
-      "Default": "LocalMySql",
+      "Default": "LocalSqlite3",
       "Description": "Choose your Database Engine type for Grafana Server",
       "Type": "String"
     },

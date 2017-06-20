@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "This is template deploys a Grafana server in an existing VPC environment.",
+  "Description": "This is template deploys a Zabbix and Grafana server in an existing VPC environment.",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [
@@ -21,20 +21,21 @@
           },
           "Parameters": [
             "KeyPairName",
-            "GrafanaAMIOS",
-            "GrafanaInstanceType",
+            "ZabbixGrafanaAMIOS",
+            "ZabbixGrafanaInstanceType",
+            "ZabbixServerName",
             "GrafanaServerName"
           ]
         },
         {
           "Label": {
-            "default": "Grafana Mysql/Aurora Database Configuration"
+            "default": "Zabbix Mysql/Aurora Database Configuration"
           },
           "Parameters": [
             "DomainName",
             "MasterUser",
             "MasterPassword",
-            "GrafanaDatabaseType"
+            "ZabbixGrafanaDatabaseType"
           ]
         },
         {
@@ -48,20 +49,23 @@
         }
       ],
       "ParameterLabels": {
+        "ZabbixServerName": {
+          "default": "DNS/Tag Name for Zabbix Server"
+        },
         "GrafanaServerName": {
-          "default": "DNS/Tag Name for Server"
+          "default": "DNS/Tag Name for Grafana Server"
         },
         "MasterPassword": {
-          "default": "Grafana Database Master Password"
+          "default": "Zabbix/Grafana Database Master Password"
         },
         "MasterUser": {
-          "default": "Grafana Database Master User"
+          "default": "Zabbix/Grafana Database Master User"
         },
         "DomainName": {
           "default": "Domain Name"
         },
-        "GrafanaInstanceType": {
-          "default": "Grafana Custom Instance Type"
+        "ZabbixGrafanaInstanceType": {
+          "default": "Zabbix/Grafana Custom Instance Type"
         },
         "PrivateSubnetID1": {
           "default": "Private Subnet ID1"
@@ -81,35 +85,35 @@
         "VPCID": {
           "default": "VPC ID"
         },
-        "GrafanaAMIOS": {
-          "default": "Grafana Operating System"
+        "ZabbixGrafanaAMIOS": {
+          "default": "Zabbix/Grafana Operating System"
         },
-        "GrafanaDatabaseType": {
-          "default": "Grafana Database Engine Type"
+        "ZabbixGrafanaDatabaseType": {
+          "default": "Zabbix/Grafana Database Engine Type"
         }
       }
     }
   },
   "Parameters": {
     "MasterPassword": {
-      "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{3,50})",
-      "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
-      "Description": "Enter your Database Password, Min 8, maximum of 30 characters. This password is used for the admin user of Grafana Database.",
+      "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{8,50})",
+      "ConstraintDescription": "Input your database Password, Min 8, Maximum of 30 characters.",
+      "Description": "Enter your Database Password, Min 8, maximum of 30 characters. This password is used for the admin user of Zabbix Mysql Database.",
       "NoEcho": "true",
       "Type": "String",
       "Default": "dgGGk.juki78$$"
     },
     "MasterUser": {
-      "AllowedPattern": "([A-Za-z0-9]{3,50})",
+      "AllowedPattern": "([A-Za-z0-9]{8,50})",
       "ConstraintDescription": "Input your database UserName, Min 3, Maximum of 30 characters.",
-      "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Grafana Sqllite/Aurora Database.",
+      "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Zabbix Mysql/Aurora Database.",
       "Type": "String",
-      "Default": "Grafana"
+      "Default": "zabbixgrafana"
     },
     "DomainName": {
       "ConstraintDescription": "String domain name.",
-      "Default": "graph",
-      "Description": "Name of Private Route53 Domain to reach your Grafana Endpoint after setup.",
+      "Default": "mon",
+      "Description": "Name of Private Route53 Domain to reach your Zabbix Endpoint after setup.",
       "Type": "String"
     },
     "KeyPairName": {
@@ -117,7 +121,7 @@
       "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
       "Type": "AWS::EC2::KeyPair::KeyName"
     },
-    "GrafanaInstanceType": {
+    "ZabbixGrafanaInstanceType": {
       "AllowedValues": [
         "t2.medium",
         "t2.large",
@@ -135,22 +139,22 @@
         "r4.16xlarge"
       ],
       "ConstraintDescription": "Must be a valid EC2 instance type.",
-      "Default": "m4.xlarge",
-      "Description": "Choose your Custom Instance type for Grafana Server",
+      "Default": "m4.2xlarge",
+      "Description": "Choose your Custom Instance type for Zabbix Server",
       "Type": "String"
     },
-    "GrafanaDatabaseType": {
+    "ZabbixGrafanaDatabaseType": {
       "AllowedValues": [
         "AuroraRDSCluster",
-        "Localsqlite3"
+        "LocalMySql"
       ],
       "ConstraintDescription": "Must be a valid Database Engine type.",
-      "Default": "Localsqlite3",
-      "Description": "Choose your Database Engine type for Grafana Server",
+      "Default": "LocalMySql",
+      "Description": "Choose your Database Engine type for Zabbix Server",
       "Type": "String"
     },
     "PrivateSubnetID1": {
-      "Description": "ID of the private subnet aka Availability Zone needed for Grafana Server and DBSubnet(e.g., subnet-a0246dcd)",
+      "Description": "ID of the private subnet aka Availability Zone needed for Zabbix Server and DBSubnet(e.g., subnet-a0246dcd)",
       "Type": "AWS::EC2::Subnet::Id"
     },
     "PrivateSubnetID2": {
@@ -180,16 +184,22 @@
       "Default": "vpc-77e23811",
       "Type": "AWS::EC2::VPC::Id"
     },
-    "GrafanaAMIOS": {
+    "ZabbixGrafanaAMIOS": {
       "AllowedValues": [
         "RHEL72HVM"
       ],
       "Default": "RHEL72HVM",
-      "Description": "Operating system and version for Grafana Server.",
+      "Description": "Operating system and version for Zabbix Server.",
+      "Type": "String"
+    },
+    "ZabbixServerName": {
+      "AllowedPattern": "([A-Za-z0-9]{3,50})",
+      "Default": "Zabbix",
+      "Description": "Name for EC2 Instance/Tag.",
       "Type": "String"
     },
     "GrafanaServerName": {
-      "AllowedPattern": "([A-Za-z0-9_]{3,50})",
+      "AllowedPattern": "([A-Za-z0-9]{3,50})",
       "Default": "Grafana",
       "Description": "Name for EC2 Instance/Tag.",
       "Type": "String"
@@ -199,7 +209,7 @@
     "IsAZLinux": {
       "Fn::Equals": [
         {
-          "Ref": "GrafanaAMIOS"
+          "Ref": "ZabbixGrafanaAMIOS"
         },
         "AmazonLinux"
       ]
@@ -207,17 +217,17 @@
     "UseAuroraRDS": {
       "Fn::Equals": [
         {
-          "Ref": "GrafanaDatabaseType"
+          "Ref": "ZabbixGrafanaDatabaseType"
         },
         "AuroraRDSCluster"
       ]
     },
-    "UseLocalsqlite3": {
+    "UseLocalMySql": {
       "Fn::Equals": [
         {
-          "Ref": "GrafanaDatabaseType"
+          "Ref": "ZabbixGrafanaDatabaseType"
         },
-        "Localsqlite3"
+        "LocalMySql"
       ]
     }
   },
@@ -261,7 +271,7 @@
               }
             ]
           },
-          "AssertDescription": "Must have the ELB (PublicSubnetED) in the same AZ as the PrivateSubnetID1."
+          "AssertDescription": "Must have the ELB (Public Subnet) in the same AZ as the Private Subnet."
         }
       ]
     }
@@ -299,7 +309,7 @@
         "RHEL72HVM": "ami-873e6190"
       },
       "us-east-2": {
-        "RHEL72HVM": "ami-873e6190"
+        "RHEL72HVM": "ami-873e6190ZabbixInstallTemplate.json"
       },
       "us-west-1": {
         "RHEL72HVM": "ami-f88fc498"
@@ -362,7 +372,7 @@
         "QuickStartS3URL": "https://s3.amazonaws.com"
       }
     },
-    "GrafanaAMINameMap": {
+    "ZabbixGrafanaAMINameMap": {
       "RHEL72HVM": {
         "Code": "RHEL72HVM",
         "repo": ""
@@ -378,7 +388,7 @@
       "Type": "AWS::Route53::HostedZone",
       "Properties": {
         "HostedZoneConfig": {
-          "Comment": "Private Hosted Zone for Grafana Domain"
+          "Comment": "Private Hosted Zone for Zabbix/Grafana Domain"
         },
         "Name": {
           "Fn::Join": [
@@ -403,9 +413,9 @@
         ]
       }
     },
-    "Route53RecordSetGrafanaSqlite3": {
+    "Route53RecordSetGrafanaMySql": {
       "Type": "AWS::Route53::RecordSet",
-      "Condition": "UseLocalsqlite3",
+      "Condition": "UseLocalMySql",
       "Properties": {
         "HostedZoneId": {
           "Ref": "Route53PrivateHostedZone"
@@ -429,7 +439,41 @@
         "ResourceRecords": [
           {
             "Fn::GetAtt": [
-              "GrafanaSqlite3Instance",
+              "GrafanaMySqlInstance",
+              "PrivateIp"
+            ]
+          }
+        ],
+        "TTL": "60"
+      }
+    },
+    "Route53RecordSetZabbixMySql": {
+      "Type": "AWS::Route53::RecordSet",
+      "Condition": "UseLocalMySql",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "Route53PrivateHostedZone"
+        },
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "ZabbixServerName"
+              },
+              ".",
+              {
+                "Ref": "DomainName"
+              },
+              "."
+            ]
+          ]
+        },
+        "Type": "A",
+        "ResourceRecords": [
+          {
+            "Fn::GetAtt": [
+              "ZabbixMySqlInstance",
               "PrivateIp"
             ]
           }
@@ -471,7 +515,41 @@
         "TTL": "60"
       }
     },
-    "InstanceRoleGrafana": {
+    "Route53RecordSetZabbixAurora": {
+      "Type": "AWS::Route53::RecordSet",
+      "Condition": "UseAuroraRDS",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "Route53PrivateHostedZone"
+        },
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "ZabbixServerName"
+              },
+              ".",
+              {
+                "Ref": "DomainName"
+              },
+              "."
+            ]
+          ]
+        },
+        "Type": "A",
+        "ResourceRecords": [
+          {
+            "Fn::GetAtt": [
+              "ZabbixAuroraInstance",
+              "PrivateIp"
+            ]
+          }
+        ],
+        "TTL": "60"
+      }
+    },
+    "InstanceRoleZabbixGrafana": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -492,13 +570,13 @@
         "Path": "/"
       }
     },
-    "InstanceProfileGrafana": {
+    "InstanceProfileZabbixGrafana": {
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
         "Path": "/",
         "Roles": [
           {
-            "Ref": "InstanceRoleGrafana"
+            "Ref": "InstanceRoleZabbixGrafana"
           }
         ]
       }
@@ -573,29 +651,9 @@
         ]
       }
     },
-    "GrafanaDBSecurityGroup": {
-      "Type": "AWS::EC2::SecurityGroup",
-      "Condition": "UseAuroraRDS",
-      "Properties": {
-        "VpcId": {
-          "Ref": "VPCID"
-        },
-        "GroupDescription": "Grafana RDS inter-server communication and management ports",
-        "SecurityGroupIngress": [
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "3306",
-            "ToPort": "3306",
-            "SourceSecurityGroupId": {
-              "Ref": "GrafanaServerSecurityGroup"
-            }
-          }
-        ]
-      }
-    },
-    "GrafanaSqlite3LoadBalancer": {
+    "GrafanaMySqlLoadBalancer": {
       "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
-      "Condition": "UseLocalsqlite3",
+      "Condition": "UseLocalMySql",
       "Properties": {
         "Scheme": "internet-facing",
         "SecurityGroups": [
@@ -665,7 +723,211 @@
         }
       }
     },
-    "GrafanaDBCluster": {
+    "ZabbixServerAccessSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "GroupName": "Zabbix Server Access Security Group",
+        "GroupDescription": "Instances with management access to Zabbix server"
+      }
+    },
+    "ZabbixServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "GroupName": "Zabbix Server Security Group",
+        "GroupDescription": "Zabbix server management and access ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixServerAccessSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixELBSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixELBSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "10050",
+            "ToPort": "10050",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixAgentsSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "10051",
+            "ToPort": "10051",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixAgentsSecurityGroup"
+            }
+          }
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "3000",
+            "ToPort": "3000",
+            "SourceSecurityGroupId": {
+              "Ref": "GrafanaServerSecurityGroup"
+            }
+          }
+        ]
+      }
+    },
+    "ZabbixAgentsSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "GroupName": "Zabbix Agents Security Group",
+        "GroupDescription": "Zabbix inter-agent communication and management ports"
+      }
+    },
+    "ZabbixELBSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "GroupName": "Zabbix ELB Security Group",
+        "GroupDescription": "Zabbix ELB http, https communication and management ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "ZabbixGrafanaDBSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Condition": "UseAuroraRDS",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "GroupDescription": "Zabbix RDS inter-server communication and management ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "3306",
+            "ToPort": "3306",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixServerSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "3306",
+            "ToPort": "3306",
+            "SourceSecurityGroupId": {
+              "Ref": "GrafanaServerSecurityGroup"
+            }
+          }
+        ]
+      }
+    },
+    "ZabbixMySqlLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Condition": "UseLocalMySql",
+      "Properties": {
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Ref": "ZabbixELBSecurityGroup"
+          }
+        ],
+        "Subnets": [
+          {
+            "Ref": "PublicSubnetID"
+          }
+        ],
+        "Instances": [
+          {
+            "Ref": "ZabbixMySqlInstance"
+          }
+        ],
+        "Listeners": [
+          {
+            "LoadBalancerPort": "80",
+            "InstancePort": "80",
+            "Protocol": "HTTP"
+          }
+        ],
+        "HealthCheck": {
+          "Target": "TCP:80",
+          "HealthyThreshold": "3",
+          "UnhealthyThreshold": "5",
+          "Interval": "30",
+          "Timeout": "5"
+        }
+      }
+    },
+    "ZabbixAuroraLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Condition": "UseAuroraRDS",
+      "Properties": {
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Ref": "ZabbixELBSecurityGroup"
+          }
+        ],
+        "Subnets": [
+          {
+            "Ref": "PublicSubnetID"
+          }
+        ],
+        "Instances": [
+          {
+            "Ref": "ZabbixAuroraInstance"
+          }
+        ],
+        "Listeners": [
+          {
+            "LoadBalancerPort": "80",
+            "InstancePort": "80",
+            "Protocol": "HTTP"
+          }
+        ],
+        "HealthCheck": {
+          "Target": "TCP:80",
+          "HealthyThreshold": "3",
+          "UnhealthyThreshold": "5",
+          "Interval": "30",
+          "Timeout": "5"
+        }
+      }
+    },
+    "ZABBIXGrafanaDBCluster": {
       "Type": "AWS::RDS::DBCluster",
       "Condition": "UseAuroraRDS",
       "Properties": {
@@ -677,24 +939,24 @@
         },
         "Engine": "aurora",
         "DBSubnetGroupName": {
-          "Ref": "GrafanaDBSubnetGroup"
+          "Ref": "ZABBIXGrafanaDBSubnetGroup"
         },
         "DBClusterParameterGroupName": {
-          "Ref": "GrafanaDBClusterParameterGroup"
+          "Ref": "ZABBIXGrafanaDBClusterParameterGroup"
         },
         "VpcSecurityGroupIds": [
           {
-            "Ref": "GrafanaDBSecurityGroup"
+            "Ref": "ZabbixGrafanaDBSecurityGroup"
           }
         ]
       },
       "DeletionPolicy": "Snapshot"
     },
-    "GrafanaDBSubnetGroup": {
+    "ZABBIXGrafanaDBSubnetGroup": {
       "Type": "AWS::RDS::DBSubnetGroup",
       "Condition": "UseAuroraRDS",
       "Properties": {
-        "DBSubnetGroupDescription": "description",
+        "DBSubnetGroupDescription": "Zabbix Subnet Group",
         "SubnetIds": [
           {
             "Ref": "PrivateSubnetID1"
@@ -706,60 +968,433 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Grafana DB Subnet Group"
+            "Value": "Zabbix/Grafana DB Subnet Group"
           }
         ]
       }
     },
-    "GrafanaDBInstance": {
+    "ZABBIXGrafanaDBInstance": {
       "Type": "AWS::RDS::DBInstance",
       "Condition": "UseAuroraRDS",
       "Properties": {
         "DBInstanceClass": "db.r3.large",
         "Engine": "aurora",
         "DBSubnetGroupName": {
-          "Ref": "GrafanaDBSubnetGroup"
+          "Ref": "ZABBIXGrafanaDBSubnetGroup"
         },
         "DBParameterGroupName": {
-          "Ref": "GrafanaDBParameterGroup"
+          "Ref": "ZABBIXGrafanaDBParameterGroup"
         },
         "DBClusterIdentifier": {
-          "Ref": "GrafanaDBCluster"
+          "Ref": "ZABBIXGrafanaDBCluster"
         },
         "PubliclyAccessible": "false",
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Grafana Aurora Database"
+            "Value": "Zabbix/Grafana Aurora Database"
           }
         ]
       }
     },
-    "GrafanaDBClusterParameterGroup": {
+    "ZABBIXGrafanaDBClusterParameterGroup": {
       "Type": "AWS::RDS::DBClusterParameterGroup",
       "Condition": "UseAuroraRDS",
       "Properties": {
-        "Description": "Grafana Aurora Cluster Parameter Group",
+        "Description": "Zabbix/Grafana Aurora Cluster Parameter Group",
         "Family": "aurora5.6",
         "Parameters": {
           "time_zone": "America/Denver"
         }
       }
     },
-    "GrafanaDBParameterGroup": {
+    "ZABBIXGrafanaDBParameterGroup": {
       "Type": "AWS::RDS::DBParameterGroup",
       "Condition": "UseAuroraRDS",
       "Properties": {
-        "Description": "Grafana Aurora Parameter Group",
+        "Description": "Zabbix/Grafana Aurora Parameter Group",
         "Family": "aurora5.6",
         "Parameters": {
           "sql_mode": "IGNORE_SPACE"
         }
       }
     },
-    "GrafanaSqlite3Instance": {
+    "ZabbixMySqlInstance": {
       "Type": "AWS::EC2::Instance",
-      "Condition": "UseLocalsqlite3",
+      "Condition": "UseLocalMySql",
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "config": {
+            "files": {
+              "/tmp/zabbix-setup.txt": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "QuickStartS3URL|",
+                      {
+                        "Fn::FindInMap": [
+                          "AWSInfoRegionMap",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "QuickStartS3URL"
+                        ]
+                      },
+                      "\n",
+                      "QSS3BucketName|",
+                      {
+                        "Ref": "QSS3BucketName"
+                      },
+                      "\n",
+                      "QSS3KeyPrefix|",
+                      {
+                        "Ref": "QSS3KeyPrefix"
+                      },
+                      "\n",
+                      "DatabasePass|",
+                      {
+                        "Ref": "MasterPassword"
+                      },
+                      "\n",
+                      "DatabaseUser|",
+                      {
+                        "Ref": "MasterUser"
+                      },
+                      "\n",
+                      "DBConnString|NA",
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000440",
+                "owner": "root",
+                "group": "root"
+              },
+              "/tmp/bootstrapZabbix.sh": {
+                "source": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Fn::FindInMap": [
+                          "AWSInfoRegionMap",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "QuickStartS3URL"
+                        ]
+                      },
+                      {
+                        "Ref": "QSS3BucketName"
+                      },
+                      {
+                        "Ref": "QSS3KeyPrefix"
+                      },
+                      "Scripts/bootstrapZabbix.sh"
+                    ]
+                  ]
+                },
+                "mode": "000777",
+                "owner": "root",
+                "group": "root"
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "IamInstanceProfile": {
+          "Ref": "InstanceProfileZabbixGrafana"
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "AWSAMIRegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            {
+              "Fn::FindInMap": [
+                "ZabbixGrafanaAMINameMap",
+                {
+                  "Ref": "ZabbixGrafanaAMIOS"
+                },
+                "Code"
+              ]
+            }
+          ]
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "ZabbixServerSecurityGroup"
+          },
+          {
+            "Ref": "ZabbixAgentsSecurityGroup"
+          }
+        ],
+        "SubnetId": {
+          "Ref": "PrivateSubnetID1"
+        },
+        "InstanceType": {
+          "Ref": "ZabbixGrafanaInstanceType"
+        },
+        "KeyName": {
+          "Ref": "KeyPairName"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash \n",
+                "cd /tmp \n",
+                "curl -O https://bootstrap.pypa.io/get-pip.py\n",
+                "python get-pip.py\n",
+                "echo DEBUGPipInstalled &> /tmp/bootstrap.log\n",
+                "pip install awscli\n",
+                "curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                "gunzip aws-cfn-bootstrap-latest.tar.gz\n",
+                "tar -xvf aws-cfn-bootstrap-latest.tar\n",
+                "cd aws-cfn-bootstrap*\n",
+                "python setup.py build\n",
+                "python setup.py install\n",
+                "yum install -y zip\n",
+                "yum install -y unzip\n",
+                "/usr/bin/cfn-init -v ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ZabbixMySqlInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "/tmp/bootstrapZabbix.sh --v --params_file /tmp/zabbix-setup.txt &>> /tmp/bootstrap.log\n",
+                "/usr/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ZabbixMySqlInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Ref": "ZabbixServerName"
+            }
+          }
+        ]
+      },
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Timeout": "PT90M"
+        }
+      }
+    },
+    "ZabbixAuroraInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Condition": "UseAuroraRDS",
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "config": {
+            "files": {
+              "/tmp/zabbix-setup.txt": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "QuickStartS3URL|",
+                      {
+                        "Fn::FindInMap": [
+                          "AWSInfoRegionMap",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "QuickStartS3URL"
+                        ]
+                      },
+                      "\n",
+                      "QSS3BucketName|",
+                      {
+                        "Ref": "QSS3BucketName"
+                      },
+                      "\n",
+                      "QSS3KeyPrefix|",
+                      {
+                        "Ref": "QSS3KeyPrefix"
+                      },
+                      "\n",
+                      "DatabasePass|",
+                      {
+                        "Ref": "MasterPassword"
+                      },
+                      "\n",
+                      "DatabaseUser|",
+                      {
+                        "Ref": "MasterUser"
+                      },
+                      "\n",
+                      "DBConnString|",
+                      {
+                        "Fn::GetAtt": [
+                          "ZABBIXGrafanaDBCluster",
+                          "Endpoint.Address"
+                        ]
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000440",
+                "owner": "root",
+                "group": "root"
+              },
+              "/tmp/bootstrapZabbix.sh": {
+                "source": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Fn::FindInMap": [
+                          "AWSInfoRegionMap",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "QuickStartS3URL"
+                        ]
+                      },
+                      {
+                        "Ref": "QSS3BucketName"
+                      },
+                      {
+                        "Ref": "QSS3KeyPrefix"
+                      },
+                      "Scripts/bootstrapZabbix.sh"
+                    ]
+                  ]
+                },
+                "mode": "000777",
+                "owner": "root",
+                "group": "root"
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "IamInstanceProfile": {
+          "Ref": "InstanceProfileZabbixGrafana"
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "AWSAMIRegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            {
+              "Fn::FindInMap": [
+                "ZabbixGrafanaAMINameMap",
+                {
+                  "Ref": "ZabbixGrafanaAMIOS"
+                },
+                "Code"
+              ]
+            }
+          ]
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "ZabbixServerSecurityGroup"
+          },
+          {
+            "Ref": "ZabbixAgentsSecurityGroup"
+          }
+        ],
+        "SubnetId": {
+          "Ref": "PrivateSubnetID1"
+        },
+        "InstanceType": {
+          "Ref": "ZabbixGrafanaInstanceType"
+        },
+        "KeyName": {
+          "Ref": "KeyPairName"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash \n",
+                "cd /tmp \n",
+                "curl -O https://bootstrap.pypa.io/get-pip.py\n",
+                "python get-pip.py\n",
+                "echo DEBUGPipInstalled &> /tmp/bootstrap.log\n",
+                "pip install awscli\n",
+                "curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                "gunzip aws-cfn-bootstrap-latest.tar.gz\n",
+                "tar -xvf aws-cfn-bootstrap-latest.tar\n",
+                "cd aws-cfn-bootstrap*\n",
+                "python setup.py build\n",
+                "python setup.py install\n",
+                "yum install -y zip\n",
+                "yum install -y unzip\n",
+                "/usr/bin/cfn-init -v ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ZabbixAuroraInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "/tmp/bootstrapZabbix.sh --v --params_file /tmp/zabbix-setup.txt &>> /tmp/bootstrap.log\n",
+                "/usr/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ZabbixAuroraInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Ref": "ZabbixServerName"
+            }
+          }
+        ]
+      },
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Timeout": "PT90M"
+        }
+      },
+      "DependsOn": "ZABBIXGrafanaDBInstance"
+    },
+    "GrafanaMySqlInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Condition": "UseLocalMySql",
       "Metadata": {
         "AWS::CloudFormation::Init": {
           "config": {
@@ -843,7 +1478,7 @@
       },
       "Properties": {
         "IamInstanceProfile": {
-          "Ref": "InstanceProfileGrafana"
+          "Ref": "InstanceProfileZabbixGrafana"
         },
         "ImageId": {
           "Fn::FindInMap": [
@@ -853,9 +1488,9 @@
             },
             {
               "Fn::FindInMap": [
-                "GrafanaAMINameMap",
+                "ZabbixGrafanaAMINameMap",
                 {
-                  "Ref": "GrafanaAMIOS"
+                  "Ref": "ZabbixGrafanaAMIOS"
                 },
                 "Code"
               ]
@@ -864,14 +1499,17 @@
         },
         "SecurityGroupIds": [
           {
-            "Ref": "GrafanaServerSecurityGroup"
+            "Ref": "ZabbixServerSecurityGroup"
+          },
+          {
+            "Ref": "ZabbixAgentsSecurityGroup"
           }
         ],
         "SubnetId": {
           "Ref": "PrivateSubnetID1"
         },
         "InstanceType": {
-          "Ref": "GrafanaInstanceType"
+          "Ref": "ZabbixGrafanaInstanceType"
         },
         "KeyName": {
           "Ref": "KeyPairName"
@@ -900,19 +1538,19 @@
                 {
                   "Ref": "AWS::StackName"
                 },
-                "         --resource GrafanaSqlite3Instance ",
+                "         --resource GrafanaMySqlInstance ",
                 "         --region ",
                 {
                   "Ref": "AWS::Region"
                 },
                 "\n",
-                "/tmp/bootstrapGrafana.sh --v --params_file /tmp/grafana-setup.txt &>> /tmp/bootstrap.log\n",
+                "/tmp/bootstrapGrafana.sh --v --params_file /tmp/grafan a-setup.txt &>> /tmp/bootstrap.log\n",
                 "/usr/bin/cfn-signal -e $? ",
                 "         --stack ",
                 {
                   "Ref": "AWS::StackName"
                 },
-                "         --resource GrafanaSqlite3Instance ",
+                "         --resource GrafanaMySqlInstance ",
                 "         --region ",
                 {
                   "Ref": "AWS::Region"
@@ -983,7 +1621,7 @@
                       "DBConnString|",
                       {
                         "Fn::GetAtt": [
-                          "GrafanaDBCluster",
+                          "ZABBIXGrafanaDBCluster",
                           "Endpoint.Address"
                         ]
                       },
@@ -1029,7 +1667,7 @@
       },
       "Properties": {
         "IamInstanceProfile": {
-          "Ref": "InstanceProfileGrafana"
+          "Ref": "InstanceProfileZabbixGrafana"
         },
         "ImageId": {
           "Fn::FindInMap": [
@@ -1039,9 +1677,9 @@
             },
             {
               "Fn::FindInMap": [
-                "GrafanaAMINameMap",
+                "ZabbixGrafanaAMINameMap",
                 {
-                  "Ref": "GrafanaAMIOS"
+                  "Ref": "ZabbixGrafanaAMIOS"
                 },
                 "Code"
               ]
@@ -1050,14 +1688,17 @@
         },
         "SecurityGroupIds": [
           {
-            "Ref": "GrafanaServerSecurityGroup"
+            "Ref": "ZabbixServerSecurityGroup"
+          },
+          {
+            "Ref": "ZabbixAgentsSecurityGroup"
           }
         ],
         "SubnetId": {
           "Ref": "PrivateSubnetID1"
         },
         "InstanceType": {
-          "Ref": "GrafanaInstanceType"
+          "Ref": "ZabbixGrafanaInstanceType"
         },
         "KeyName": {
           "Ref": "KeyPairName"
@@ -1122,25 +1763,51 @@
           "Timeout": "PT90M"
         }
       },
-      "DependsOn": "GrafanaDBInstance"
+      "DependsOn": "ZABBIXGrafanaDBInstance"
     }
   },
   "Outputs": {
+    "ZabbixServerName": {
+      "Value": {
+        "Ref": "ZabbixServerName"
+      },
+      "Description": "Zabbix Server Name"
+    },
     "GrafanaServerName": {
       "Value": {
         "Ref": "GrafanaServerName"
       },
       "Description": "Grafana Server Name"
     },
-    "GrafanaSqlite3PrivateIPAddress": {
-      "Condition": "UseLocalsqlite3",
+    "ZabbixMyqlPrivateIPAddress": {
+      "Condition": "UseLocalMySql",
       "Value": {
         "Fn::GetAtt": [
-          "GrafanaSqlite3Instance",
+          "ZabbixMySqlInstance",
           "PrivateIp"
         ]
       },
-      "Description": "Grafana Instance private IP address that uses local Sqlite3"
+      "Description": "Zabbix  Instance private IP addres that uses local MySql"
+    },
+    "ZabbixAuroraPrivateIPAddress": {
+      "Condition": "UseAuroraRDS",
+      "Value": {
+        "Fn::GetAtt": [
+          "ZabbixAuroraInstance",
+          "PrivateIp"
+        ]
+      },
+      "Description": "Zabbix Instance private IP address that uses Aurora Cluster"
+    },
+    "GrafanaMyqlPrivateIPAddress": {
+      "Condition": "UseLocalMySql",
+      "Value": {
+        "Fn::GetAtt": [
+          "GrafanaMySqlInstance",
+          "PrivateIp"
+        ]
+      },
+      "Description": "Grafana Instance private IP addres that uses local MySql"
     },
     "GrafanaAuroraPrivateIPAddress": {
       "Condition": "UseAuroraRDS",
@@ -1152,25 +1819,77 @@
       },
       "Description": "Grafana Instance private IP address that uses Aurora Cluster"
     },
-    "GrafanaSqlit3WebURL": {
-      "Condition": "UseLocalsqlite3",
+    "ZabbixMySqlWebURL": {
+      "Condition": "UseLocalMySql",
       "Value": {
-        "Fn::GetAtt": [
-          "GrafanaSqlite3LoadBalancer",
-          "DNSName"
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": [
+                "ZabbixMySqlLoadBalancer",
+                "DNSName"
+              ]
+            },
+            "zabbix"
+          ]
         ]
       },
-      "Description": "Grafana Web  URL"
+      "Description": "Zabbix Web URL"
+    },
+    "ZabbixAuroraWebURL": {
+      "Condition": "UseAuroraRDS",
+      "Value": {
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": [
+                "ZabbixAuroraLoadBalancer",
+                "DNSName"
+              ]
+            },
+            "zabbix"
+          ]
+        ]
+      },
+      "Description": "Zabbix Web URL"
+    },
+    "GrafanaMySqlWebURL": {
+      "Condition": "UseLocalMySql",
+      "Value": {
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": [
+                "GrafanaMySqlLoadBalancer",
+                "DNSName"
+              ]
+            },
+            "login"
+          ]
+        ]
+      },
+      "Description": "Grafana Web URL"
     },
     "GrafanaAuroraWebURL": {
       "Condition": "UseAuroraRDS",
       "Value": {
-        "Fn::GetAtt": [
-          "GrafanaAuroraLoadBalancer",
-          "DNSName"
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": [
+                "GrafanaAuroraLoadBalancer",
+                "DNSName"
+              ]
+            },
+            "login"
+          ]
         ]
       },
-      "Description": "Grafana Web  URL"
+      "Description": "Grafana Web URL"
     }
   }
 }

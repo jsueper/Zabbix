@@ -1,11 +1,11 @@
 [
   {
     "ParameterKey": "QSS3BucketName",
-    "ParameterValue": "zabbixquickstart"
+    "ParameterValue": "quickstart-reference-as"
   },
   {
     "ParameterKey": "QSS3KeyPrefix",
-    "ParameterValue": "zabbix/setup/latest"
+    "ParameterValue": "zabbixgrafana/setup/latest"
   },
   {
     "ParameterKey": "PrivateSubnetID1",
@@ -20,7 +20,7 @@
     "ParameterValue": "subnet-87da92ce"
   },
   {
-    "ParameterKey": "ZabbixDatabaseType",
+    "ParameterKey": "ZabbixGrafanaDatabaseType",
     "ParameterValue": "AuroraRDSCluster"
   },
   {
@@ -32,16 +32,20 @@
     "ParameterValue": "Zabbix"
   },
   {
+    "ParameterKey": "GrafanaServerName",
+    "ParameterValue": "Grafana"
+  },
+  {
     "ParameterKey": "KeyPairName",
     "ParameterValue": "private-az-key"
   },
   {
-    "ParameterKey": "ZabbixAMIOS",
+    "ParameterKey": "ZabbixGrafanaAMIOS",
     "ParameterValue": "RHEL72HVM"
   },
   {
-    "ParameterKey": "ZabbixInstanceType",
-    "ParameterValue": "m3.2xlarge"
+    "ParameterKey": "ZabbixGrafanaInstanceType",
+    "ParameterValue": "m4.2xlarge"
   },
   {
     "ParameterKey": "DomainName",
@@ -53,6 +57,6 @@
   },
   {
     "ParameterKey": "MasterUser",
-    "ParameterValue": "zabbix"
+    "ParameterValue": "zabbixgrafana"
   }
 ]

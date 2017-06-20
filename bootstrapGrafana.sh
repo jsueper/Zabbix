@@ -151,8 +151,8 @@ echo QS_Grafana_user_created
 
 mkdir -p /home/grafana/.ssh
 cp /home/ec2-user/.ssh/authorized_keys /home/grafana/.ssh/.
-chown grafana:dba /home/Grafana/.ssh /home/grafana/.ssh/authorized_keys
-chmod 600 /home/Grafana/.ssh/authorized_keys
+chown grafana:dba /home/grafana/.ssh /home/grafana/.ssh/authorized_keys
+chmod 600 /home/grafana/.ssh/authorized_keys
 echo 'grafana ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 sed -i 's/requiretty/!requiretty/g' /etc/sudoers
 echo QS_Grafana_user_sudo_perms_finished
@@ -170,16 +170,6 @@ YUM_PACKAGES=(
     httpd
     httpd-devel 
     wget
-    php
-    php-cli
-    php-common
-    php-devel
-    php-pear
-    php-gd
-    php-mbstring
-    php-bcmath
-    php-mysql
-    php-xml
 )
 
 echo QS_BEGIN_Install_YUM_Packages
@@ -256,14 +246,14 @@ echo QS_END_Install_Grafana_Packages
 sudo rpm -Uvh grafana-4.3.1-1.x86_64.rpm
 
 echo QS_BEGIN_Install_Grafana_Zabbix_Plugin
-sudo krafana-cli plugins install alexanderzobnin-zabbix-app
+sudo grafana-cli plugins install alexanderzobnin-zabbix-app
 echo QS_END_Install_Grafana_Zabbix_Plugin
 
 #Creating Web Conf So User Doesn't have to go through web setup
 if [[ ${DATABASE_CONN_STRING} == 'NA' ]]; then
 
 
-#Create the Grafana database
+#Create the Grafana Mysql database
 echo QS_BEGIN_Create_Grafana_MySql_Database
 mysql -u root --password="${DATABASE_PASS}" -e "CREATE DATABASE grafana CHARACTER SET UTF8;"
 mysql -u root --password="${DATABASE_PASS}" -e "GRANT ALL PRIVILEGES on grafana.* to ${DATABASE_USER}@localhost IDENTIFIED BY '${DATABASE_PASS}';"
@@ -273,11 +263,16 @@ echo QS_END_Create_Grafana_MySql_Database
 
 cd /etc/grafana/
 
-grep -A21 "\[database\]" config.ini | sed -i '' 's/sqlite3/mysql/' config.ini
-grep -A21 "\[database\]" config.ini | sed -i '' "s/;user = root/;user = ${DATABASE_USER}/" config.ini
-grep -A21 "\[database\]" config.ini | sed -i '' "s/;password =/;password = ${DATABASE_PASS}/" config.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i 's/;type = sqlite3/type = mysql/' grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i "s/;host = 127.*/host = 127.0.0.1:3306/" grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i "s/;user = root/user = ${DATABASE_USER}/" grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i "s/;password =/password = ${DATABASE_PASS}/" grafana.ini
+
+sudo grep -A21 "\[session\]" grafana.ini | sed -i 's/;provider = file/provider = mysql/' grafana.ini
+sudo grep -A21 "\[session\]" grafana.ini | sed -i "s/;provider_config = sessions/provider_config = ${DATABASE_USER}:${DATABASE_PASS}@tcp(${DATABASE_CONN_STRING}:3306)/grafana/" grafana.ini
 
 
+cd /tmp
 
 sudo touch create_grafana_session.sql
 
@@ -296,7 +291,7 @@ if [[ ${DATABASE_CONN_STRING} != 'NA' ]]; then
 
 echo QS_BEGIN_Create_Grafana_Aurora_Web_Conf_File
 
-#Create the Grafana database
+#Create the Grafana Aurora database
 echo QS_BEGIN_Create_Grafana_Aurora_Database
 mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" -e "CREATE DATABASE grafana CHARACTER SET UTF8;"
 echo QS_END_Create_Grafana_Aurora_Database
@@ -304,21 +299,23 @@ echo QS_END_Create_Grafana_Aurora_Database
 
 cd /etc/grafana/
 
-grep -A21 "\[database\]" config.ini | sed -i '' 's/sqlite3/mysql/' config.ini
-grep -A21 "\[database\]" config.ini | sed -i '' "s/127.*/${DATABASE_CONN_STRING}:3306/" config.ini
-grep -A21 "\[database\]" config.ini | sed -i '' "s/;user = root/;user = ${DATABASE_USER}/" config.ini
-grep -A21 "\[database\]" config.ini | sed -i '' "s/;password =/;password = ${DATABASE_PASS}/" config.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i 's/;type = sqlite3/type = mysql/' grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;host = 127.*/host = ${DATABASE_CONN_STRING}:3306/" grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i "s/;user = root/user = ${DATABASE_USER}/" grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i "s/;password =/password = ${DATABASE_PASS}/" grafana.ini
 
+
+sudo grep -A21 "\[session\]" grafana.ini | sed -i 's/;provider = file/provider = mysql/' grafana.ini
+sudo grep -A21 "\[session\]" grafana.ini | sed -i "s/;provider_config = sessions/provider_config = ${DATABASE_USER}:${DATABASE_PASS}@tcp(${DATABASE_CONN_STRING}:3306)\/grafana/" grafana.ini
 
 cd /tmp
 
 sudo touch create_grafana_session.sql
 
-chown grafana:dba create_grafana_session.sql
+chown root:grafana create_grafana_session.sql
 
-sudo echo "create table 'session' ('key' char(16) not null, 'data' blob, 'expiry' init(11) unsigned not null, primary key ('key'))  ENGINE=MyISAM default charset=uf8;" >> create_grafana_session.sql
+sudo echo "create table session (key char(16) not null, data blob, expiry init(11) unsigned not null, primary key (key))  ENGINE=MyISAM default charset=uf8;" >> create_grafana_session.sql
 
-#Unzip Create.sql.gz file
 #Run create.sql file against Grafanadb we created above to create user session schema.
 echo QS_BEGIN_Apply_Grafana_Aurora_Schema
 mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" grafana < create_grafana_session.sql
@@ -329,8 +326,9 @@ fi
 echo QS_END_Create_Grafana_Web_Conf_File
 
 sudo service httpd restart
+sudo /bin/systemctl daemon-reload
 
-sudo service Grafana-server restart
+sudo service grafana-server restart
 
 # Remove passwords from files
 sed -i s/${DATABASE_PASS}/xxxxx/g  /var/log/cloud-init.log
