@@ -269,16 +269,22 @@ sudo grep -A21 "\[database\]" grafana.ini | sed -i "s/;user = root/user = ${DATA
 sudo grep -A21 "\[database\]" grafana.ini | sed -i "s/;password =/password = ${DATABASE_PASS}/" grafana.ini
 
 sudo grep -A21 "\[session\]" grafana.ini | sed -i 's/;provider = file/provider = mysql/' grafana.ini
-sudo grep -A21 "\[session\]" grafana.ini | sed -i "s/;provider_config = sessions/provider_config = ${DATABASE_USER}:${DATABASE_PASS}@tcp(${DATABASE_CONN_STRING}:3306)/grafana/" grafana.ini
+sudo grep -A21 "\[session\]" grafana.ini | sed -i "s/;provider_config = sessions/provider_config = ${DATABASE_USER}:${DATABASE_PASS}@tcp(${DATABASE_CONN_STRING}:3306)\/grafana/" grafana.ini
 
 
 cd /tmp
 
 sudo touch create_grafana_session.sql
 
-chown grafana:dba create_grafana_session.sql
+chown root:grafana create_grafana_session.sql
 
-sudo echo "create table 'session' ('key' char(16) not null, 'data' blob, 'expiry' init(11) unsigned not null, primary key ('key'))  ENGINE=MyISAM default charset=uf8;" >> create_grafana_session.sql
+echo QS_BEGIN_Create_Grafana_Aurora_Sessions_Table
+sudo echo "create table session("  >> create_grafana_session.sql
+sudo echo "\`key\` char(16) not null,"  >> create_grafana_session.sql
+sudo echo "data blob,"  >> create_grafana_session.sql
+sudo echo "expiry int(11) unsigned not null,"  >> create_grafana_session.sql
+sudo echo "primary key (\`key\`))"  >> create_grafana_session.sql
+sudo echo "ENGINE=MyISAM default charset=UTF8;" >> create_grafana_session.sql
 
 #Run create.sql file against Grafanadb we created above to create user session schema.
 
@@ -299,14 +305,14 @@ echo QS_END_Create_Grafana_Aurora_Database
 
 cd /etc/grafana/
 
-sudo grep -A21 "\[database\]" grafana.ini | sed -i 's/;type = sqlite3/type = mysql/' grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i  's/;type = sqlite3/type = mysql/' grafana.ini
 sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;host = 127.*/host = ${DATABASE_CONN_STRING}:3306/" grafana.ini
-sudo grep -A21 "\[database\]" grafana.ini | sed -i "s/;user = root/user = ${DATABASE_USER}/" grafana.ini
-sudo grep -A21 "\[database\]" grafana.ini | sed -i "s/;password =/password = ${DATABASE_PASS}/" grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;user = root/user = ${DATABASE_USER}/" grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;password =/password = ${DATABASE_PASS}/" grafana.ini
 
 
-sudo grep -A21 "\[session\]" grafana.ini | sed -i 's/;provider = file/provider = mysql/' grafana.ini
-sudo grep -A21 "\[session\]" grafana.ini | sed -i "s/;provider_config = sessions/provider_config = ${DATABASE_USER}:${DATABASE_PASS}@tcp(${DATABASE_CONN_STRING}:3306)\/grafana/" grafana.ini
+sudo grep -A21 "\[session\]" grafana.ini | sed -i  's/;provider = file/provider = mysql/' grafana.ini
+sudo grep -A21 "\[session\]" grafana.ini | sed -i  "s/;provider_config = sessions/provider_config = ${DATABASE_USER}:${DATABASE_PASS}@tcp(${DATABASE_CONN_STRING}:3306)\/grafana/" grafana.ini
 
 cd /tmp
 
@@ -314,20 +320,29 @@ sudo touch create_grafana_session.sql
 
 chown root:grafana create_grafana_session.sql
 
-sudo echo "create table session (key char(16) not null, data blob, expiry init(11) unsigned not null, primary key (key))  ENGINE=MyISAM default charset=uf8;" >> create_grafana_session.sql
+echo QS_BEGIN_Create_Grafana_Aurora_Sessions_Table
+sudo echo "create table session("  >> create_grafana_session.sql
+sudo echo "\`key\` char(16) not null,"  >> create_grafana_session.sql
+sudo echo "data blob,"  >> create_grafana_session.sql
+sudo echo "expiry int(11) unsigned not null,"  >> create_grafana_session.sql
+sudo echo "primary key (\`key\`))"  >> create_grafana_session.sql
+sudo echo "ENGINE=MyISAM default charset=UTF8;" >> create_grafana_session.sql
 
 #Run create.sql file against Grafanadb we created above to create user session schema.
-echo QS_BEGIN_Apply_Grafana_Aurora_Schema
+echo QS_BEGIN_Apply_Grafana_Aurora_Sessions_Schema
 mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" grafana < create_grafana_session.sql
 echo QS_END_Apply_Grafana_Aurora_Schema
 
+
+
+mysql --user=grafana --host=grafana-deploy-grafanadbcluster-1qzocrjnfgxgu.cluster-cdtnc1nr0zsw.us-east-1.rds.amazonaws.com --port=3306 --password='dgGGk.juki78$$' grafana < create_grafana_session.sql
 fi
+
 
 echo QS_END_Create_Grafana_Web_Conf_File
 
 sudo service httpd restart
 sudo /bin/systemctl daemon-reload
-
 sudo service grafana-server restart
 
 # Remove passwords from files

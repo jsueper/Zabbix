@@ -1787,7 +1787,7 @@
           "PrivateIp"
         ]
       },
-      "Description": "Zabbix  Instance private IP addres that uses local MySql"
+      "Description": "Zabbix  Instance private IP address that uses local MySql"
     },
     "ZabbixAuroraPrivateIPAddress": {
       "Condition": "UseAuroraRDS",
@@ -1807,7 +1807,7 @@
           "PrivateIp"
         ]
       },
-      "Description": "Grafana Instance private IP addres that uses local MySql"
+      "Description": "Grafana Instance private IP address that uses local MySql"
     },
     "GrafanaAuroraPrivateIPAddress": {
       "Condition": "UseAuroraRDS",
