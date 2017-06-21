@@ -694,7 +694,7 @@
       "Type": "AWS::RDS::DBSubnetGroup",
       "Condition": "UseAuroraRDS",
       "Properties": {
-        "DBSubnetGroupDescription": "description",
+        "DBSubnetGroupDescription": "Grafana DB Subnet Group",
         "SubnetIds": [
           {
             "Ref": "PrivateSubnetID1"
@@ -1155,22 +1155,38 @@
     "GrafanaSqlit3WebURL": {
       "Condition": "UseLocalsqlite3",
       "Value": {
-        "Fn::GetAtt": [
-          "GrafanaSqlite3LoadBalancer",
-          "DNSName"
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": [
+                "GrafanaSqlite3LoadBalancer",
+                "DNSName"
+              ]
+            },
+            "login"
+          ]
         ]
       },
-      "Description": "Grafana Web  URL"
+      "Description": "Grafana Web URL"
     },
     "GrafanaAuroraWebURL": {
       "Condition": "UseAuroraRDS",
       "Value": {
-        "Fn::GetAtt": [
-          "GrafanaAuroraLoadBalancer",
-          "DNSName"
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": [
+                "GrafanaAuroraLoadBalancer",
+                "DNSName"
+              ]
+            },
+            "login"
+          ]
         ]
       },
-      "Description": "Grafana Web  URL"
+      "Description": "Grafana Web URL"
     }
   }
 }

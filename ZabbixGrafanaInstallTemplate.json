@@ -668,7 +668,7 @@
         ],
         "Instances": [
           {
-            "Ref": "GrafanaSqlite3Instance"
+            "Ref": "GrafanaMySqlInstance"
           }
         ],
         "Listeners": [
@@ -781,7 +781,7 @@
             "SourceSecurityGroupId": {
               "Ref": "ZabbixAgentsSecurityGroup"
             }
-          }
+          },
           {
             "IpProtocol": "tcp",
             "FromPort": "3000",
@@ -1499,10 +1499,7 @@
         },
         "SecurityGroupIds": [
           {
-            "Ref": "ZabbixServerSecurityGroup"
-          },
-          {
-            "Ref": "ZabbixAgentsSecurityGroup"
+            "Ref": "GrafanaServerSecurityGroup"
           }
         ],
         "SubnetId": {
@@ -1688,10 +1685,7 @@
         },
         "SecurityGroupIds": [
           {
-            "Ref": "ZabbixServerSecurityGroup"
-          },
-          {
-            "Ref": "ZabbixAgentsSecurityGroup"
+            "Ref": "GrafanaServerSecurityGroup"
           }
         ],
         "SubnetId": {
