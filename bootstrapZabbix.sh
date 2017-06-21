@@ -371,6 +371,17 @@ gunzip *.gz
 mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" zabbix < create.sql
 echo QS_END_Apply_Zabbix_Aurora_Schema
 
+
+
+echo QS_BEGIN_Apply_Zabbix_Aurora_Default_Password_Update
+sudo touch create_grafana_session.sql
+chown root:grafana create_grafana_session.sql
+
+sudo echo "update zabbix.users set passwd=md5('${DATABASE_PASS}') where alias='Admin';"  >> update_zabbix_password.sql
+mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" zabbix < update_zabbix_password.sql
+
+echo QS_END_Apply_Zabbix_Aurora_Default_Password_Update
+
 fi
 
 echo QS_END_Create_Zabbix_Web_Conf_File

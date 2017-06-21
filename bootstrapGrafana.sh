@@ -310,7 +310,8 @@ sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;host = 127.*/host = ${DA
 sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;user = root/user = ${DATABASE_USER}/" grafana.ini
 sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;password =/password = ${DATABASE_PASS}/" grafana.ini
 
-sudo grep -A21 "\[server\]" grafana.ini | sed -i  "s/;domain = localhost/domain = ${DATABASE_PASS}/" grafana.ini
+sudo grep -A21 "\[security\]" grafana.ini | sed -i  "s/admin_user = admin/admin_user = ${DATABASE_USER}/" grafana.ini
+sudo grep -A21 "\[security\]" grafana.ini | sed -i  "s/admin_password = admin/admin_password = ${DATABASE_PASS}/" grafana.ini
 
 
 sudo grep -A21 "\[session\]" grafana.ini | sed -i  's/;provider = file/provider = mysql/' grafana.ini
