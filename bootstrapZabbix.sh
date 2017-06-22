@@ -356,8 +356,7 @@ sudo echo '$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;' >>/etc/zabbix/web/zabbix.c
 echo QS_BEGIN_Create_Zabbix_Aurora_Database
 
 mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" -e "CREATE DATABASE zabbix CHARACTER SET UTF8;"
-#mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password=${DATABASE_PASS} -e "GRANT ALL PRIVILEGES on zabbix.* to ${DATABASE_USER}@localhost IDENTIFIED BY '${DATABASE_PASS}';"
-#mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password=${DATABASE_PASS} -e "FLUSH PRIVILEGES;"
+
 echo QS_END_Create_Zabbix_Aurora_Database
 
 
