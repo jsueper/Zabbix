@@ -8,4 +8,6 @@ CloudFormation to Setup Zabbix Server with ELB and EC2 Servers with Agents Insta
 5.  ZabbixDatabaseType => LocalMySql or AuroraRDSCluster
     1. LocalMySql option will use local MySql install on Zabbix Server.
     2. AuroraRDSCluster option will create Aurora RDS Cluster.
-    3. Test
+6. The UserName and Password you choose will be the credentials set for:
+    1. Grafana and Zabbix Databases
+    2. The default Web Login for Grafana and Zabbix.
