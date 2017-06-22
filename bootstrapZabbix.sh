@@ -200,13 +200,13 @@ sudo service httpd start
 echo ""
 echo ""
 echo "###############################"
-sleep 30
+
 
 sudo service mysqld start
 echo ""
 echo ""
 echo "###############################"
-sleep 30
+
 
 sudo service mysqld status 
 echo ""
@@ -374,7 +374,7 @@ echo QS_END_Apply_Zabbix_Aurora_Schema
 
 echo QS_BEGIN_Apply_Zabbix_Aurora_Default_Password_Update
 sudo touch create_grafana_session.sql
-chown root:grafana create_grafana_session.sql
+chown root:zabbix create_grafana_session.sql
 
 sudo echo "INSERT INTO \`users\` (\`userid\`,\`alias\`,\`name\`,\`surname\`,\`passwd\`,\`url\`,\`autologin\`,\`autologout\`,\`lang\`,\`refresh\`,\`type\`,\`theme\`,\`rows_per_page\`) values ('3','${DATABASE_USER}','AWS','QUICKSTART', md5('${DATABASE_PASS})','','1','0','en_GB','30','3','default','50');" >> update_zabbix_password.sql
 
