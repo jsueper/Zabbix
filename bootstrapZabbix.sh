@@ -380,6 +380,8 @@ sudo echo "INSERT INTO \`users\` (\`userid\`,\`alias\`,\`name\`,\`surname\`,\`pa
 
 sudo echo "INSERT INTO \`users_groups\` (\`id\`,\`usrgrpid\`,\`userid\`) values ('6','7','3');"  >> update_zabbix_password.sql
 sudo echo "update zabbix.users set passwd=md5('${DATABASE_PASS}') where alias='Admin';"  >> update_zabbix_password.sql
+sudo echo "update zabbix.users set passwd=md5('${DATABASE_PASS}') where alias='Guest';"  >> update_zabbix_password.sql
+
 
 mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" zabbix < update_zabbix_password.sql
 
