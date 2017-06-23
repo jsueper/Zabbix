@@ -346,7 +346,7 @@ chown root:grafana enable_zabbix_plugin.sql
 sudo echo "INSERT INTO \`data_source\` (\`id\`,\`org_id\`,\`version\`,\`type\`,\`name\`,\`access\`,\`url\`,\`password\`,\`user\`,\`database\`,\`basic_auth\`,\`basic_auth_user\`,\`basic_auth_password\`,\`is_default\`,\`json_data\`,\`created\`,\`updated\`,\`with_credentials\`,\`secure_json_data\`) values ('1','1','1','alexanderzobnin-zabbix-datasource','ZabbixDS','proxy','${ZABBIX_URL}','','','','0','${DATABASE_USER}','api_jsonrpc.php','1','{\"addThresholds\":true,\"alerting\":true,\"alertingMinSeverity\":1,\"cacheTTL\":\"1h\",\"password\":\"${DATABASE_PASS}\",\"trends\":true,\"trendsFrom\":\"7d\",\"trendsRange\":\"4d\",\"username\":\"${DATABASE_USER}\"}',CURDATE(),CURDATE(),'0','{}');"  >> enable_zabbix_plugin.sql
 
 
-sudo echo "INSERT INTO \`plugin_setting\` (\`id\`,\`org_id\`,\`plugin_id\`,\`enabled\`,\`pinned\`,\`json_data\`,\`secure_json_data\`,\`created\`,\`updated\`,\`plugin_version\`) values ('1','1','1','alexanderzobnin-zabbix-app','1','1','null','{}',CURDATE(),CURDATE(), '3.4.0');"  >> enable_zabbix_plugin.sql
+sudo echo "INSERT INTO \`plugin_setting\` (\`id\`,\`org_id\`,\`plugin_id\`,\`enabled\`,\`pinned\`,\`json_data\`,\`secure_json_data\`,\`created\`,\`updated\`,\`plugin_version\`) values ('1','1','alexanderzobnin-zabbix-app','1','1','null','{}',CURDATE(),CURDATE(), '3.4.0');"  >> enable_zabbix_plugin.sql
 
 
 
