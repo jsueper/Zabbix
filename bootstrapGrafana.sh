@@ -315,7 +315,7 @@ sudo echo "INSERT INTO \`dashboard\` (\`id\`,\`version\`,\`slug\`,\`title\`,\`da
 sleep 120
 
 echo QS_BEGIN_Enable_Zabbix_Plugin_and_Datasource
-mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" grafana < enable_zabbix_plugin.sql
+mysql --user=${DATABASE_USER} --password="${DATABASE_PASS}" grafana < enable_zabbix_plugin.sql
 echo QS_END_Enable_Zabbix_Plugin_and_Datasource
 
 
