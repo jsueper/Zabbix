@@ -784,8 +784,8 @@
           },
           {
             "IpProtocol": "tcp",
-            "FromPort": "3000",
-            "ToPort": "3000",
+            "FromPort": "0",
+            "ToPort": "65535",
             "SourceSecurityGroupId": {
               "Ref": "GrafanaServerSecurityGroup"
             }
@@ -1761,6 +1761,18 @@
     }
   },
   "Outputs": {
+    "LoginName": {
+      "Value": {
+        "Ref": "MasterUser"
+      },
+      "Description": "Zabbix and Grafana Web User"
+    },
+    "LoginPassword": {
+      "Value": {
+        "Ref": "MasterPassword"
+      },
+      "Description": "Zabbix and Grafana Web Password"
+    },
     "ZabbixServerName": {
       "Value": {
         "Ref": "ZabbixServerName"

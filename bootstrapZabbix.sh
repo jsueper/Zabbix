@@ -391,9 +391,11 @@ fi
 
 echo QS_END_Create_Zabbix_Web_Conf_File
 
-sudo service httpd restart
 
+echo "QS_Restart_All_Services"
+sudo service httpd restart
 sudo service zabbix-server restart
+sudo service zabbix-agent restart
 
 # Remove passwords from files
 sed -i s/${DATABASE_PASS}/xxxxx/g  /var/log/cloud-init.log
@@ -408,5 +410,6 @@ rm ${PARAMS_FILE}
 sudo systemctl enable mysqld.service
 sudo systemctl enable httpd.service
 sudo systemctl enable zabbix-server.service
+sudo systemctl enable zabbix-agent.service
 
 echo "Finished AWS Zabbix Quick Start Bootstrapping"
