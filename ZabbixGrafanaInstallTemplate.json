@@ -149,7 +149,7 @@
         "LocalMySql"
       ],
       "ConstraintDescription": "Must be a valid Database Engine type.",
-      "Default": "LocalMySql",
+      "Default": "AuroraRDSCluster",
       "Description": "Choose your Database Engine type for Zabbix Server",
       "Type": "String"
     },
