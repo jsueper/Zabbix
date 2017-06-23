@@ -1622,6 +1622,24 @@
                           "Endpoint.Address"
                         ]
                       },
+                      "\n",
+                      "ZabbixURL|",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "http://",
+                            {
+                              "Ref": "ZabbixServerName"
+                            },
+                            ".",
+                            {
+                              "Ref": "DomainName"
+                            },
+                            "/zabbix/api_jsonrpc.php"
+                          ]
+                        ]
+                      },
                       "\n"
                     ]
                   ]
@@ -1757,7 +1775,11 @@
           "Timeout": "PT90M"
         }
       },
-      "DependsOn": "ZABBIXGrafanaDBInstance"
+      "DependsOn": [
+        "ZABBIXGrafanaDBInstance",
+        "ZabbixAuroraInstance",
+        "Route53RecordSetZabbixAurora"
+      ]
     }
   },
   "Outputs": {
