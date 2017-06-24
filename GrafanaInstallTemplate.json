@@ -145,7 +145,7 @@
         "Localsqlite3"
       ],
       "ConstraintDescription": "Must be a valid Database Engine type.",
-      "Default": "Localsqlite3",
+      "Default": "AuroraRDSCluster",
       "Description": "Choose your Database Engine type for Grafana Server",
       "Type": "String"
     },
