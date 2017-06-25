@@ -801,6 +801,8 @@
                       },
                       "\n",
                       "DBConnString|NA",
+                      "\n",
+                      "ZabbixURL|NA",
                       "\n"
                     ]
                   ]
@@ -987,6 +989,8 @@
                           "Endpoint.Address"
                         ]
                       },
+                      "\n",
+                      "ZabbixURL|NA",
                       "\n"
                     ]
                   ]
