@@ -36,7 +36,7 @@ function chkstatus() {
         exit 1
     fi
 }
- 
+
 function configRHEL72HVM() {
     sed -i 's/4096/16384/g' /etc/security/limits.d/20-nproc.conf
     sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config

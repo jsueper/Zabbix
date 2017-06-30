@@ -95,8 +95,8 @@
       "Default": "dgGGk.juki78$$"
     },
     "MasterUser": {
-      "AllowedPattern": "([A-Za-z0-9]{3,50})",
-      "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
+      "AllowedPattern": "([A-Za-z0-9]{8,50})",
+      "ConstraintDescription": "Input your database Password, Min 8, Maximum of 30 characters.",
       "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Zabbix/Grafana Aurora Database.",
       "Type": "String",
       "Default": "zabbix"
@@ -150,7 +150,7 @@
     "QSS3KeyPrefix": {
       "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
       "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
-      "Default": "zabbixgrafana/setup/latest",
+      "Default": "zabbixgrafananested/setup/latest",
       "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
       "Type": "String"
     },

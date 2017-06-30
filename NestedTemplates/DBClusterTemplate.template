@@ -55,7 +55,7 @@
     },
     "MasterUser": {
       "AllowedPattern": "([A-Za-z0-9]{8,50})",
-      "ConstraintDescription": "Input your database UserName, Min 3, Maximum of 30 characters.",
+      "ConstraintDescription": "Input your database UserName, Min 8, Maximum of 30 characters.",
       "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Zabbix Mysql/Aurora Database.",
       "Type": "String",
       "Default": "zabbixgrafana"
