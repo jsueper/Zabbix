@@ -62,7 +62,9 @@
         ],
         "Subnets": [
           {
-            "Ref": "PublicSubnetID1",
+            "Ref": "PublicSubnetID1"
+          },
+          {
             "Ref": "PublicSubnetID2"
           }
         ],
@@ -91,21 +93,14 @@
   "Outputs": {
     "ElbDns": {
       "Value": {
-        "Fn::Join": [
-          "/",
-          [
-            {
-              "Fn::GetAtt": [
-                "LoadBalancer",
-                "DNSName"
-              ]
-            },
-            "zabbix"
-          ]
+        "Fn::GetAtt": [
+          "LoadBalancer",
+          "DNSName"
         ]
-      },
-      "Description": "ELB Web  URL"
-    }
+      }
+    },
+    "Description": "ELB DNS Name"
   }
 }
+
 

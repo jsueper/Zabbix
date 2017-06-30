@@ -83,8 +83,8 @@
     }
   },
   "Outputs": {
-    "VPCId": {
-      "Description": "VPCId of the newly created VPC",
+    "RecordSet": {
+      "Description": "ID of the New R53 Recordset",
       "Value": {
         "Ref": "Route53RecordSet"
       }
