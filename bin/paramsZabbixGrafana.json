@@ -9,15 +9,15 @@
   },
   {
     "ParameterKey": "PrivateSubnetID1",
-    "ParameterValue": "subnet-64db932d"
+    "ParameterValue": "subnet-ded9a6b7"
   },
   {
     "ParameterKey": "PrivateSubnetID2",
-    "ParameterValue": "subnet-940192cf"
+    "ParameterValue": "subnet-b51491ce"
   },
   {
     "ParameterKey": "PublicSubnetID",
-    "ParameterValue": "subnet-87da92ce"
+    "ParameterValue": "subnet-79d5aa10"
   },
   {
     "ParameterKey": "ZabbixGrafanaDatabaseType",
@@ -25,7 +25,7 @@
   },
   {
     "ParameterKey": "VPCID",
-    "ParameterValue": "vpc-77e23811"
+    "ParameterValue": "vpc-37d4bd5e"
   },
   {
     "ParameterKey": "ZabbixServerName",
@@ -37,7 +37,7 @@
   },
   {
     "ParameterKey": "KeyPairName",
-    "ParameterValue": "private-az-key"
+    "ParameterValue": "az-ohio-private-pem"
   },
   {
     "ParameterKey": "ZabbixGrafanaAMIOS",

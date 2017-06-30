@@ -248,6 +248,7 @@ ZABBIX_PACKAGES=(
   zabbix-web-mysql
   zabbix-agent
   zabbix-java-gateway
+  zabbix-sender
 
 )
 echo QS_BEGIN_Install_Zabbix_Packages
