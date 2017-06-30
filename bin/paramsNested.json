@@ -1,0 +1,46 @@
+[
+  {
+    "ParameterKey": "RemoteAccessCIDR",
+    "ParameterValue": "71.205.193.40/32"
+  },
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "quickstart-reference-as"
+  },
+  {
+    "ParameterKey": "QSS3KeyPrefix",
+    "ParameterValue": "zabbixgrafananested/setup/latest"
+  },
+  {
+    "ParameterKey": "ZabbixServerName",
+    "ParameterValue": "Zabbix"
+  },
+  {
+    "ParameterKey": "GrafanaServerName",
+    "ParameterValue": "Grafana"
+  },
+  {
+    "ParameterKey": "KeyPairName",
+    "ParameterValue": "private-az-key-oregon"
+  },
+  {
+    "ParameterKey": "InstanceType",
+    "ParameterValue": "m4.2xlarge"
+  },
+  {
+    "ParameterKey": "ZabbixDomainName",
+    "ParameterValue": "mon"
+  },
+  {
+    "ParameterKey": "GrafanaDomainName",
+    "ParameterValue": "graph"
+  },
+  {
+    "ParameterKey": "MasterPassword",
+    "ParameterValue": "dgGGk.juki78$$"
+  },
+  {
+    "ParameterKey": "MasterUser",
+    "ParameterValue": "zabbixgrafana"
+  }
+]

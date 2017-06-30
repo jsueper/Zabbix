@@ -1,0 +1,1222 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Master template that includes nested templates for installing a Zabbix, Grafana and RDS Aurora Cluster in a NEW VPC",
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Bastion Configuration"
+          },
+          "Parameters": [
+            "RemoteAccessCIDR"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Amazon Custom EC2 Configuration"
+          },
+          "Parameters": [
+            "KeyPairName",
+            "InstanceType",
+            "ZabbixServerName",
+            "GrafanaServerName"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Zabbix/Grafana Database Configuration"
+          },
+          "Parameters": [
+            "MasterUser",
+            "MasterPassword"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Zabbix/Grafana DNS Configuration"
+          },
+          "Parameters": [
+            "ZabbixDomainName",
+            "GrafanaDomainName"
+          ]
+        },
+        {
+          "Label": {
+            "default": "AWS QS Configuration"
+          },
+          "Parameters": [
+            "QSS3BucketName",
+            "QSS3KeyPrefix"
+          ]
+        }
+      ],
+      "ParameterLabels": {
+        "RemoteAccessCIDR": {
+          "default": "Allowed Bastion External Access CIDR"
+        },
+        "ZabbixServerName": {
+          "default": "DNS/Tag Name for Zabbix Server"
+        },
+        "GrafanaServerName": {
+          "default": "DNS/Tag Name for Grafana Server"
+        },
+        "MasterPassword": {
+          "default": "Zabbix/Grafana Database Master Password"
+        },
+        "MasterUser": {
+          "default": "Zabbix/Grafana Database Master User"
+        },
+        "ZabbixDomainName": {
+          "default": "Zabbix Domain Name"
+        },
+        "GrafanaDomainName": {
+          "default": "Grafana Domain Name"
+        },
+        "InstanceType": {
+          "default": "Zabbix/Grafana Instance Type"
+        },
+        "QSS3BucketName": {
+          "default": "Quick Start S3 Bucket Name"
+        },
+        "QSS3KeyPrefix": {
+          "default": "Quick Start S3 Key Prefix"
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "MasterPassword": {
+      "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{3,50})",
+      "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
+      "Description": "Enter your Database Password, Min 8, maximum of 30 characters. This password is used for the admin user of Zabbix/Grafana Database.",
+      "NoEcho": "true",
+      "Type": "String",
+      "Default": "dgGGk.juki78$$"
+    },
+    "MasterUser": {
+      "AllowedPattern": "([A-Za-z0-9]{3,50})",
+      "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
+      "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Zabbix/Grafana Aurora Database.",
+      "Type": "String",
+      "Default": "zabbix"
+    },
+    "ZabbixDomainName": {
+      "ConstraintDescription": "String domain name.",
+      "Default": "mon",
+      "Description": "Name of Private Route53 Domain to reach your Zabbix Endpoint after setup.",
+      "Type": "String"
+    },
+    "GrafanaDomainName": {
+      "ConstraintDescription": "String domain name.",
+      "Default": "draw",
+      "Description": "Name of Private Route53 Domain to reach your Grafana Endpoint after setup.",
+      "Type": "String"
+    },
+    "KeyPairName": {
+      "ConstraintDescription": "must be the name of an existing EC2 KeyPair.",
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "InstanceType": {
+      "AllowedValues": [
+        "t2.medium",
+        "t2.large",
+        "m4.large",
+        "m4.xlarge",
+        "m4.2xlarge",
+        "m4.4xlarge",
+        "m4.10xlarge",
+        "r3.large",
+        "r3.xlarge",
+        "r3.2xlarge",
+        "r3.4xlarge",
+        "r3.8xlarge",
+        "r4.8xlarge",
+        "r4.16xlarge"
+      ],
+      "ConstraintDescription": "Must be a valid EC2 instance type.",
+      "Default": "m4.xlarge",
+      "Description": "Choose your Custom Instance type for Zabbix/Grafana Server",
+      "Type": "String"
+    },
+    "QSS3BucketName": {
+      "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+      "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Default": "quickstart-reference-as",
+      "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Type": "String"
+    },
+    "QSS3KeyPrefix": {
+      "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
+      "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+      "Default": "zabbixgrafana/setup/latest",
+      "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+      "Type": "String"
+    },
+    "ZabbixServerName": {
+      "AllowedPattern": "([A-Za-z0-9_]{3,50})",
+      "Default": "Zabbix",
+      "Description": "Name for Zabbix EC2 Instance/Tag.",
+      "Type": "String"
+    },
+    "GrafanaServerName": {
+      "AllowedPattern": "([A-Za-z0-9_]{3,50})",
+      "Default": "Grafana",
+      "Description": "Name for Grafana EC2 Instance/Tag.",
+      "Type": "String"
+    },
+    "RemoteAccessCIDR": {
+      "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
+      "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
+      "Description": "Allowed CIDR block for external SSH access to the bastions",
+      "Type": "String"
+    }
+  },
+  "Mappings": {
+    "AWSInfoRegionMap": {
+      "ap-northeast-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-northeast-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-south-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-southeast-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-southeast-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "eu-central-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "eu-west-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "sa-east-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-east-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-east-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-gov-west-1": {
+        "Partition": "aws-us-gov",
+        "QuickStartS3URL": "https://s3-us-gov-west-1.amazonaws.com"
+      },
+      "us-west-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-west-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      }
+    }
+  },
+  "Resources": {
+    "ZabbixServerAccessSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Fn::GetAtt": [
+            "VPCStack",
+            "Outputs.VPCId"
+          ]
+        },
+        "GroupName": "Zabbix Server Access Security Group",
+        "GroupDescription": "Instances with management access to Zabbix server",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "SourceSecurityGroupId": {
+              "Ref": "BastionSecurityGroup"
+            }
+          }
+        ]
+      }
+    },
+    "ZabbixServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Fn::GetAtt": [
+            "VPCStack",
+            "Outputs.VPCId"
+          ]
+        },
+        "GroupName": "Zabbix Server Security Group",
+        "GroupDescription": "Zabbix server management and access ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixServerAccessSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixELBSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixELBSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "10050",
+            "ToPort": "10050",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixAgentsSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "10051",
+            "ToPort": "10051",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixAgentsSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "0",
+            "ToPort": "65535",
+            "SourceSecurityGroupId": {
+              "Ref": "GrafanaServerSecurityGroup"
+            }
+          }
+        ]
+      }
+    },
+    "ZabbixAgentsSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Fn::GetAtt": [
+            "VPCStack",
+            "Outputs.VPCId"
+          ]
+        },
+        "GroupName": "Zabbix Agents Security Group",
+        "GroupDescription": "Zabbix inter-agent communication and management ports"
+      }
+    },
+    "ZabbixELBSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Fn::GetAtt": [
+            "VPCStack",
+            "Outputs.VPCId"
+          ]
+        },
+        "GroupName": "Zabbix ELB Security Group",
+        "GroupDescription": "Zabbix ELB http, https communication and management ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "DBSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Fn::GetAtt": [
+            "VPCStack",
+            "Outputs.VPCId"
+          ]
+        },
+        "GroupDescription": "Zabbix/Grafana RDS inter-server communication and management ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "3306",
+            "ToPort": "3306",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixServerSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "3306",
+            "ToPort": "3306",
+            "SourceSecurityGroupId": {
+              "Ref": "GrafanaServerSecurityGroup"
+            }
+          }
+        ]
+      }
+    },
+    "InstanceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/"
+      }
+    },
+    "InstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "InstanceRole"
+          }
+        ]
+      }
+    },
+    "GrafanaServerAccessSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Fn::GetAtt": [
+            "VPCStack",
+            "Outputs.VPCId"
+          ]
+        },
+        "GroupName": "Grafana Server Access Security Group",
+        "GroupDescription": "Instances with management access to Grafana server",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "SourceSecurityGroupId": {
+              "Ref": "BastionSecurityGroup"
+            }
+          }
+        ]
+      }
+    },
+    "GrafanaServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Fn::GetAtt": [
+            "VPCStack",
+            "Outputs.VPCId"
+          ]
+        },
+        "GroupName": "Grafana Server Security Group",
+        "GroupDescription": "Grafana server management and access ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "SourceSecurityGroupId": {
+              "Ref": "GrafanaServerAccessSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "3000",
+            "ToPort": "3000",
+            "SourceSecurityGroupId": {
+              "Ref": "GrafanaELBSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "SourceSecurityGroupId": {
+              "Ref": "GrafanaELBSecurityGroup"
+            }
+          }
+        ]
+      }
+    },
+    "GrafanaELBSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Fn::GetAtt": [
+            "VPCStack",
+            "Outputs.VPCId"
+          ]
+        },
+        "GroupName": "Grafana ELB Security Group",
+        "GroupDescription": "Grafana ELB http, https communication and management ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "BastionSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enables SSH Access to Bastion Hosts",
+        "VpcId": {
+          "Fn::GetAtt": [
+            "VPCStack",
+            "Outputs.VPCId"
+          ]
+        },
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": {
+              "Ref": "RemoteAccessCIDR"
+            }
+          },
+          {
+            "IpProtocol": "icmp",
+            "FromPort": "-1",
+            "ToPort": "-1",
+            "CidrIp": {
+              "Ref": "RemoteAccessCIDR"
+            }
+          }
+        ]
+      }
+    },
+    "VPCStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "VPCTemplate.template"
+            ]
+          ]
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
+    "ZabbixPrivateZoneStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "Route53PrivateHostedZoneTemplate.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "VPCID": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.VPCId"
+            ]
+          },
+          "DomainName": {
+            "Ref": "ZabbixDomainName"
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
+    "GrafanaPrivateZoneStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "Route53PrivateHostedZoneTemplate.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "VPCID": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.VPCId"
+            ]
+          },
+          "DomainName": {
+            "Ref": "GrafanaDomainName"
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
+    "ZabbixELBStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "ELBTemplate.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "ELBSecurityGroup": {
+            "Ref": "ZabbixELBSecurityGroup"
+          },
+          "PublicSubnetID1": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PublicSubnetAZ1"
+            ]
+          },
+          "PublicSubnetID2": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PublicSubnetAZ2"
+            ]
+          },
+          "InstancePrivateIP": {
+            "Fn::GetAtt": [
+              "ZabbixInstanceStack",
+              "Outputs.ZabbixPrivateIPAddress"
+            ]
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
+    "GrafanaELBStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "ELBTemplate.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "ELBSecurityGroup": {
+            "Ref": "GrafanaELBSecurityGroup"
+          },
+          "PublicSubnetID1": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PublicSubnetAZ1"
+            ]
+          },
+          "PublicSubnetID2": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PublicSubnetAZ2"
+            ]
+          },
+          "InstancePrivateIP": {
+            "Fn::GetAtt": [
+              "GrafanaInstanceStack",
+              "Outputs.GrafanaPrivateIPAddress"
+            ]
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
+    "DBStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "DBClusterTemplate.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "PrivateSubnetID1": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PrivateSubnetAZ1"
+            ]
+          },
+          "PrivateSubnetID2": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PrivateSubnetAZ2"
+            ]
+          },
+          "MasterUser": {
+            "Ref": "MasterUser"
+          },
+          "MasterPassword": {
+            "Ref": "MasterPassword"
+          },
+          "DBSecurityGroup": {
+            "Ref": "DBSecurityGroup"
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
+    "GrafanaR53RsStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "Route53RecordSetTemplate.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "Route53PrivateHostedZone": {
+            "Fn::GetAtt": [
+              "GrafanaPrivateZoneStack",
+              "Outputs.PrivateHostedZone"
+            ]
+          },
+          "ServerName": {
+            "Ref": "GrafanaServerName"
+          },
+          "DomainName": {
+            "Ref": "GrafanaDomainName"
+          },
+          "InstanceID": {
+            "Fn::GetAtt": [
+              "GrafanaInstanceStack",
+              "Outputs.InstanceID"
+            ]
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
+    "ZabbixR53RsStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "Route53RecordSetTemplate.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "Route53PrivateHostedZone": {
+            "Fn::GetAtt": [
+              "ZabbixPrivateZoneStack",
+              "Outputs.PrivateHostedZone"
+            ]
+          },
+          "ServerName": {
+            "Ref": "ZabbixServerName"
+          },
+          "DomainName": {
+            "Ref": "ZabbixDomainName"
+          },
+          "InstanceID": {
+            "Fn::GetAtt": [
+              "ZabbixInstanceStack",
+              "Outputs.InstanceID"
+            ]
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
+    "ZabbixInstanceStack": {
+      "DependsOn": "BastionStack",
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "ZabbixInstallTemplate.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "VPCID": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.VPCId"
+            ]
+          },
+          "PrivateSubnetID": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PrivateSubnetAZ1"
+            ]
+          },
+          "ZabbixAgentsSecurityGroup": {
+            "Ref": "ZabbixAgentsSecurityGroup"
+          },
+          "ZabbixServerSecurityGroup": {
+            "Ref": "ZabbixServerSecurityGroup"
+          },
+          "InstanceProfileZabbix": {
+            "Ref": "InstanceProfile"
+          },
+          "DBEndPoint": {
+            "Fn::GetAtt": [
+              "DBStack",
+              "Outputs.DBClusterEndpoint"
+            ]
+          },
+          "KeyPairName": {
+            "Ref": "KeyPairName"
+          },
+          "ZabbixAMIOS": "RHEL72HVM",
+          "ZabbixInstanceType": {
+            "Ref": "InstanceType"
+          },
+          "ZabbixServerName": {
+            "Ref": "ZabbixServerName"
+          },
+          "MasterUser": {
+            "Ref": "MasterUser"
+          },
+          "MasterPassword": {
+            "Ref": "MasterPassword"
+          },
+          "QSS3BucketName": {
+            "Ref": "QSS3BucketName"
+          },
+          "QSS3KeyPrefix": {
+            "Ref": "QSS3KeyPrefix"
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
+    "GrafanaInstanceStack": {
+      "DependsOn": "BastionStack",
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "GrafanaInstallTemplate.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "VPCID": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.VPCId"
+            ]
+          },
+          "PrivateSubnetID": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PrivateSubnetAZ1"
+            ]
+          },
+          "GrafanaServerSecurityGroup": {
+            "Ref": "GrafanaServerSecurityGroup"
+          },
+          "InstanceProfileGrafana": {
+            "Ref": "InstanceProfile"
+          },
+          "DBEndPoint": {
+            "Fn::GetAtt": [
+              "DBStack",
+              "Outputs.DBClusterEndpoint"
+            ]
+          },
+          "KeyPairName": {
+            "Ref": "KeyPairName"
+          },
+          "GrafanaAMIOS": "RHEL72HVM",
+          "GrafanaInstanceType": {
+            "Ref": "InstanceType"
+          },
+          "ZabbixServerName": {
+            "Ref": "ZabbixServerName"
+          },
+          "GrafanaServerName": {
+            "Ref": "GrafanaServerName"
+          },
+          "ZabbixDomainName": {
+            "Ref": "ZabbixDomainName"
+          },
+          "MasterUser": {
+            "Ref": "MasterUser"
+          },
+          "MasterPassword": {
+            "Ref": "MasterPassword"
+          },
+          "QSS3BucketName": {
+            "Ref": "QSS3BucketName"
+          },
+          "QSS3KeyPrefix": {
+            "Ref": "QSS3KeyPrefix"
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
+    "BastionStack": {
+      "DependsOn": "VPCStack",
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "linux-bastion.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "BastionAMIOS": "Amazon-Linux-HVM",
+          "BastionBanner": "https://s3.amazonaws.com/quickstart-reference/linux/bastion/latest/scripts/banner_message.txt",
+          "BastionInstanceType": "t2.large",
+          "EnableBanner": "true",
+          "EnableTCPForwarding": "true",
+          "EnableX11Forwarding": "true",
+          "KeyPairName": {
+            "Ref": "KeyPairName"
+          },
+          "NumBastionHosts": "1",
+          "PublicSubnet1ID": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PublicSubnetAZ1"
+            ]
+          },
+          "PublicSubnet2ID": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PublicSubnetAZ2"
+            ]
+          },
+          "QSS3BucketName": "quickstart-reference",
+          "QSS3KeyPrefix": "linux/bastion/latest/",
+          "RemoteAccessCIDR": {
+            "Ref": "RemoteAccessCIDR"
+          },
+          "BastionSecurityGroup": {
+            "Ref": "BastionSecurityGroup"
+          },
+          "VPCID": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.VPCId"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "GrafanaPrivateIPAddress": {
+      "Value": {
+        "Fn::GetAtt": [
+          "GrafanaInstanceStack",
+          "Outputs.GrafanaPrivateIPAddress"
+        ]
+      }
+    },
+    "ZabbixPrivateIPAddress": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ZabbixInstanceStack",
+          "Outputs.ZabbixPrivateIPAddress"
+        ]
+      }
+    },
+    "VPCId": {
+      "Value": {
+        "Fn::GetAtt": [
+          "VPCStack",
+          "Outputs.VPCId"
+        ]
+      }
+    },
+    "DatabaseEndpoint": {
+      "Value": {
+        "Fn::GetAtt": [
+          "DBStack",
+          "Outputs.DBClusterEndpoint"
+        ]
+      }
+    },
+    "ZabbixWebURL": {
+      "Value": {
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": [
+                "ZabbixELBStack",
+                "Outputs.ElbDns"
+              ]
+            },
+            "zabbix"
+          ]
+        ]
+      },
+      "Description": "Zabbix Web  URL"
+    },
+    "GrafanaWebURL": {
+      "Value": {
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": [
+                "GrafanaELBStack",
+                "Outputs.ElbDns"
+              ]
+            },
+            "login"
+          ]
+        ]
+      },
+      "Description": "Zabbix Web  URL"
+    },
+    "ZabbixServerName": {
+      "Value": {
+        "Ref": "ZabbixServerName"
+      },
+      "Description": "Zabbix Server Name"
+    },
+    "LoginName": {
+      "Value": {
+        "Ref": "MasterUser"
+      },
+      "Description": "Zabbix and Grafana Web User"
+    },
+    "LoginPassword": {
+      "Value": {
+        "Ref": "MasterPassword"
+      },
+      "Description": "Zabbix and Grafana Web Password"
+    }
+  }
+}

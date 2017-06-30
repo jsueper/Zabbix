@@ -1,0 +1,491 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "This is template deploys a new VPC for a Zabbix and/or Grafana Setup.",
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Network Configuration"
+          },
+          "Parameters": [
+            "VPCCIDR",
+            "EnableDnsSupport",
+            "EnableDnsHostNames",
+            "PublicSubnetCidrAZ1",
+            "PrivateSubnetCidrAZ1",
+            "PublicSubnetCidrAZ2",
+            "PrivateSubnetCidrAZ2"
+
+          ]
+        }
+      ],
+      "ParameterLabels": {
+        "VPCCIDR": {
+          "default": "VPC CIDR Block"
+        },
+        "EnableDnsSupport": {
+          "default": "Enable Dns Support"
+        },
+        "EnableDnsHostNames": {
+          "default": "Enable Dns HostNames"
+        }
+
+      }
+    }
+  },
+  "Parameters": {
+    "VPCCIDR": {
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "Description": "The CIDR block you want the VPC to cover. For example: \"10.0.0.0/16\".",
+      "Type": "String",
+      "Default": "10.0.0.0/16"
+    },
+    "EnableDnsSupport": {
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Description": "Specifies whether DNS resolution is supported for the VPC. If this attribute is true, the Amazon DNS server resolves DNS hostnames for your instances to their corresponding IP addresses; otherwise, it does not. By default the value is set to true.",
+      "Type": "String",
+      "Default": "true"
+    },
+    "EnableDnsHostNames": {
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Description": "Specifies whether the instances launched in the VPC get DNS hostnames. If this attribute is true, instances in the VPC get DNS hostnames; otherwise, they do not. You can only set EnableDnsHostnames to true if you also set the EnableDnsSupport attribute to true.",
+      "Type": "String",
+      "Default": "true"
+    },
+    "PublicSubnetCidrAZ1": {
+      "Description": "CIDR block for subnet containing the Zabbix and Grafana Elastic Loadbalancers (e.g. 10.0.128.0/20)",
+      "Type": "String",
+      "MinLength": "9",
+      "MaxLength": "18",
+      "Default": "10.0.128.0/20",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+    },
+    "PrivateSubnetCidrAZ1": {
+      "Description": "CIDR block for subnet containing the Zabbix/Grafana Servers and Aurora DB Cluster (e.g. 10.0.0.0/19)",
+      "Type": "String",
+      "MinLength": "9",
+      "MaxLength": "18",
+      "Default": "10.0.0.0/19",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+    },
+    "PublicSubnetCidrAZ2": {
+      "Description": "CIDR block for subnet containing the Zabbix and Grafana Elastic Loadbalancers (e.g. 10.0.144.0/20)",
+      "Type": "String",
+      "MinLength": "9",
+      "MaxLength": "18",
+      "Default": "10.0.144.0/20",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+    },
+    "PrivateSubnetCidrAZ2": {
+      "Description": "CIDR block for subnet containing the Zabbix/Grafana Servers and Aurora DB Cluster (e.g. 10.0.32.0/19)",
+      "Type": "String",
+      "MinLength": "9",
+      "MaxLength": "18",
+      "Default": "10.0.32.0/19",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+    }
+  },
+  "Resources": {
+    "VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": {
+          "Ref": "VPCCIDR"
+        },
+        "EnableDnsSupport": {
+          "Ref": "EnableDnsSupport"
+        },
+        "EnableDnsHostnames": {
+          "Ref": "EnableDnsHostNames"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Zabbix-Grafana-QS"
+          },
+          {
+            "Key": "App",
+            "Value": "QuickStart"
+          },
+          {
+            "Key": "Stack",
+            "Value": "Zabbix-Grafana"
+          },
+          {
+            "Key": "Layer",
+            "Value": "Network"
+          }
+        ]
+      }
+    },
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Zabbix-Grafana-IGW"
+          },
+          {
+            "Key": "App",
+            "Value": "QuickStart"
+          },
+          {
+            "Key": "Stack",
+            "Value": "Zabbix-Grafana"
+          },
+          {
+            "Key": "Layer",
+            "Value": "Network"
+          }
+        ]
+      }
+    },
+    "AttachInternetGateway": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "InternetGatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "NATAZ1": {
+      "DependsOn": "InternetGateway",
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "NATIPAZ1",
+            "AllocationId"
+          ]
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnetAZ1"
+        }
+      }
+    },
+    "NATIPAZ1": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "PublicSubnetAZ1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Ref": "PublicSubnetCidrAZ1"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "0",
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Purpose",
+            "Value": "ELB - Public Subnet AZ-1"
+          },
+          {
+            "Key": "Stack",
+            "Value": "Zabbix-Grafana"
+          },
+          {
+            "Key": "Network",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "Quickstart-Public AZ-1"
+          }
+        ],
+        "MapPublicIpOnLaunch": true
+      }
+    },
+    "PrivateSubnetAZ1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Ref": "PrivateSubnetCidrAZ1"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "0",
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Purpose",
+            "Value": "Private Subnet AZ-1"
+          },
+          {
+            "Key": "Stack",
+            "Value": "Zabbix-Grafana"
+          },
+          {
+            "Key": "Network",
+            "Value": "Internal"
+          },
+          {
+            "Key": "Name",
+            "Value": "Quickstart-Internal AZ-1"
+          }
+        ]
+      }
+    },
+    "PublicSubnetAZ2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Ref": "PublicSubnetCidrAZ2"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "1",
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Purpose",
+            "Value": "ELB Public Subnet AZ-2"
+          },
+          {
+            "Key": "Stack",
+            "Value": "Zabbix-Grafana"
+          },
+          {
+            "Key": "Network",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "Quickstart-Public AZ-2"
+          }
+        ],
+        "MapPublicIpOnLaunch": true
+      }
+    },
+    "PrivateSubnetAZ2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Ref": "PrivateSubnetCidrAZ2"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "1",
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Purpose",
+            "Value": "Private Subnet AZ2"
+          },
+          {
+            "Key": "Stack",
+            "Value": "Zabbix-Grafana"
+          },
+          {
+            "Key": "Network",
+            "Value": "Internal"
+          },
+          {
+            "Key": "Name",
+            "Value": "Quickstart-Internal AZ-2"
+          }
+        ]
+      }
+    },
+    "PublicRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "DependsOn": "AttachInternetGateway",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Zabbix-Grafana Public Route Table"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "Internet Access"
+          },
+          {
+            "Key": "Stack",
+            "Value": "Zabbix-Grafana"
+          },
+          {
+            "Key": "Network",
+            "Value": "Public"
+          }
+        ]
+      }
+    },
+    "PrivateRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Zabbix-Grafana Private Route Table"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "Internal Access"
+          },
+          {
+            "Key": "Stack",
+            "Value": "Zabbix-Grafana"
+          },
+          {
+            "Key": "Network",
+            "Value": "Internal"
+          }
+        ]
+      }
+    },
+    "InternetRoute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "InternalRouteNAT": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRouteTable"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "NATAZ1"
+        }
+      }
+    },
+    "InternetLoadBalancersSubnetRouteTableAssociation1": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnetAZ1"
+        },
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },
+    "InternetLoadBalancersSubnetRouteTableAssociation2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnetAZ2"
+        },
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },
+    "ApplicationSubnetRouteTableAssociation1": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PrivateSubnetAZ1"
+        },
+        "RouteTableId": {
+          "Ref": "PrivateRouteTable"
+        }
+      }
+    },
+    "ApplicationSubnetRouteTableAssociation2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PrivateSubnetAZ2"
+        },
+        "RouteTableId": {
+          "Ref": "PrivateRouteTable"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "VPCId": {
+      "Description": "VPCId of the newly created VPC",
+      "Value": {
+        "Ref": "VPC"
+      }
+    },
+    "PublicSubnetAZ1": {
+      "Description": "SubnetId of the public subnet in AZ1",
+      "Value": {
+        "Ref": "PublicSubnetAZ1"
+      }
+    },
+    "PublicSubnetAZ2": {
+      "Description": "SubnetId of the public subnet in AZ2",
+      "Value": {
+        "Ref": "PublicSubnetAZ2"
+      }
+    },
+    "PrivateSubnetAZ1": {
+      "Description": "SubnetId of the private subnet in AZ1",
+      "Value": {
+        "Ref": "PrivateSubnetAZ1"
+      }
+    },
+    "PrivateSubnetAZ2": {
+      "Description": "SubnetId of the private subnet in AZ2",
+      "Value": {
+        "Ref": "PrivateSubnetAZ2"
+      }
+    }
+  }
+}

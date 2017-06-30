@@ -1,0 +1,111 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "This is template deploys Elastic Loadbalancer.",
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Network Configuration"
+          },
+          "Parameters": [
+            "ELBSecurityGroup",
+            "PublicSubnetID1",
+            "PublicSubnetID2",
+            "InstanceID"
+          ]
+        }
+      ],
+      "ParameterLabels": {
+        "ELBSecurityGroup": {
+          "default": "ELB Security Group"
+        },
+        "PublicSubnetID1": {
+          "default": "Public SubnetID1"
+        },
+        "PublicSubnetID2": {
+          "default": "Public SubnetID2"
+        },
+        "InstanceID": {
+          "default": "Instance ID"
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "ELBSecurityGroup": {
+      "Description": "Security Group for ELB",
+      "Type": "AWS::EC2::SecurityGroup::Id"
+    },
+    "PublicSubnetID1": {
+      "Description": "Public Subnet ID1 for AZ1",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "PublicSubnetID2": {
+      "Description": "Public Subnet ID2 for AZ2",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "InstanceID": {
+      "Description": "Intance ID",
+      "Type": "AWS::EC2::Instance::Id"
+    }
+  },
+  "Resources": {
+    "LoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Ref": "ELBSecurityGroup"
+          }
+        ],
+        "Subnets": [
+          {
+            "Ref": "PublicSubnetID1",
+            "Ref": "PublicSubnetID2"
+          }
+        ],
+        "Instances": [
+          {
+            "Ref": "InstanceID"
+          }
+        ],
+        "Listeners": [
+          {
+            "LoadBalancerPort": "80",
+            "InstancePort": "80",
+            "Protocol": "HTTP"
+          }
+        ],
+        "HealthCheck": {
+          "Target": "TCP:80",
+          "HealthyThreshold": "3",
+          "UnhealthyThreshold": "5",
+          "Interval": "30",
+          "Timeout": "5"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ElbDns": {
+      "Value": {
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": [
+                "LoadBalancer",
+                "DNSName"
+              ]
+            },
+            "zabbix"
+          ]
+        ]
+      },
+      "Description": "ELB Web  URL"
+    }
+  }
+}
+

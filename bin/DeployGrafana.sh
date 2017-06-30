@@ -11,7 +11,7 @@ aws s3api create-bucket --bucket ${bucket} --region us-east-1 --acl public-read
 
 aws s3 cp ../bootstrapGrafana.sh "s3://${bucket}/${key}/Scripts/bootstrapGrafana.sh" --acl public-read
 
-aws s3 cp ../GrafanaInstallTemplate.json "s3://${bucket}/${key}/GrafanaInstallTemplate.json" --acl public-read
+aws s3 cp ../GrafanaInstallTemplate.json "s3://${bucket}/${key}/GrafanaInstallTemplate.template" --acl public-read
 
 
 

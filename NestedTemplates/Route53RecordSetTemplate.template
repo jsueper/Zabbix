@@ -1,0 +1,93 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "This is template deploys Route53 Record Set.",
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Default Configuration"
+          },
+          "Parameters": [
+            "Route53PrivateHostedZone",
+            "ServerName",
+            "DomainName",
+            "InstancePrivateIP"
+          ]
+        }
+      ],
+      "ParameterLabels": {
+        "Route53PrivateHostedZone": {
+          "default": "Enter Route 53 Zone ID"
+        },
+        "ServerName": {
+          "default": "DNS Entry"
+        },
+        "DomainName": {
+          "default": "Domain Name"
+        },
+        "InstancePrivateIP": {
+          "default": "EC2 Instance Private IP"
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "Route53PrivateHostedZone": {
+      "Description": "ID of the Route 53 Hosted Zone to Create Record Set In.",
+      "Type": "AWS::Route53::HostedZone::Id"
+    },
+    "ServerName": {
+      "Description": "DNS Name for Instance",
+      "Type": "String"
+    },
+    "DomainName": {
+      "Description": "Domain Name for Route 53 Zone this Record is being placed into.",
+      "Type": "String"
+    },
+    "InstancePrivateIP": {
+      "Description": "EC2 Instance Private IP",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "Route53RecordSet": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "Route53PrivateHostedZone"
+        },
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "ServerName"
+              },
+              ".",
+              {
+                "Ref": "DomainName"
+              },
+              "."
+            ]
+          ]
+        },
+        "Type": "A",
+        "ResourceRecords": [
+          {
+            "Ref": "InstancePrivateIP"
+          }
+        ],
+        "TTL": "60"
+      }
+    }
+  },
+  "Outputs": {
+    "VPCId": {
+      "Description": "VPCId of the newly created VPC",
+      "Value": {
+        "Ref": "Route53RecordSet"
+      }
+    }
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "This is template deploys Database for a Zabbix and/or Grafana Setup.",
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Network Configuration"
+          },
+          "Parameters": [
+            "PrivateSubnetID1",
+            "PrivateSubnetID2",
+            "MasterUser",
+            "MasterPassword",
+            "DBSecurityGroup"
+          ]
+        }
+      ],
+      "ParameterLabels": {
+        "PrivateSubnetID1": {
+          "default": "Private Subnet ID1"
+        },
+        "PrivateSubnetID2": {
+          "default": "Private Subnet ID2"
+        },
+        "MasterUser": {
+          "default": "Database Master User"
+        },
+        "MasterPassword": {
+          "default": "Database Master Password"
+        },
+        "DBSecurityGroup": {
+          "default": "Database Security Group ID"
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "PrivateSubnetID1": {
+      "Description": "Private Subnet ID1 for Aurora Cluster",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "PrivateSubnetID2": {
+      "Description": "Private Subnet ID2 for Aurora Cluster",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "MasterPassword": {
+      "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{8,50})",
+      "ConstraintDescription": "Input your database Password, Min 8, Maximum of 30 characters.",
+      "Description": "Enter your Database Password, Min 8, maximum of 30 characters. This password is used for the admin user of Zabbix Mysql Database.",
+      "NoEcho": "true",
+      "Type": "String",
+      "Default": "dgGGk.juki78$$"
+    },
+    "MasterUser": {
+      "AllowedPattern": "([A-Za-z0-9]{8,50})",
+      "ConstraintDescription": "Input your database UserName, Min 3, Maximum of 30 characters.",
+      "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Zabbix Mysql/Aurora Database.",
+      "Type": "String",
+      "Default": "zabbixgrafana"
+    },
+    "DBSecurityGroup": {
+      "Description": "ID of Security Group that will be used for Aurora RDS",
+      "Type": "AWS::EC2::SecurityGroup::Id"
+    }
+  },
+  "Resources": {
+    "DBCluster": {
+      "Type": "AWS::RDS::DBCluster",
+      "Properties": {
+        "MasterUsername": {
+          "Ref": "MasterUser"
+        },
+        "MasterUserPassword": {
+          "Ref": "MasterPassword"
+        },
+        "Engine": "aurora",
+        "DBSubnetGroupName": {
+          "Ref": "DBSubnetGroup"
+        },
+        "DBClusterParameterGroupName": {
+          "Ref": "DBClusterParameterGroup"
+        },
+        "VpcSecurityGroupIds": [
+          {
+            "Ref": "DBSecurityGroup"
+          }
+        ]
+      },
+      "DeletionPolicy": "Snapshot"
+    },
+    "DBSubnetGroup": {
+      "Type": "AWS::RDS::DBSubnetGroup",
+      "Properties": {
+        "DBSubnetGroupDescription": "Zabbix/Grafana Subnet Group",
+        "SubnetIds": [
+          {
+            "Ref": "PrivateSubnetID1"
+          },
+          {
+            "Ref": "PrivateSubnetID2"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Zabbix/Grafana DB Subnet Group"
+          }
+        ]
+      }
+    },
+    "DBInstance": {
+      "Type": "AWS::RDS::DBInstance",
+      "Properties": {
+        "DBInstanceClass": "db.r3.large",
+        "Engine": "aurora",
+        "DBSubnetGroupName": {
+          "Ref": "DBSubnetGroup"
+        },
+        "DBParameterGroupName": {
+          "Ref": "DBParameterGroup"
+        },
+        "DBClusterIdentifier": {
+          "Ref": "DBCluster"
+        },
+        "PubliclyAccessible": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Zabbix/Grafana Aurora Database"
+          }
+        ]
+      }
+    },
+    "DBClusterParameterGroup": {
+      "Type": "AWS::RDS::DBClusterParameterGroup",
+      "Properties": {
+        "Description": "Zabbix/Grafana Aurora Cluster Parameter Group",
+        "Family": "aurora5.6",
+        "Parameters": {
+          "time_zone": "America/Denver"
+        }
+      }
+    },
+    "DBParameterGroup": {
+      "Type": "AWS::RDS::DBParameterGroup",
+      "Properties": {
+        "Description": "Zabbix/Grafana Aurora Parameter Group",
+        "Family": "aurora5.6",
+        "Parameters": {
+          "sql_mode": "IGNORE_SPACE"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "DBInstance3": {
+      "Description": "DB Instance ID",
+      "Value": {
+        "Ref": "DBInstance"
+      }
+    },
+    "DBClusterEndpoint": {
+      "Description": "DB Cluster Endpoint Address",
+      "Value": {
+        "Fn::GetAtt": [
+          "DBCluster",
+          "Endpoint.Address"
+        ]
+      }
+    }
+  }
+}

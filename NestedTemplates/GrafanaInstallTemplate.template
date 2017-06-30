@@ -1,0 +1,561 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "This is template deploys a Grafana server.",
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Network Configuration"
+          },
+          "Parameters": [
+            "VPCID",
+            "PrivateSubnetID",
+            "GrafanaServerSecurityGroup"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Amazon Custom EC2 Configuration"
+          },
+          "Parameters": [
+            "KeyPairName",
+            "GrafanaAMIOS",
+            "GrafanaInstanceType",
+            "GrafanaServerName",
+            "ZabbixServerName",
+            "ZabbixDomainName",
+            "InstanceProfileGrafana"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Grafana Database Configuration"
+          },
+          "Parameters": [
+            "MasterUser",
+            "DBEndPoint",
+            "MasterPassword"
+          ]
+        },
+        {
+          "Label": {
+            "default": "AWS QS Configuration"
+          },
+          "Parameters": [
+            "QSS3BucketName",
+            "QSS3KeyPrefix"
+          ]
+        }
+      ],
+      "ParameterLabels": {
+        "GrafanaServerName": {
+          "default": "DNS/Tag Name"
+        },
+        "DBEndPoint": {
+          "default": "Database Endpoint"
+        },
+        "InstanceProfileGrafana": {
+          "default": "Instance Profile"
+        },
+        "GrafanaServerSecurityGroup": {
+          "default": "Security Group"
+        },
+        "ZabbixServerName": {
+          "default": "DNS/Tag Name"
+        },
+        "MasterPassword": {
+          "default": "Database Master Password"
+        },
+        "MasterUser": {
+          "default": "Database Master User"
+        },
+        "ZabbixDomainName": {
+          "default": "Domain Name"
+        },
+        "GrafanaInstanceType": {
+          "default": "Instance Type"
+        },
+        "PrivateSubnetID": {
+          "default": "Private Subnet ID"
+        },
+        "QSS3BucketName": {
+          "default": "Quick Start S3 Bucket Name"
+        },
+        "QSS3KeyPrefix": {
+          "default": "Quick Start S3 Key Prefix"
+        },
+        "VPCID": {
+          "default": "VPC ID"
+        },
+        "GrafanaAMIOS": {
+          "default": "Operating System"
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "MasterPassword": {
+      "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{3,50})",
+      "ConstraintDescription": "Input your database Password, Min 3, Maximum of 30 characters.",
+      "Description": "Enter your Database Password, Min 8, maximum of 30 characters. This password is used for the admin user of Grafana Database.",
+      "NoEcho": "true",
+      "Type": "String",
+      "Default": "dgGGk.juki78$$"
+    },
+    "MasterUser": {
+      "AllowedPattern": "([A-Za-z0-9]{3,50})",
+      "ConstraintDescription": "Input your database UserName, Min 3, Maximum of 30 characters.",
+      "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Grafana Sqllite/Aurora Database.",
+      "Type": "String",
+      "Default": "Grafana"
+    },
+    "ZabbixDomainName": {
+      "ConstraintDescription": "Zabbix String domain name.",
+      "Default": "graph",
+      "Description": "Name of Private Route53 Domain to reach your Zabbix Endpoint after setup.",
+      "Type": "String"
+    },
+    "KeyPairName": {
+      "ConstraintDescription": "must be the name of an existing EC2 KeyPair.",
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "GrafanaInstanceType": {
+      "AllowedValues": [
+        "t2.medium",
+        "t2.large",
+        "m4.large",
+        "m4.xlarge",
+        "m4.2xlarge",
+        "m4.4xlarge",
+        "m4.10xlarge",
+        "r3.large",
+        "r3.xlarge",
+        "r3.2xlarge",
+        "r3.4xlarge",
+        "r3.8xlarge",
+        "r4.8xlarge",
+        "r4.16xlarge"
+      ],
+      "ConstraintDescription": "Must be a valid EC2 instance type.",
+      "Default": "m4.xlarge",
+      "Description": "Choose your Custom Instance type for Grafana Server",
+      "Type": "String"
+    },
+    "PrivateSubnetID": {
+      "Description": "ID of the private subnet aka Availability Zone needed for Grafana Server (e.g., subnet-a0246dcd)",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "QSS3BucketName": {
+      "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+      "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Default": "quickstart-reference-as",
+      "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Type": "String"
+    },
+    "QSS3KeyPrefix": {
+      "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
+      "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+      "Default": "zabbixgrafana/setup/latest",
+      "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+      "Type": "String"
+    },
+    "VPCID": {
+      "Description": "ID of the VPC (e.g., vpc-0343606e)",
+      "Default": "vpc-77e23811",
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "GrafanaAMIOS": {
+      "AllowedValues": [
+        "RHEL72HVM"
+      ],
+      "Default": "RHEL72HVM",
+      "Description": "Operating system and version for Grafana Server.",
+      "Type": "String"
+    },
+    "GrafanaServerName": {
+      "AllowedPattern": "([A-Za-z0-9_]{3,50})",
+      "Default": "Grafana",
+      "Description": "Name for Grafana EC2 Instance/Tag.",
+      "Type": "String"
+    },
+    "ZabbixServerName": {
+      "AllowedPattern": "([A-Za-z0-9_]{3,50})",
+      "Default": "Zabbix",
+      "Description": "Name for Zabbix EC2 Instance/Tag.",
+      "Type": "String"
+    },
+    "InstanceProfileGrafana": {
+      "Description": "Instance Profile for Grafana Server",
+      "Type": "String"
+    },
+    "DBEndPoint": {
+      "Description": "Endpoint for Database for Grafana",
+      "Type": "String"
+    },
+    "GrafanaServerSecurityGroup": {
+      "Description": "Grafana Server Main Security Group",
+      "Type": "AWS::EC2::SecurityGroup::Id"
+    }
+  },
+  "Rules": {
+    "SubnetsInVPC": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::EachMemberIn": [
+              {
+                "Fn::ValueOfAll": [
+                  "AWS::EC2::Subnet::Id",
+                  "VpcId"
+                ]
+              },
+              {
+                "Fn::RefAll": "AWS::EC2::VPC::Id"
+              }
+            ]
+          },
+          "AssertDescription": "All subnets must in the VPC"
+        }
+      ]
+    }
+  },
+  "Mappings": {
+    "AWSAMIRegionMap": {
+      "AMI": {
+        "RHEL72HVM": "RHEL-7.2_HVM-20161025-x86_64-1-Hourly2-GP2"
+      },
+      "ap-northeast-1": {
+        "RHEL72HVM": "ami-2265c543"
+      },
+      "ap-northeast-2": {
+        "RHEL72HVM": "ami-a9e532c7"
+      },
+      "ap-south-1": {
+        "RHEL72HVM": "ami-917205fe"
+      },
+      "ap-southeast-1": {
+        "RHEL72HVM": "ami-22953841"
+      },
+      "ap-southeast-2": {
+        "RHEL72HVM": "ami-91cdf0f2"
+      },
+      "eu-central-1": {
+        "RHEL72HVM": "ami-7def1712"
+      },
+      "eu-west-1": {
+        "RHEL72HVM": "ami-b22961c1"
+      },
+      "sa-east-1": {
+        "RHEL72HVM": "ami-28f66a44"
+      },
+      "us-east-1": {
+        "RHEL72HVM": "ami-873e6190"
+      },
+      "us-east-2": {
+        "RHEL72HVM": "ami-0a33696f"
+      },
+      "us-west-1": {
+        "RHEL72HVM": "ami-f88fc498"
+      },
+      "us-west-2": {
+        "RHEL72HVM": "ami-5dd3743d"
+      }
+    },
+    "AWSInfoRegionMap": {
+      "ap-northeast-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-northeast-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-south-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-southeast-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "ap-southeast-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "eu-central-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "eu-west-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "sa-east-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-east-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-east-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-gov-west-1": {
+        "Partition": "aws-us-gov",
+        "QuickStartS3URL": "https://s3-us-gov-west-1.amazonaws.com"
+      },
+      "us-west-1": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      },
+      "us-west-2": {
+        "Partition": "aws",
+        "QuickStartS3URL": "https://s3.amazonaws.com"
+      }
+    },
+    "GrafanaAMINameMap": {
+      "RHEL72HVM": {
+        "Code": "RHEL72HVM",
+        "repo": ""
+      },
+      "AZLinux": {
+        "Code": "AZLinux",
+        "repo": ""
+      }
+    }
+  },
+  "Resources": {
+    "GrafanaInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "config": {
+            "files": {
+              "/tmp/grafana-setup.txt": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "QuickStartS3URL|",
+                      {
+                        "Fn::FindInMap": [
+                          "AWSInfoRegionMap",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "QuickStartS3URL"
+                        ]
+                      },
+                      "\n",
+                      "QSS3BucketName|",
+                      {
+                        "Ref": "QSS3BucketName"
+                      },
+                      "\n",
+                      "QSS3KeyPrefix|",
+                      {
+                        "Ref": "QSS3KeyPrefix"
+                      },
+                      "\n",
+                      "DatabasePass|",
+                      {
+                        "Ref": "MasterPassword"
+                      },
+                      "\n",
+                      "DatabaseUser|",
+                      {
+                        "Ref": "MasterUser"
+                      },
+                      "\n",
+                      "DBConnString|",
+                      {
+                        "Ref": "DBEndPoint"
+                      },
+                      "\n",
+                      "ZabbixURL|",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "http://",
+                            {
+                              "Ref": "ZabbixServerName"
+                            },
+                            ".",
+                            {
+                              "Ref": "ZabbixDomainName"
+                            },
+                            "/zabbix/api_jsonrpc.php"
+                          ]
+                        ]
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000440",
+                "owner": "root",
+                "group": "root"
+              },
+              "/tmp/bootstrapGrafana.sh": {
+                "source": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Fn::FindInMap": [
+                          "AWSInfoRegionMap",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "QuickStartS3URL"
+                        ]
+                      },
+                      {
+                        "Ref": "QSS3BucketName"
+                      },
+                      {
+                        "Ref": "QSS3KeyPrefix"
+                      },
+                      "Scripts/bootstrapGrafana.sh"
+                    ]
+                  ]
+                },
+                "mode": "000777",
+                "owner": "root",
+                "group": "root"
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "IamInstanceProfile": {
+          "Ref": "InstanceProfileGrafana"
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "AWSAMIRegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            {
+              "Fn::FindInMap": [
+                "GrafanaAMINameMap",
+                {
+                  "Ref": "GrafanaAMIOS"
+                },
+                "Code"
+              ]
+            }
+          ]
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "GrafanaServerSecurityGroup"
+          }
+        ],
+        "SubnetId": {
+          "Ref": "PrivateSubnetID"
+        },
+        "InstanceType": {
+          "Ref": "GrafanaInstanceType"
+        },
+        "KeyName": {
+          "Ref": "KeyPairName"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash \n",
+                "cd /tmp \n",
+                "curl -O https://bootstrap.pypa.io/get-pip.py\n",
+                "python get-pip.py\n",
+                "echo DEBUGPipInstalled &> /tmp/bootstrap.log\n",
+                "pip install awscli\n",
+                "curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                "gunzip aws-cfn-bootstrap-latest.tar.gz\n",
+                "tar -xvf aws-cfn-bootstrap-latest.tar\n",
+                "cd aws-cfn-bootstrap*\n",
+                "python setup.py build\n",
+                "python setup.py install\n",
+                "yum install -y zip\n",
+                "yum install -y unzip\n",
+                "/usr/bin/cfn-init -v ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource GrafanaInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "/tmp/bootstrapGrafana.sh -v --params_file /tmp/grafana-setup.txt &>> /tmp/bootstrap.log\n",
+                "/usr/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource GrafanaInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Ref": "GrafanaServerName"
+            }
+          }
+        ]
+      },
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Timeout": "PT90M"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "GrafanaServerName": {
+      "Value": {
+        "Ref": "GrafanaServerName"
+      },
+      "Description": "Grafana Server Name"
+    },
+    "InstanceID": {
+      "Value": {
+        "Ref": "GrafanaInstance"
+      },
+      "Description": "Grafana Instance ID"
+    },
+    "GrafanaPrivateIPAddress": {
+      "Value": {
+        "Fn::GetAtt": [
+          "GrafanaInstance",
+          "PrivateIp"
+        ]
+      },
+      "Description": "Grafana Instance private IP"
+    }
+  }
+}
+
+
+
+
+

@@ -1,0 +1,77 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "This is template deploys Route53 Private Hosted Zone.",
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Network Configuration"
+          },
+          "Parameters": [
+            "VPCID",
+            "DomainName"
+          ]
+        }
+      ],
+      "ParameterLabels": {
+        "VPCID": {
+          "default": "VPC ID"
+        },
+        "DomainName": {
+          "default": "Domain Name"
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "VPCID": {
+      "Description": "ID of the VPC (e.g., vpc-0343606e)",
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "DomainName": {
+      "Description": "Domain name to create",
+      "Type": "String",
+      "Default": "mon"
+    }
+  },
+  "Resources": {
+    "Route53PrivateHostedZone": {
+      "Type": "AWS::Route53::HostedZone",
+      "Properties": {
+        "HostedZoneConfig": {
+          "Comment": "Private Hosted Zone for Zabbix/Grafana Domain"
+        },
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "DomainName"
+              },
+              "."
+            ]
+          ]
+        },
+        "VPCs": [
+          {
+            "VPCId": {
+              "Ref": "VPCID"
+            },
+            "VPCRegion": {
+              "Ref": "AWS::Region"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "PrivateHostedZone": {
+      "Description": "ID of the newly created Route53 Private Hosted Zone.",
+      "Value": {
+        "Ref": "Route53PrivateHostedZone"
+      }
+    }
+  }
+}
