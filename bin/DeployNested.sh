@@ -12,4 +12,4 @@ aws s3 cp ../BootStrapScripts/ "s3://${bucket}/${key}/Scripts/" --recursive --ac
 
 aws s3 cp ../NestedTemplates/ "s3://${bucket}/${key}/" --recursive --acl public-read
 
-aws cloudformation create-stack --template-url https://s3.amazonaws.com/"${bucket}/${key}/RootTemplate"/RootNestedTemplate.template --stack-name ZG --parameters file://paramsNested.json --disable-rollback --capabilities CAPABILITY_IAM
+#aws cloudformation create-stack --template-url https://s3.amazonaws.com/"${bucket}/${key}/RootTemplate"/RootNestedTemplate.template --stack-name ZG --parameters file://paramsNested.json --disable-rollback --capabilities CAPABILITY_IAM
