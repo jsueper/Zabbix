@@ -131,11 +131,6 @@ if [[ ${VERBOSE} == 'true' ]]; then
 fi
 
 
-if [[ ${DATABASE_CONN_STRING} != '' ]]; then
-    echo "DATABASE_CONN_STRING = ${DATABASE_CONN_STRING}"
-
-fi
-
 #############################################################
 # Start Zabbix Install and Database Setup
 #############################################################

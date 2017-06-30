@@ -698,10 +698,10 @@
               "Outputs.PublicSubnetAZ2"
             ]
           },
-          "InstancePrivateIP": {
+          "InstanceID": {
             "Fn::GetAtt": [
               "ZabbixInstanceStack",
-              "Outputs.ZabbixPrivateIPAddress"
+              "Outputs.InstanceID"
             ]
           }
         },
@@ -750,10 +750,10 @@
               "Outputs.PublicSubnetAZ2"
             ]
           },
-          "InstancePrivateIP": {
+          "InstanceID": {
             "Fn::GetAtt": [
               "GrafanaInstanceStack",
-              "Outputs.GrafanaPrivateIPAddress"
+              "Outputs.InstanceID"
             ]
           }
         },
@@ -851,10 +851,10 @@
           "DomainName": {
             "Ref": "GrafanaDomainName"
           },
-          "InstanceID": {
+          "InstancePrivateIP": {
             "Fn::GetAtt": [
               "GrafanaInstanceStack",
-              "Outputs.InstanceID"
+              "Outputs.GrafanaPrivateIPAddress"
             ]
           }
         },
@@ -900,10 +900,10 @@
           "DomainName": {
             "Ref": "ZabbixDomainName"
           },
-          "InstanceID": {
+          "InstancePrivateIP": {
             "Fn::GetAtt": [
               "ZabbixInstanceStack",
-              "Outputs.InstanceID"
+              "Outputs.ZabbixPrivateIPAddress"
             ]
           }
         },

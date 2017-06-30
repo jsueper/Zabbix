@@ -131,16 +131,9 @@ if [[ ${VERBOSE} == 'true' ]]; then
 fi
 
 
-if [[ ${DATABASE_CONN_STRING} != '' ]]; then
-    echo "DATABASE_CONN_STRING = ${DATABASE_CONN_STRING}"
-
-fi
-
 #############################################################
 # Start Zabbix Install and Database Setup
 #############################################################
-
-
 
 
 groupadd -g 54321 zinstall
@@ -187,55 +180,12 @@ install_packages ${YUM_PACKAGES[@]}
 echo QS_COMPLETE_Install_YUM_Packages
 
 
-sudo wget http://dev.mysql.com/get/mysql57-community-release-el7-7.noarch.rpm
-
-sudo yum -y localinstall mysql57-community-release-el7-7.noarch.rpm
-
-sudo yum repolist enabled | grep "mysql.*-community.*" 
-
-sudo yum -y install mysql-community-server 
-
-
 sudo service httpd start 
 echo ""
 echo ""
 echo "###############################"
 
 
-sudo service mysqld start
-echo ""
-echo ""
-echo "###############################"
-
-
-sudo service mysqld status 
-echo ""
-echo ""
-echo "###############################"
-
-sudo mysql --version 
-echo ""
-echo ""
-echo "###############################"
-
-
-#Get Temporary DB Password from mysqld.log
-echo QS_BEGIN_Get_Temp_MySql_Password
-DBPASS=$(sudo awk '/temporary password/ {print $11}' /var/log/mysqld.log)
-
-echo ""
-echo ""
-echo ""
-echo "###############################"
-
-
-#Setup Mysql Security - Change Temp Password with Password set from cloud formation
-echo QS_BEGIN_Setup_MySql_Secure_Process
-mysql -u root --connect-expired-password --password="${DBPASS}" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${DATABASE_PASS}';"
-mysql -u root --password="${DATABASE_PASS}" -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
-mysql -u root --password="${DATABASE_PASS}" -e "DELETE FROM mysql.user WHERE User='';"
-mysql -u root --password="${DATABASE_PASS}" -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%';"
-mysql -u root --password="${DATABASE_PASS}" -e "FLUSH PRIVILEGES;"
 
 #Go get the RPM for Zabbix
 echo QS_BEGIN_Install_Zabbix_Repo
@@ -244,10 +194,9 @@ echo QS_END_Install_Zabbix_Repo
 
 #Install Packages from Zabbix RPM for Zabbix Server Setup
 ZABBIX_PACKAGES=(
-  zabbix-server-mysql
-  zabbix-web-mysql
   zabbix-agent
   zabbix-java-gateway
+  zabbix-sender
 
 )
 echo QS_BEGIN_Install_Zabbix_Packages
@@ -255,149 +204,9 @@ install_packages ${ZABBIX_PACKAGES[@]}
 echo QS_END_Install_Zabbix_Packages
 
 
-
-#Need to set timezone as Zabbix install depends on it.
-
-sed -e 's/# php_value date.timezone Europe\/Riga/php_value date.timezone America\/Denver/g' /etc/httpd/conf.d/zabbix.conf > /etc/httpd/conf.d/zabbix_new.conf
-sudo mv /etc/httpd/conf.d/zabbix_new.conf /etc/httpd/conf.d/zabbix.conf
-
-echo QS_BEGIN_Update_Zabbix_Server_Conf
-sudo echo 'DBPassword='${DATABASE_PASS} >>/etc/zabbix/zabbix_server.conf
-
-sed -e 's/DBUser=zabbix/DBUser='${DATABASE_USER}'/g' /etc/zabbix/zabbix_server.conf > /etc/zabbix/zabbix_server_new.conf
-sudo mv /etc/zabbix/zabbix_server_new.conf /etc/zabbix/zabbix_server.conf
-
-
-
-#Creating Web Conf So User Doesn't have to go through web setup
-if [[ ${DATABASE_CONN_STRING} == 'NA' ]]; then
-
-echo QS_BEGIN_Create_Zabbix_MySql_Web_Conf_File
-
-sudo touch /etc/zabbix/web/zabbix.conf.php
-sudo chown root:zabbix /etc/zabbix/web/zabbix.conf.php
-
-sudo echo '<?php' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '// Zabbix GUI configuration file.' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo 'global $DB;' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
-
-sudo echo '$DB['\'TYPE\'']     = '\'MYSQL\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'SERVER\'']   = '\'localhost\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'PORT\'']     = '\'0\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'DATABASE\''] = '\'zabbix\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'USER\'']     = '\'${DATABASE_USER}\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'PASSWORD\''] = '\'${DATABASE_PASS}\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
-
-sudo echo '// Schema name. Used for IBM DB2 and PostgreSQL.' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'SCHEMA\''] = '\'\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$ZBX_SERVER      = '\'localhost\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$ZBX_SERVER_PORT = '\'10051\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$ZBX_SERVER_NAME = '\'ZABBIX\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;' >>/etc/zabbix/web/zabbix.conf.php
-
-
-
-#Create the Zabbix database
-echo QS_BEGIN_Create_Zabbix_MySql_Database
-mysql -u root --password="${DATABASE_PASS}" -e "CREATE DATABASE zabbix CHARACTER SET UTF8;"
-mysql -u root --password="${DATABASE_PASS}" -e "GRANT ALL PRIVILEGES on zabbix.* to ${DATABASE_USER}@localhost IDENTIFIED BY '${DATABASE_PASS}';"
-mysql -u root --password="${DATABASE_PASS}" -e "FLUSH PRIVILEGES;"
-echo QS_END_Create_Zabbix_MySql_Database
-
-#Move to Director where Zabbix Mysql Server is
-cd /usr/share/doc/zabbix-server-mysql-3.2.6/
-
-#Unzip Create.sql.gz file
-#Run create.sql file against zabbixdb we created above to create schema and data.
-echo QS_BEGIN_Apply_Zabbix_MySql_Schema
-gunzip *.gz
-mysql -u zabbix --password="${DATABASE_PASS}" zabbix < create.sql
-echo QS_END_Apply_Zabbix_MySql_Schema
-
-fi
-
-if [[ ${DATABASE_CONN_STRING} != 'NA' ]]; then
-
-echo QS_BEGIN_Create_Zabbix_Aurora_Web_Conf_File
-
-sudo echo 'DBHost='${DATABASE_CONN_STRING} >>/etc/zabbix/zabbix_server.conf
-sudo echo 'DBPort=3306' >>/etc/zabbix/zabbix_server.conf
-
-sudo touch /etc/zabbix/web/zabbix.conf.php
-sudo chown root:zabbix /etc/zabbix/web/zabbix.conf.php
-
-sudo echo '<?php' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '// Zabbix GUI configuration file.' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo 'global $DB;' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
-
-sudo echo '$DB['\'TYPE\'']     = '\'MYSQL\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'SERVER\'']   = '\'${DATABASE_CONN_STRING}\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'PORT\'']     = '\'3306\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'DATABASE\''] = '\'zabbix\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'USER\'']     = '\'${DATABASE_USER}\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'PASSWORD\''] = '\'${DATABASE_PASS}\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
-
-sudo echo '// Schema name. Used for IBM DB2 and PostgreSQL.' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$DB['\'SCHEMA\''] = '\'\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$ZBX_SERVER      = '\'localhost\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$ZBX_SERVER_PORT = '\'10051\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$ZBX_SERVER_NAME = '\'ZABBIX\'';' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '' >>/etc/zabbix/web/zabbix.conf.php
-sudo echo '$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;' >>/etc/zabbix/web/zabbix.conf.php
-
-#Create the Zabbix database
-echo QS_BEGIN_Create_Zabbix_Aurora_Database
-
-mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" -e "CREATE DATABASE zabbix CHARACTER SET UTF8;"
-
-echo QS_END_Create_Zabbix_Aurora_Database
-
-
-#Move to Director where Zabbix Mysql Server is
-cd /usr/share/doc/zabbix-server-mysql-3.2.6/
-
-#Unzip Create.sql.gz file
-#Run create.sql file against zabbixdb we created above to create schema and data.
-echo QS_BEGIN_Apply_Zabbix_Aurora_Schema
-gunzip *.gz
-mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" zabbix < create.sql
-echo QS_END_Apply_Zabbix_Aurora_Schema
-
-
-
-echo QS_BEGIN_Apply_Zabbix_Aurora_Default_Password_Update
-sudo touch create_grafana_session.sql
-chown root:zabbix create_grafana_session.sql
-
-sudo echo "INSERT INTO \`users\` (\`userid\`,\`alias\`,\`name\`,\`surname\`,\`passwd\`,\`url\`,\`autologin\`,\`autologout\`,\`lang\`,\`refresh\`,\`type\`,\`theme\`,\`rows_per_page\`) values ('3','${DATABASE_USER}','AWS','QUICKSTART', md5('${DATABASE_PASS}'),'','1','0','en_GB','30','3','default','50');" >> update_zabbix_password.sql
-
-sudo echo "INSERT INTO \`users_groups\` (\`id\`,\`usrgrpid\`,\`userid\`) values ('6','7','3');"  >> update_zabbix_password.sql
-sudo echo "update zabbix.users set passwd=md5('${DATABASE_PASS}') where alias='Admin';"  >> update_zabbix_password.sql
-sudo echo "update zabbix.users set passwd=md5('${DATABASE_PASS}') where alias='Guest';"  >> update_zabbix_password.sql
-
-echo QS_Enable_Zabbix_Agent_UI
-sudo echo "update zabbix.hosts set status='0' where host='Zabbix server';"  >> update_zabbix_password.sql
-
-
-mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" zabbix < update_zabbix_password.sql
-
-echo QS_END_Apply_Zabbix_Aurora_Default_Password_Update
-
-fi
-
-echo QS_END_Create_Zabbix_Web_Conf_File
-
-
 echo "QS_Restart_All_Services"
 sudo service httpd restart
-sudo service zabbix-server restart
+sudo service zabbix-sender restart
 sudo service zabbix-agent restart
 
 # Remove passwords from files
