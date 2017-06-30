@@ -240,17 +240,7 @@
           ]
         },
         "GroupName": "Zabbix Server Access Security Group",
-        "GroupDescription": "Instances with management access to Zabbix server",
-        "SecurityGroupIngress": [
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "22",
-            "ToPort": "22",
-            "SourceSecurityGroupId": {
-              "Ref": "BastionSecurityGroup"
-            }
-          }
-        ]
+        "GroupDescription": "Instances with management access to Zabbix server"
       }
     },
     "ZabbixServerSecurityGroup": {
@@ -271,6 +261,14 @@
             "ToPort": "22",
             "SourceSecurityGroupId": {
               "Ref": "ZabbixServerAccessSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "SourceSecurityGroupId": {
+              "Ref": "BastionSecurityGroup"
             }
           },
           {
@@ -303,6 +301,14 @@
             "ToPort": "10051",
             "SourceSecurityGroupId": {
               "Ref": "ZabbixAgentsSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "10051",
+            "ToPort": "10051",
+            "SourceSecurityGroupId": {
+              "Ref": "ZabbixELBSecurityGroup"
             }
           },
           {
@@ -351,6 +357,12 @@
             "IpProtocol": "tcp",
             "FromPort": "80",
             "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "10051",
+            "ToPort": "10051",
             "CidrIp": "0.0.0.0/0"
           }
         ]
@@ -428,17 +440,7 @@
           ]
         },
         "GroupName": "Grafana Server Access Security Group",
-        "GroupDescription": "Instances with management access to Grafana server",
-        "SecurityGroupIngress": [
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "22",
-            "ToPort": "22",
-            "SourceSecurityGroupId": {
-              "Ref": "BastionSecurityGroup"
-            }
-          }
-        ]
+        "GroupDescription": "Instances with management access to Grafana server"
       }
     },
     "GrafanaServerSecurityGroup": {
@@ -475,6 +477,14 @@
             "ToPort": "80",
             "SourceSecurityGroupId": {
               "Ref": "GrafanaELBSecurityGroup"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "SourceSecurityGroupId": {
+              "Ref": "BastionSecurityGroup"
             }
           }
         ]
@@ -901,7 +911,6 @@
       }
     },
     "ZabbixInstanceStack": {
-      "DependsOn": "BastionStack",
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "TemplateURL": {
@@ -982,7 +991,6 @@
       }
     },
     "GrafanaInstanceStack": {
-      "DependsOn": "BastionStack",
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "TemplateURL": {
