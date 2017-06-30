@@ -162,9 +162,9 @@
           "LoadBalancer",
           "DNSName"
         ]
-      }
-    },
-    "Description": "ELB DNS Name"
+      },
+      "Description": "ELB DNS Name"
+    }
   }
 }
 

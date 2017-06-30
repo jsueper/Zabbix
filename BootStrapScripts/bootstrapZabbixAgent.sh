@@ -204,6 +204,21 @@ install_packages ${ZABBIX_PACKAGES[@]}
 echo QS_END_Install_Zabbix_Packages
 
 
+sudo grep -A21 "\[database\]" grafana.ini | sed -i  's/;type = sqlite3/type = mysql/' grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;host = 127.*/host = ${DATABASE_CONN_STRING}:3306/" grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;user = root/user = ${DATABASE_USER}/" grafana.ini
+sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;password =/password = ${DATABASE_PASS}/" grafana.ini
+
+sudo grep -A21 "\[security\]" grafana.ini | sed -i  "s/;admin_user = admin/admin_user = ${DATABASE_USER}/" grafana.ini
+sudo grep -A21 "\[security\]" grafana.ini | sed -i  "s/;admin_password = admin/admin_password = ${DATABASE_PASS}/" grafana.ini
+
+
+sudo echo "HostMetadata=ServerSpecTest    21df83bf21bf0be663090bb8d4128558ab9b95fba66a6dbf834f8b91ae5e08ae"  >> /etc/zabbix/zabbix-agents.conf
+
+sudo echo "HostMetadataItem=system.uname"  >> /etc/zabbix/zabbix-agentd.conf
+
+
+
 echo "QS_Restart_All_Services"
 sudo service httpd restart
 sudo service zabbix-sender restart
