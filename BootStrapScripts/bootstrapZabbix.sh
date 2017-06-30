@@ -386,6 +386,7 @@ mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --passw
 
 echo QS_END_Apply_Zabbix_Aurora_Default_Password_Update
 
+
 fi
 
 echo QS_END_Create_Zabbix_Web_Conf_File
