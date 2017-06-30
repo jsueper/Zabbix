@@ -703,7 +703,13 @@
               "ZabbixInstanceStack",
               "Outputs.InstanceID"
             ]
-          }
+          },
+          "Protocol1": "HTTP",
+          "ElbPort1": "80",
+          "InstancePort1": "80",
+          "Protocol2": "TCP",
+          "ElbPort2": "10051",
+          "InstancePort2": "10051"
         },
         "TimeoutInMinutes": "90"
       }
@@ -755,7 +761,13 @@
               "GrafanaInstanceStack",
               "Outputs.InstanceID"
             ]
-          }
+          },
+          "Protocol1": "HTTP",
+          "ElbPort1": "80",
+          "InstancePort1": "3000",
+          "Protocol2": "TCP",
+          "ElbPort2": "443",
+          "InstancePort2": "3000"
         },
         "TimeoutInMinutes": "90"
       }

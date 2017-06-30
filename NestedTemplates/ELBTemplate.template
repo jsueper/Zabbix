@@ -6,13 +6,19 @@
       "ParameterGroups": [
         {
           "Label": {
-            "default": "Network Configuration"
+            "default": "Default Configuration"
           },
           "Parameters": [
             "ELBSecurityGroup",
             "PublicSubnetID1",
             "PublicSubnetID2",
-            "InstanceID"
+            "InstanceID",
+            "Protocol1",
+            "Protocol2",
+            "ElbPort1",
+            "ElbPort2",
+            "InstancePort1",
+            "InstancePort2"
           ]
         }
       ],
@@ -28,6 +34,24 @@
         },
         "InstanceID": {
           "default": "Instance ID"
+        },
+        "ElbPort1": {
+          "default": "ELB Port #1"
+        },
+        "ElbPort2": {
+          "default": "ELB Port #2"
+        },
+        "InstancePort2": {
+          "default": "ELB Instance Port  #2"
+        },
+        "InstancePort1": {
+          "default": "ELB Instance Port  #1"
+        },
+        "Protocol1": {
+          "default": "ELB Protocol  #1"
+        },
+        "Protocol2": {
+          "default": "ELB Protocol  #2"
         }
       }
     }
@@ -48,6 +72,30 @@
     "InstanceID": {
       "Description": "Intance ID",
       "Type": "AWS::EC2::Instance::Id"
+    },
+    "ElbPort1": {
+      "Description": "ELB Port 1",
+      "Type": "String"
+    },
+    "ElbPort2": {
+      "Description": "ELB Port 2",
+      "Type": "String"
+    },
+    "InstancePort1": {
+      "Description": "ELB Instance Port 1",
+      "Type": "String"
+    },
+    "InstancePort2": {
+      "Description": "ELB Instance Port 2",
+      "Type": "String"
+    },
+    "Protocol1": {
+      "Description": "ELB Protocol 1",
+      "Type": "String"
+    },
+    "Protocol2": {
+      "Description": "ELB Protocol 2",
+      "Type": "String"
     }
   },
   "Resources": {
@@ -75,9 +123,26 @@
         ],
         "Listeners": [
           {
-            "LoadBalancerPort": "80",
-            "InstancePort": "80",
-            "Protocol": "HTTP"
+            "LoadBalancerPort": {
+              "Ref": "ElbPort1"
+            },
+            "InstancePort": {
+              "Ref": "InstancePort1"
+            },
+            "Protocol": {
+              "Ref": "Protocol1"
+            }
+          },
+          {
+            "LoadBalancerPort": {
+              "Ref": "ElbPort2"
+            },
+            "InstancePort": {
+              "Ref": "InstancePort2"
+            },
+            "Protocol": {
+              "Ref": "Protocol2"
+            }
           }
         ],
         "HealthCheck": {
