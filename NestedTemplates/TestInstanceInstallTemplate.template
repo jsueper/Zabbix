@@ -423,7 +423,7 @@
                 "cd /tmp \n",
                 "curl -O https://bootstrap.pypa.io/get-pip.py\n",
                 "python get-pip.py\n",
-                "echo DEBUGPipInstalled &> /tmp/bootstrap.log\n",
+                "echo DEBUGPipInstalled &> /tmp/bootstrapagent.log\n",
                 "pip install awscli\n",
                 "curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
                 "gunzip aws-cfn-bootstrap-latest.tar.gz\n",
