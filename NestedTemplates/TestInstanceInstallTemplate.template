@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "This is template deploys a Zabbix server.",
+  "Description": "This is template deploys a Zabbix Test Subject Server.",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [
