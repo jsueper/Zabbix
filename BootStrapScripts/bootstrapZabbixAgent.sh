@@ -199,7 +199,6 @@ sudo grep -A20 "### Option: Hostname" zabbix_agentd.conf | sed -i  "s/Hostname=Z
 sudo grep -A20 "### Option: HostMetadata" zabbix_agentd.conf | sed -i  "s/# HostMetadata=/HostMetadata=$(uname)   ServerSpec/" zabbix_agentd.conf
 sudo grep -A20 "### Option: DebugLevel" zabbix_agentd.conf | sed -i  's/# DebugLevel=3/DebugLevel=5/' zabbix_agentd.conf
 sudo grep -A20 "### Option: EnableRemoteCommands" zabbix_agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix_agentd.conf
-sudo grep -A20 "### Option: EnableRemoteCommands" zabbix_agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix_agentd.conf
 
 
 echo "QS_Restart_All_Services"

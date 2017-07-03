@@ -328,7 +328,6 @@
                         "Fn::Join": [
                           "",
                           [
-                            "http://",
                             {
                               "Ref": "ZabbixServerName"
                             },
