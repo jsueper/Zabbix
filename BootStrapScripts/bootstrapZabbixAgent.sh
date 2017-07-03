@@ -193,10 +193,10 @@ echo QS_END_Install_Zabbix_Packages
 
 cd /etc/zabbix/
 
-sudo grep -A20 "### Option: ServerActive" zabbix-agentd.conf | sed -i  's/ServerActive=127.0.0.1/ServerActive='${ZABBIX_SERVER}'/' zabbix-agentd.conf
-sudo grep -A20 "### Option: Server" zabbix-agentd.conf | sed -i  's/Server=127.0.0.1/ServerActive='${ZABBIX_SERVER}'/' zabbix-agentd.conf
-sudo grep -A20 "### Option: Hostname" zabbix-agentd.conf | sed -i  's/Hostname=Zabbix server/Hostname='$(hostname)'/' zabbix-agentd.conf
-sudo grep -A20 "### Option: HostMetadata" zabbix-agentd.conf | sed -i  's/# HostMetadata=/HostMetadata='$(uname)'   ServerSpec/' zabbix-agentd.conf
+sudo grep -A20 "### Option: ServerActive" zabbix-agentd.conf | sed -i  "s/ServerActive=127.0.0.1/ServerActive='${ZABBIX_SERVER}'/" zabbix-agentd.conf
+sudo grep -A20 "### Option: Server" zabbix-agentd.conf | sed -i  "s/Server=127.0.0.1/ServerActive='${ZABBIX_SERVER}'/" zabbix-agentd.conf
+sudo grep -A20 "### Option: Hostname" zabbix-agentd.conf | sed -i  "s/Hostname=Zabbix server/Hostname='$(hostname)'/" zabbix-agentd.conf
+sudo grep -A20 "### Option: HostMetadata" zabbix-agentd.conf | sed -i  "s/# HostMetadata=/HostMetadata='$(uname)'   ServerSpec/" zabbix-agentd.conf
 sudo grep -A20 "### Option: DebugLevel" zabbix-agentd.conf | sed -i  's/# DebugLevel=3/DebugLevel=5/' zabbix-agentd.conf
 sudo grep -A20 "### Option: EnableRemoteCommands" zabbix-agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix-agentd.conf
 sudo grep -A20 "### Option: EnableRemoteCommands" zabbix-agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix-agentd.conf
