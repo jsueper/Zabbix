@@ -202,7 +202,7 @@ sudo grep -A20 "### Option: EnableRemoteCommands" zabbix_agentd.conf | sed -i  '
 
 
 echo "QS_Restart_All_Services"
-sudo service httpd restarta
+sudo service httpd restart
 sudo service zabbix-agent restart
 
 echo "QS_END_OF_SETUP_ZABBIX"
@@ -212,9 +212,7 @@ echo "QS_END_OF_SETUP_ZABBIX"
 rm ${PARAMS_FILE}
 
 #Ensure all services survive reboot
-sudo systemctl enable mysqld.service
 sudo systemctl enable httpd.service
-sudo systemctl enable zabbix-server.service
 sudo systemctl enable zabbix-agent.service
 
 echo "Finished AWS Zabbix Quick Start Bootstrapping"
