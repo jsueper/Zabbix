@@ -202,7 +202,7 @@ sudo grep -A20 "### Option: EnableRemoteCommands" zabbix_agentd.conf | sed -i  '
 
 
 echo "QS_Restart_All_Services"
-sudo service httpd restart
+sudo service httpd restarta
 sudo service zabbix-agent restart
 
 echo "QS_END_OF_SETUP_ZABBIX"

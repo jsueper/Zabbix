@@ -25,7 +25,7 @@
   },
   {
     "ParameterKey": "KeyPairName",
-    "ParameterValue": "az-ohio-private-pem"
+    "ParameterValue": "private-az-key-oregon"
   },
   {
     "ParameterKey": "InstanceType",

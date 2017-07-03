@@ -388,53 +388,53 @@ echo QS_END_Apply_Zabbix_Aurora_Default_Password_Update
 
 
 
-sudo echo "INSERT INTO \`groups\'  (\`groupid\`,\`name\`,\`internal\`,\`flags\`) values ('8', 'ServerSpec', '0','1');"  >> create_serverspec_group.sql
-sudo echo "INSERT INTO \`actions\'  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('7', 'Register Agent - Linux', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`groups\`  (\`groupid\`,\`name\`,\`internal\`,\`flags\`) values ('8', 'ServerSpec', '0','1');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`actions\`  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('7', 'Register Agent - Linux', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_serverspec_group.sql
 
 
 sudo echo "update zabbix.ids set nextid='8' where table_name='groups';"  >> create_serverspec_group.sql
 
-sudo echo "INSERT INTO \`actions\'  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('8', 'Register Agent - Windows', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`actions\`  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('8', 'Register Agent - Windows', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_serverspec_group.sql
 
 sudo echo "update zabbix.ids set nextid='8' where table_name='actions';"  >> create_serverspec_group.sql
 
 
-sudo echo "INSERT INTO \`operations\'  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('12', '7', '6', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('12', '7', '6', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
 
 
-sudo echo "INSERT INTO \`operations\'  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('13', '8', '6', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('13', '8', '6', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
 
-sudo echo "INSERT INTO \`operations\'  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('14', '8', '4', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('14', '8', '4', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
 
-sudo echo "INSERT INTO \`operations\'  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('15', '7', '4', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('15', '7', '4', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
 
 sudo echo "update zabbix.ids set nextid='15' where table_name='operations';"  >> create_serverspec_group.sql
 
 
-sudo echo "INSERT INTO \`opgroup\'  (\`opgroupid\`,\`operationid\`,\`groupid\`) values ('3', '14', '8');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`opgroup\`  (\`opgroupid\`,\`operationid\`,\`groupid\`) values ('3', '14', '8');"  >> create_serverspec_group.sql
 
-sudo echo "INSERT INTO \`opgroup\'  (\`opgroupid\`,\`operationid\`,\`groupid\`) values ('4', '15', '8');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`opgroup\`  (\`opgroupid\`,\`operationid\`,\`groupid\`) values ('4', '15', '8');"  >> create_serverspec_group.sql
 
 
 sudo echo "update zabbix.ids set nextid='4' where table_name='opgroup';"  >> create_serverspec_group.sql
 
 
 
-sudo echo "INSERT INTO \`optemplate\'  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('2', '12', '10001');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('2', '12', '10001');"  >> create_serverspec_group.sql
 
-sudo echo "INSERT INTO \`optemplate\'  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('3', '13', '10001');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('3', '13', '10001');"  >> create_serverspec_group.sql
 
 
 sudo echo "update zabbix.ids set nextid='3' where table_name='optemplate';"  >> create_serverspec_group.sql
 
 
-sudo echo "INSERT INTO \`conditions\'  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('9', '7', '24', '2', 'ServerSpec', '');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('9', '7', '24', '2', 'ServerSpec', '');"  >> create_serverspec_group.sql
 
-sudo echo "INSERT INTO \`conditions\'  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('10', '7', '24', '2', 'Linux', '');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('10', '7', '24', '2', 'Linux', '');"  >> create_serverspec_group.sql
 
-sudo echo "INSERT INTO \`conditions\'  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('11', '8', '24', '2', 'Windows', '');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('11', '8', '24', '2', 'Windows', '');"  >> create_serverspec_group.sql
 
-sudo echo "INSERT INTO \`conditions\'  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('12', '8', '24', '2', 'ServerSpec', '');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('12', '8', '24', '2', 'ServerSpec', '');"  >> create_serverspec_group.sql
 
 
 sudo echo "update zabbix.ids set nextid='12' where table_name='conditions';"  >> create_serverspec_group.sql
