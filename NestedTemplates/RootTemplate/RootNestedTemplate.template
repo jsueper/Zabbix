@@ -1116,6 +1116,7 @@
       }
     },
     "TestInstanceStack": {
+      "DependsOn": "ZabbixInstanceStack",
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "TemplateURL": {
