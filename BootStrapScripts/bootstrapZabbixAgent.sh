@@ -91,18 +91,15 @@ QS_S3_URL='NONE'
 QS_S3_BUCKET='NONE'
 QS_S3_KEY_PREFIX='NONE'
 QS_S3_SCRIPTS_PATH='NONE'
-DATABASE_PASS='NONE'
-DATABASE_USER='NONE'
-DATABASE_CONN_STRING='NONE'
+ZABBIX_SERVER='NONE'
+
 
 
 if [ -f ${PARAMS_FILE} ]; then
     QS_S3_URL=`grep 'QuickStartS3URL' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
     QS_S3_BUCKET=`grep 'QSS3Bucket' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
     QS_S3_KEY_PREFIX=`grep 'QSS3KeyPrefix' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
-    DATABASE_PASS=`grep 'DatabasePass' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
-    DATABASE_USER=`grep 'DatabaseUser' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
-    DATABASE_CONN_STRING=`grep 'DBConnString' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
+    ZABBIX_SERVER=`grep 'DatabasePass' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
 
 
     # Strip leading slash
@@ -123,9 +120,8 @@ if [[ ${VERBOSE} == 'true' ]]; then
     echo "QS_S3_BUCKET = ${QS_S3_BUCKET}"
     echo "QS_S3_KEY_PREFIX = ${QS_S3_KEY_PREFIX}"
     echo "QS_S3_SCRIPTS_PATH = ${QS_S3_SCRIPTS_PATH}"
-    echo "DATABASE_PASS = ${DATABASE_PASS}"
-    echo "DATABASE_USER = ${DATABASE_USER}"
-    echo "DATABASE_CONN_STRING = ${DATABASE_CONN_STRING}"
+    echo "ZABBIX_SERVER = ${ZABBIX_SERVER}"
+
 
  
 fi
@@ -163,16 +159,7 @@ YUM_PACKAGES=(
     httpd
     httpd-devel 
     wget
-    php
-    php-cli
-    php-common
-    php-devel
-    php-pear
-    php-gd
-    php-mbstring
-    php-bcmath
-    php-mysql
-    php-xml
+    git
 )
 
 echo QS_BEGIN_Install_YUM_Packages
@@ -203,29 +190,24 @@ echo QS_BEGIN_Install_Zabbix_Packages
 install_packages ${ZABBIX_PACKAGES[@]}
 echo QS_END_Install_Zabbix_Packages
 
+set HOSTNAME = hostname
+set OS = uname
 
-sudo grep -A21 "\[database\]" grafana.ini | sed -i  's/;type = sqlite3/type = mysql/' grafana.ini
-sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;host = 127.*/host = ${DATABASE_CONN_STRING}:3306/" grafana.ini
-sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;user = root/user = ${DATABASE_USER}/" grafana.ini
-sudo grep -A21 "\[database\]" grafana.ini | sed -i  "s/;password =/password = ${DATABASE_PASS}/" grafana.ini
+cd /etc/zabbix/
 
-sudo grep -A21 "\[security\]" grafana.ini | sed -i  "s/;admin_user = admin/admin_user = ${DATABASE_USER}/" grafana.ini
-sudo grep -A21 "\[security\]" grafana.ini | sed -i  "s/;admin_password = admin/admin_password = ${DATABASE_PASS}/" grafana.ini
-
-
-sudo echo "HostMetadata=ServerSpecTest    21df83bf21bf0be663090bb8d4128558ab9b95fba66a6dbf834f8b91ae5e08ae"  >> /etc/zabbix/zabbix-agents.conf
-
-sudo echo "HostMetadataItem=system.uname"  >> /etc/zabbix/zabbix-agentd.conf
-
+sudo grep -A20 "### Option: ServerActive" zabbix-agentd.conf | sed -i  's/ServerActive=127.0.0.1/ServerActive='${ZABBIX_SERVER}'/' zabbix-agentd.conf
+sudo grep -A20 "### Option: Server" zabbix-agentd.conf | sed -i  's/Server=127.0.0.1/ServerActive='${ZABBIX_SERVER}'/' zabbix-agentd.conf
+sudo grep -A20 "### Option: Hostname" zabbix-agentd.conf | sed -i  's/Hostname=Zabbix server/Hostname='${HOSTNAME}'/' zabbix-agentd.conf
+sudo grep -A20 "### Option: HostMetadata" zabbix-agentd.conf | sed -i  's/# HostMetadata=/HostMetadata='${OS}'   ServerSpec/' zabbix-agentd.conf
+sudo grep -A20 "### Option: DebugLevel" zabbix-agentd.conf | sed -i  's/# DebugLevel=3/DebugLevel=5/' zabbix-agentd.conf
+sudo grep -A20 "### Option: EnableRemoteCommands" zabbix-agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix-agentd.conf
+sudo grep -A20 "### Option: EnableRemoteCommands" zabbix-agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix-agentd.conf
 
 
 echo "QS_Restart_All_Services"
 sudo service httpd restart
 sudo service zabbix-sender restart
 sudo service zabbix-agent restart
-
-# Remove passwords from files
-sed -i s/${DATABASE_PASS}/xxxxx/g  /var/log/cloud-init.log
 
 echo "QS_END_OF_SETUP_ZABBIX"
 # END SETUP script
