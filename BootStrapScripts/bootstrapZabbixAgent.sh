@@ -99,7 +99,7 @@ if [ -f ${PARAMS_FILE} ]; then
     QS_S3_URL=`grep 'QuickStartS3URL' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
     QS_S3_BUCKET=`grep 'QSS3Bucket' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
     QS_S3_KEY_PREFIX=`grep 'QSS3KeyPrefix' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
-    ZABBIX_SERVER=`grep 'DatabasePass' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
+    ZABBIX_SERVER=`grep 'ZabbixServer' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
 
 
     # Strip leading slash
@@ -190,15 +190,13 @@ echo QS_BEGIN_Install_Zabbix_Packages
 install_packages ${ZABBIX_PACKAGES[@]}
 echo QS_END_Install_Zabbix_Packages
 
-set HOSTNAME = hostname
-set OS = uname
 
 cd /etc/zabbix/
 
 sudo grep -A20 "### Option: ServerActive" zabbix-agentd.conf | sed -i  's/ServerActive=127.0.0.1/ServerActive='${ZABBIX_SERVER}'/' zabbix-agentd.conf
 sudo grep -A20 "### Option: Server" zabbix-agentd.conf | sed -i  's/Server=127.0.0.1/ServerActive='${ZABBIX_SERVER}'/' zabbix-agentd.conf
-sudo grep -A20 "### Option: Hostname" zabbix-agentd.conf | sed -i  's/Hostname=Zabbix server/Hostname='${HOSTNAME}'/' zabbix-agentd.conf
-sudo grep -A20 "### Option: HostMetadata" zabbix-agentd.conf | sed -i  's/# HostMetadata=/HostMetadata='${OS}'   ServerSpec/' zabbix-agentd.conf
+sudo grep -A20 "### Option: Hostname" zabbix-agentd.conf | sed -i  's/Hostname=Zabbix server/Hostname='$(hostname)'/' zabbix-agentd.conf
+sudo grep -A20 "### Option: HostMetadata" zabbix-agentd.conf | sed -i  's/# HostMetadata=/HostMetadata='$(uname)'   ServerSpec/' zabbix-agentd.conf
 sudo grep -A20 "### Option: DebugLevel" zabbix-agentd.conf | sed -i  's/# DebugLevel=3/DebugLevel=5/' zabbix-agentd.conf
 sudo grep -A20 "### Option: EnableRemoteCommands" zabbix-agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix-agentd.conf
 sudo grep -A20 "### Option: EnableRemoteCommands" zabbix-agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix-agentd.conf

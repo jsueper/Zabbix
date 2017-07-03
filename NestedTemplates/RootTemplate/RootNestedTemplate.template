@@ -20,7 +20,8 @@
             "KeyPairName",
             "InstanceType",
             "ZabbixServerName",
-            "GrafanaServerName"
+            "GrafanaServerName",
+            "TestInstanceName"
           ]
         },
         {
@@ -60,6 +61,9 @@
         },
         "GrafanaServerName": {
           "default": "DNS/Tag Name for Grafana Server"
+        },
+        "TestInstanceName": {
+          "default": "DNS/Tag Name for Test Server"
         },
         "MasterPassword": {
           "default": "Zabbix/Grafana Database Master Password"
@@ -164,6 +168,12 @@
       "AllowedPattern": "([A-Za-z0-9_]{3,50})",
       "Default": "Grafana",
       "Description": "Name for Grafana EC2 Instance/Tag.",
+      "Type": "String"
+    },
+    "TestInstanceName": {
+      "AllowedPattern": "([A-Za-z0-9_]{3,50})",
+      "Default": "Grafana",
+      "Description": "Name for Test EC2 Instance/Tag.",
       "Type": "String"
     },
     "RemoteAccessCIDR": {
@@ -332,7 +342,17 @@
           ]
         },
         "GroupName": "Zabbix Agents Security Group",
-        "GroupDescription": "Zabbix inter-agent communication and management ports"
+        "GroupDescription": "Zabbix inter-agent communication and management ports",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "SourceSecurityGroupId": {
+              "Ref": "BastionSecurityGroup"
+            }
+          }
+        ]
       }
     },
     "ZabbixELBSecurityGroup": {
@@ -1093,6 +1113,77 @@
         "TimeoutInMinutes": "90"
       }
     },
+    "TestInstanceStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "TestInstanceInstallTemplate.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "VPCID": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.VPCId"
+            ]
+          },
+          "PrivateSubnetID": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PrivateSubnetAZ1"
+            ]
+          },
+          "ZabbixAgentsSecurityGroup": {
+            "Ref": "ZabbixAgentsSecurityGroup"
+          },
+          "InstanceProfileTestEC2": {
+            "Ref": "InstanceProfile"
+          },
+          "KeyPairName": {
+            "Ref": "KeyPairName"
+          },
+          "ZabbixAMIOS": "RHEL72HVM",
+          "ZabbixInstanceType": {
+            "Ref": "InstanceType"
+          },
+          "ServerName": {
+            "Ref": "TestInstanceName"
+          },
+          "QSS3BucketName": {
+            "Ref": "QSS3BucketName"
+          },
+          "QSS3KeyPrefix": {
+            "Ref": "QSS3KeyPrefix"
+          },
+          "ZabbixServerName": {
+            "Ref": "ZabbixServerName"
+          },
+          "ZabbixDomainName": {
+            "Ref": "ZabbixDomainName"
+          }
+        },
+        "TimeoutInMinutes": "90"
+      }
+    },
     "BastionStack": {
       "DependsOn": "VPCStack",
       "Type": "AWS::CloudFormation::Stack",
@@ -1175,6 +1266,14 @@
         "Fn::GetAtt": [
           "ZabbixInstanceStack",
           "Outputs.ZabbixPrivateIPAddress"
+        ]
+      }
+    },
+    "TestInstancePrivateIPAddress": {
+      "Value": {
+        "Fn::GetAtt": [
+          "TestInstanceStack",
+          "Outputs.TestInstancePrivateIPAddress"
         ]
       }
     },
