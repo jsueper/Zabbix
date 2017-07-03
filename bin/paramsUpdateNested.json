@@ -1,23 +1,23 @@
 [
   {
     "ParameterKey": "RemoteAccessCIDR",
-    "ParameterValue": "71.205.193.40/32"
+    "UsePreviousValue": true
   },
   {
     "ParameterKey": "QSS3BucketName",
-    "ParameterValue": "quickstart-reference-as"
+    "UsePreviousValue": true
   },
   {
     "ParameterKey": "QSS3KeyPrefix",
-    "ParameterValue": "zabbixgrafananested/setup/latest"
+    "UsePreviousValue": true
   },
   {
     "ParameterKey": "ZabbixServerName",
-    "ParameterValue": "Zabbix"
+    "UsePreviousValue": true
   },
   {
     "ParameterKey": "GrafanaServerName",
-    "ParameterValue": "Grafana"
+    "UsePreviousValue": true
   },
   {
     "ParameterKey": "TestInstanceName",
@@ -25,19 +25,19 @@
   },
   {
     "ParameterKey": "KeyPairName",
-    "ParameterValue": "az-ohio-private-pem"
+    "UsePreviousValue": true
   },
   {
     "ParameterKey": "InstanceType",
-    "ParameterValue": "m4.2xlarge"
+    "UsePreviousValue": true
   },
   {
     "ParameterKey": "ZabbixDomainName",
-    "ParameterValue": "mon"
+    "UsePreviousValue": true
   },
   {
     "ParameterKey": "GrafanaDomainName",
-    "ParameterValue": "graph"
+    "UsePreviousValue": true
   },
   {
     "ParameterKey": "MasterPassword",

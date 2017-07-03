@@ -23,6 +23,7 @@
             "KeyPairName",
             "ZabbixAMIOS",
             "ServerName",
+            "InstanceType",
             "ZabbixServerName",
             "ZabbixDomainName"
           ]
