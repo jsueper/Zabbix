@@ -408,7 +408,9 @@ sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operation
 
 sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('15', '7', '4', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
 
-sudo echo "update zabbix.ids set nextid='15' where table_name='operations';"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('16', '7', '6', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
+
+sudo echo "update zabbix.ids set nextid='16' where table_name='operations';"  >> create_serverspec_group.sql
 
 
 sudo echo "INSERT INTO \`opgroup\`  (\`opgroupid\`,\`operationid\`,\`groupid\`) values ('3', '14', '8');"  >> create_serverspec_group.sql
@@ -419,13 +421,14 @@ sudo echo "INSERT INTO \`opgroup\`  (\`opgroupid\`,\`operationid\`,\`groupid\`) 
 sudo echo "update zabbix.ids set nextid='4' where table_name='opgroup';"  >> create_serverspec_group.sql
 
 
-
 sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('2', '12', '10001');"  >> create_serverspec_group.sql
 
-sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('3', '13', '10001');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('3', '13', '10081');"  >> create_serverspec_group.sql
+
+sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('4', '16', '10106');"  >> create_serverspec_group.sql
 
 
-sudo echo "update zabbix.ids set nextid='3' where table_name='optemplate';"  >> create_serverspec_group.sql
+sudo echo "update zabbix.ids set nextid='4' where table_name='optemplate';"  >> create_serverspec_group.sql
 
 
 sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('9', '7', '24', '2', 'ServerSpec', '');"  >> create_serverspec_group.sql
@@ -438,6 +441,12 @@ sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`condition
 
 
 sudo echo "update zabbix.ids set nextid='12' where table_name='conditions';"  >> create_serverspec_group.sql
+
+sudo echo "INSERT INTO \`hosts\`  (\`hostid\`,\`proxy_hostid\`,\`host\`,\`status\`,\`disable_until\`,\`error\`,\`available\`,\`errors_from\`,\`lastaccess\`,\`ipmi_authtype\`,\`ipmi_privilege\`,\`ipmi_username\`,\`ipmi_password\`,\`ipmi_disable_until\`,\`ipmi_available\`,\`snmp_disable_until\`,\`snmp_available\`,\`maintenanceid\`,\`maintenance_status\`,\`maintenance_type\`,\`maintenance_from\`,\`ipmi_errors_from\`,\`snmp_errors_from\`,\`ipmi_error\`,\`snmp_error\`,\`jmx_disable_until\`,\`jmx_available\`,\`jmx_errors_from\`,\`jmx_error\`,\`name\`,\`flags\`,\`templateid\`,\`description\`,\`tls_connect\`,\`tls_accept\`,\`tls_issuer\`,\`tls_subject\`,\`tls_psk_identity\`,\`tls_psk\`) values ('10106', NULL, 'ServerSpec-Template', '3', '0', '', '0', '0', '0', '0', '2', '', '', '0', '0', '0', '0', NULL, '0', '0', '0', '0', '0', '', '', '0', '0', '0', '', 'ServerSpec-Template', '0', NULL, '', '1', '1', '', '', '', '');"  >> create_serverspec_group.sql
+
+
+sudo echo "update zabbix.ids set nextid='10106' where table_name='hosts';"  >> create_serverspec_group.sql
+
 
 
 mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" zabbix < create_serverspec_group.sql
