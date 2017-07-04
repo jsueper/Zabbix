@@ -389,15 +389,21 @@ echo QS_END_Apply_Zabbix_Aurora_Default_Password_Update
 
 
 sudo echo "INSERT INTO \`groups\`  (\`groupid\`,\`name\`,\`internal\`,\`flags\`) values ('8', 'ServerSpec', '0','1');"  >> create_serverspec_group.sql
-sudo echo "INSERT INTO \`actions\`  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('7', 'Register Agent - Linux', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_serverspec_group.sql
-
 
 sudo echo "update zabbix.ids set nextid='8' where table_name='groups';"  >> create_serverspec_group.sql
+
+sudo echo "INSERT INTO \`actions\`  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('7', 'Register Agent - Linux', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_serverspec_group.sql
+
 
 sudo echo "INSERT INTO \`actions\`  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('8', 'Register Agent - Windows', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_serverspec_group.sql
 
 sudo echo "update zabbix.ids set nextid='8' where table_name='actions';"  >> create_serverspec_group.sql
 
+
+sudo echo "INSERT INTO \`hosts\`  (\`hostid\`,\`proxy_hostid\`,\`host\`,\`status\`,\`disable_until\`,\`error\`,\`available\`,\`errors_from\`,\`lastaccess\`,\`ipmi_authtype\`,\`ipmi_privilege\`,\`ipmi_username\`,\`ipmi_password\`,\`ipmi_disable_until\`,\`ipmi_available\`,\`snmp_disable_until\`,\`snmp_available\`,\`maintenanceid\`,\`maintenance_status\`,\`maintenance_type\`,\`maintenance_from\`,\`ipmi_errors_from\`,\`snmp_errors_from\`,\`ipmi_error\`,\`snmp_error\`,\`jmx_disable_until\`,\`jmx_available\`,\`jmx_errors_from\`,\`jmx_error\`,\`name\`,\`flags\`,\`templateid\`,\`description\`,\`tls_connect\`,\`tls_accept\`,\`tls_issuer\`,\`tls_subject\`,\`tls_psk_identity\`,\`tls_psk\`) values ('10106', NULL, 'ServerSpec-Template', '3', '0', '', '0', '0', '0', '0', '2', '', '', '0', '0', '0', '0', NULL, '0', '0', '0', '0', '0', '', '', '0', '0', '0', '', 'ServerSpec-Template', '0', NULL, '', '1', '1', '', '', '', '');"  >> create_serverspec_group.sql
+
+
+sudo echo "update zabbix.ids set nextid='10106' where table_name='hosts';"  >> create_serverspec_group.sql
 
 sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('12', '7', '6', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
 
@@ -442,10 +448,7 @@ sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`condition
 
 sudo echo "update zabbix.ids set nextid='12' where table_name='conditions';"  >> create_serverspec_group.sql
 
-sudo echo "INSERT INTO \`hosts\`  (\`hostid\`,\`proxy_hostid\`,\`host\`,\`status\`,\`disable_until\`,\`error\`,\`available\`,\`errors_from\`,\`lastaccess\`,\`ipmi_authtype\`,\`ipmi_privilege\`,\`ipmi_username\`,\`ipmi_password\`,\`ipmi_disable_until\`,\`ipmi_available\`,\`snmp_disable_until\`,\`snmp_available\`,\`maintenanceid\`,\`maintenance_status\`,\`maintenance_type\`,\`maintenance_from\`,\`ipmi_errors_from\`,\`snmp_errors_from\`,\`ipmi_error\`,\`snmp_error\`,\`jmx_disable_until\`,\`jmx_available\`,\`jmx_errors_from\`,\`jmx_error\`,\`name\`,\`flags\`,\`templateid\`,\`description\`,\`tls_connect\`,\`tls_accept\`,\`tls_issuer\`,\`tls_subject\`,\`tls_psk_identity\`,\`tls_psk\`) values ('10106', NULL, 'ServerSpec-Template', '3', '0', '', '0', '0', '0', '0', '2', '', '', '0', '0', '0', '0', NULL, '0', '0', '0', '0', '0', '', '', '0', '0', '0', '', 'ServerSpec-Template', '0', NULL, '', '1', '1', '', '', '', '');"  >> create_serverspec_group.sql
 
-
-sudo echo "update zabbix.ids set nextid='10106' where table_name='hosts';"  >> create_serverspec_group.sql
 
 
 
