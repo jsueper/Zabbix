@@ -342,18 +342,18 @@
           "Fn::GetAtt": [
             "VPCStack",
             "Outputs.VPCId"
-          ],
-          "SecurityGroupIngress": [
-            {
-              "IpProtocol": "tcp",
-              "FromPort": "22",
-              "ToPort": "22",
-              "SourceSecurityGroupId": {
-                "Ref": "BastionSecurityGroup"
-              }
-            }
           ]
-        }
+        },
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "SourceSecurityGroupId": {
+              "Ref": "BastionSecurityGroup"
+            }
+          }
+        ]
       }
     },
     "ZabbixInterAgentsSecurityGroup": {
