@@ -337,25 +337,39 @@
     "ZabbixAgentsSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
+        "GroupDescription": "Zabbix Server Agents Security Group",
         "VpcId": {
           "Fn::GetAtt": [
             "VPCStack",
             "Outputs.VPCId"
-          ]
-        },
-        "GroupName": "Zabbix Agents Security Group",
-        "GroupDescription": "Zabbix inter-agent communication and management ports",
-        "SecurityGroupIngress": [
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "22",
-            "ToPort": "22",
-            "SourceSecurityGroupId": {
-              "Ref": "BastionSecurityGroup"
+          ],
+          "SecurityGroupIngress": [
+            {
+              "IpProtocol": "tcp",
+              "FromPort": "22",
+              "ToPort": "22",
+              "SourceSecurityGroupId": {
+                "Ref": "BastionSecurityGroup"
+              }
             }
-          }
-        ]
+          ]
+        }
       }
+    },
+    "ZabbixInterAgentsSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "ZabbixAgentsSecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "ToPort": "65535",
+        "FromPort": "0",
+        "SourceSecurityGroupId": {
+          "Ref": "ZabbixAgentsSecurityGroup"
+        }
+      },
+      "DependsOn": "ZabbixAgentsSecurityGroup"
     },
     "ZabbixELBSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",

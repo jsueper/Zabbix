@@ -194,11 +194,12 @@ echo QS_END_Install_Zabbix_Packages
 cd /etc/zabbix/
 
 sudo grep -A20 "### Option: ServerActive" zabbix_agentd.conf | sed -i  "s/ServerActive=127.0.0.1/ServerActive=${ZABBIX_SERVER}/" zabbix_agentd.conf
-sudo grep -A20 "### Option: Server" zabbix_agentd.conf | sed -i  "s/Server=127.0.0.1/ServerActive=${ZABBIX_SERVER}/" zabbix_agentd.conf
+sudo grep -A20 "### Option: Server" zabbix_agentd.conf | sed -i  "s/Server=127.0.0.1/Server=${ZABBIX_SERVER}/" zabbix_agentd.conf
 sudo grep -A20 "### Option: Hostname" zabbix_agentd.conf | sed -i  "s/Hostname=Zabbix server/Hostname=$(hostname)/" zabbix_agentd.conf
 sudo grep -A20 "### Option: HostMetadata" zabbix_agentd.conf | sed -i  "s/# HostMetadata=/HostMetadata=$(uname)   ServerSpec/" zabbix_agentd.conf
 sudo grep -A20 "### Option: DebugLevel" zabbix_agentd.conf | sed -i  's/# DebugLevel=3/DebugLevel=5/' zabbix_agentd.conf
 sudo grep -A20 "### Option: EnableRemoteCommands" zabbix_agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix_agentd.conf
+sudo grep -A20 "### Option: StartAgents" zabbix_agentd.conf | sed -i  's/# StartAgents=3/StartAgents=3/' zabbix_agentd.conf
 
 
 echo "QS_Restart_All_Services"
