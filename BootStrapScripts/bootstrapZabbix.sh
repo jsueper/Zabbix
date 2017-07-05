@@ -388,71 +388,88 @@ echo QS_END_Apply_Zabbix_Aurora_Default_Password_Update
 
 
 
-sudo echo "INSERT INTO \`groups\`  (\`groupid\`,\`name\`,\`internal\`,\`flags\`) values ('8', 'ServerSpec', '0','1');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`groups\`  (\`groupid\`,\`name\`,\`internal\`,\`flags\`) values ('8', 'AWS-QuickStart', '0','1');"  >> create_serverspec_group.sql
 
-sudo echo "update zabbix.ids set nextid='8' where table_name='groups';"  >> create_serverspec_group.sql
+sudo echo "update zabbix.ids set nextid='8' where table_name='groups';"  >> create_aws_quickstart.sql
 
-sudo echo "INSERT INTO \`actions\`  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('7', 'Register Agent - Linux', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_serverspec_group.sql
-
-
-sudo echo "INSERT INTO \`actions\`  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('8', 'Register Agent - Windows', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_serverspec_group.sql
-
-sudo echo "update zabbix.ids set nextid='8' where table_name='actions';"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`actions\`  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('7', 'AWSQS-Register Agent - Linux', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_aws_quickstart.sql
 
 
-sudo echo "INSERT INTO \`hosts\`  (\`hostid\`,\`proxy_hostid\`,\`host\`,\`status\`,\`disable_until\`,\`error\`,\`available\`,\`errors_from\`,\`lastaccess\`,\`ipmi_authtype\`,\`ipmi_privilege\`,\`ipmi_username\`,\`ipmi_password\`,\`ipmi_disable_until\`,\`ipmi_available\`,\`snmp_disable_until\`,\`snmp_available\`,\`maintenanceid\`,\`maintenance_status\`,\`maintenance_type\`,\`maintenance_from\`,\`ipmi_errors_from\`,\`snmp_errors_from\`,\`ipmi_error\`,\`snmp_error\`,\`jmx_disable_until\`,\`jmx_available\`,\`jmx_errors_from\`,\`jmx_error\`,\`name\`,\`flags\`,\`templateid\`,\`description\`,\`tls_connect\`,\`tls_accept\`,\`tls_issuer\`,\`tls_subject\`,\`tls_psk_identity\`,\`tls_psk\`) values ('10106', NULL, 'ServerSpec-Template', '3', '0', '', '0', '0', '0', '0', '2', '', '', '0', '0', '0', '0', NULL, '0', '0', '0', '0', '0', '', '', '0', '0', '0', '', 'ServerSpec-Template', '0', NULL, '', '1', '1', '', '', '', '');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`actions\`  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('8', 'AWSQS-Register Agent - Windows', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_aws_quickstart.sql
+
+sudo echo "update zabbix.ids set nextid='8' where table_name='actions';"  >> create_aws_quickstart.sql
 
 
-sudo echo "update zabbix.ids set nextid='10106' where table_name='hosts';"  >> create_serverspec_group.sql
-
-sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('12', '7', '6', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`hosts\`  (\`hostid\`,\`proxy_hostid\`,\`host\`,\`status\`,\`disable_until\`,\`error\`,\`available\`,\`errors_from\`,\`lastaccess\`,\`ipmi_authtype\`,\`ipmi_privilege\`,\`ipmi_username\`,\`ipmi_password\`,\`ipmi_disable_until\`,\`ipmi_available\`,\`snmp_disable_until\`,\`snmp_available\`,\`maintenanceid\`,\`maintenance_status\`,\`maintenance_type\`,\`maintenance_from\`,\`ipmi_errors_from\`,\`snmp_errors_from\`,\`ipmi_error\`,\`snmp_error\`,\`jmx_disable_until\`,\`jmx_available\`,\`jmx_errors_from\`,\`jmx_error\`,\`name\`,\`flags\`,\`templateid\`,\`description\`,\`tls_connect\`,\`tls_accept\`,\`tls_issuer\`,\`tls_subject\`,\`tls_psk_identity\`,\`tls_psk\`) values ('10106', NULL, 'AWSQS-Template', '3', '0', '', '0', '0', '0', '0', '2', '', '', '0', '0', '0', '0', NULL, '0', '0', '0', '0', '0', '', '', '0', '0', '0', '', 'AWSQS-Template', '0', NULL, '', '1', '1', '', '', '', '');"  >> create_aws_quickstart.sql
 
 
-sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('13', '8', '6', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
+sudo echo "update zabbix.ids set nextid='10106' where table_name='hosts';"  >> create_aws_quickstart.sql
 
-sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('14', '8', '4', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
-
-sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('15', '7', '4', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
-
-sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('16', '7', '6', '0', '1', '1', '0', '0');"  >> create_serverspec_group.sql
-
-sudo echo "update zabbix.ids set nextid='16' where table_name='operations';"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('12', '7', '6', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
 
 
-sudo echo "INSERT INTO \`opgroup\`  (\`opgroupid\`,\`operationid\`,\`groupid\`) values ('3', '14', '8');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('13', '8', '6', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
 
-sudo echo "INSERT INTO \`opgroup\`  (\`opgroupid\`,\`operationid\`,\`groupid\`) values ('4', '15', '8');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('14', '8', '4', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
 
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('15', '7', '4', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
 
-sudo echo "update zabbix.ids set nextid='4' where table_name='opgroup';"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('16', '7', '6', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
 
-
-sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('2', '12', '10001');"  >> create_serverspec_group.sql
-
-sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('3', '13', '10081');"  >> create_serverspec_group.sql
-
-sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('4', '16', '10106');"  >> create_serverspec_group.sql
+sudo echo "update zabbix.ids set nextid='16' where table_name='operations';"  >> create_aws_quickstart.sql
 
 
-sudo echo "update zabbix.ids set nextid='4' where table_name='optemplate';"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`opgroup\`  (\`opgroupid\`,\`operationid\`,\`groupid\`) values ('3', '14', '8');"  >> create_aws_quickstart.sql
+
+sudo echo "INSERT INTO \`opgroup\`  (\`opgroupid\`,\`operationid\`,\`groupid\`) values ('4', '15', '8');"  >> create_aws_quickstart.sql
 
 
-sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('9', '7', '24', '2', 'ServerSpec', '');"  >> create_serverspec_group.sql
-
-sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('10', '7', '24', '2', 'Linux', '');"  >> create_serverspec_group.sql
-
-sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('11', '8', '24', '2', 'Windows', '');"  >> create_serverspec_group.sql
-
-sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('12', '8', '24', '2', 'ServerSpec', '');"  >> create_serverspec_group.sql
+sudo echo "update zabbix.ids set nextid='4' where table_name='opgroup';"  >> create_aws_quickstart.sql
 
 
-sudo echo "update zabbix.ids set nextid='12' where table_name='conditions';"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('2', '12', '10001');"  >> create_aws_quickstart.sql
+
+sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('3', '13', '10081');"  >> create_aws_quickstart.sql
+
+sudo echo "INSERT INTO \`optemplate\`  (\`optemplateid\`,\`operationid\`,\`templateid\`) values ('4', '16', '10106');"  >> create_aws_quickstart.sql
+
+
+sudo echo "update zabbix.ids set nextid='4' where table_name='optemplate';"  >> create_aws_quickstart.sql
+
+
+sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('9', '7', '24', '2', 'AWS-QuickStart', '');"  >> create_aws_quickstart.sql
+
+sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('10', '7', '24', '2', 'Linux', '');"  >> create_aws_quickstart.sql
+
+sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('11', '8', '24', '2', 'Windows', '');"  >> create_aws_quickstart.sql
+
+sudo echo "INSERT INTO \`conditions\`  (\`conditionid\`,\`actionid\`,\`conditiontype\`,\`operator\`,\`value\`,\`value2\`) values ('12', '8', '24', '2', 'AWS-QuickStart', '');"  >> create_aws_quickstart.sql
+
+
+sudo echo "update zabbix.ids set nextid='12' where table_name='conditions';"  >> create_aws_quickstart.sql
+
+
+sudo echo "INSERT INTO \`applications\`  (\`applicationid\`,\`hostid\`,\`name\`,\`flags\`) values ('469', '10106', 'AWSQuickStart', '0');"  >> create_aws_quickstart.sql
+
+
+sudo echo "update zabbix.ids set nextid='469' where table_name='applications';"  >> create_aws_quickstart.sql
 
 
 
+sudo echo "INSERT INTO \`items\`  (\`itemid\`,\`type\`,\`snmp_community\`,\`snmp_oid\`,\`hostid\`,\`name\`,\`key_\`,\`delay\`,\`history\`,\`trends\`,\`status\`,\`value_type\`,\`trapper_hosts\`,\`units\`,\`multiplier\`,\`delta\`,\`snmpv3_securityname\`,\`snmpv3_securitylevel\`,\`snmpv3_authpassphrase\`,\`snmpv3_privpassphrase\`,\`formula\`,\`error\`,\`lastlogsize\`,\`logtimefmt\`,\`templateid\`,\`valuemapid\`,\`delay_flex\`,\`params\`,\`ipmi_sensor\`,\`data_type\`,\`authtype\`,\`username\`,\`password\`,\`publickey\`,\`privatekey\`,\`mtime\`,\`flags\`,\`interfaceid\`,\`port\`,\`description\`,\`inventory_link\`,\`lifetime\`,\`snmpv3_authprotocol\`,\`snmpv3_privprotocol\`,\`state\`,\`snmpv3_contextname\`,\`evaltype\`) values ('25421', '2', '', '', '10106', 'AWSQS Results', 'jsonItemKey', '0', '90', '0', '0', '4', '', '', '0', '0', '', '0', '', '', '1', '', '0', '', NULL, NULL, '', '', '', '0', '0', '', '', '', '', '0', '0', NULL, '', '', '0', '30', '0', '0', '0', '', '0');"  >> create_aws_quickstart.sql
 
 
-mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" zabbix < create_serverspec_group.sql
+sudo echo "update zabbix.ids set nextid='25421' where table_name='items';"  >> create_aws_quickstart.sql
+
+
+sudo echo "INSERT INTO \`items_applications\`  (\`itemappid\`,\`applicationid\`,\`itemid\`) values ('5965', '469', '25421');"  >> create_aws_quickstart.sql
+
+
+sudo echo "update zabbix.ids set nextid='5965' where table_name='items_applications';"  >> create_aws_quickstart.sql
+
+
+
+mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" zabbix < create_aws_quickstart.sql
 
 fi
 
