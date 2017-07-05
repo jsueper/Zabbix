@@ -388,7 +388,7 @@ echo QS_END_Apply_Zabbix_Aurora_Default_Password_Update
 
 
 
-sudo echo "INSERT INTO \`groups\`  (\`groupid\`,\`name\`,\`internal\`,\`flags\`) values ('8', 'AWS-QuickStart', '0','1');"  >> create_serverspec_group.sql
+sudo echo "INSERT INTO \`groups\`  (\`groupid\`,\`name\`,\`internal\`,\`flags\`) values ('8', 'AWS-QuickStart', '0','1');"  >> create_aws_quickstart.sql
 
 sudo echo "update zabbix.ids set nextid='8' where table_name='groups';"  >> create_aws_quickstart.sql
 
