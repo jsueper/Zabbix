@@ -109,7 +109,7 @@ if [ -f ${PARAMS_FILE} ]; then
     fi
 
     # Format S3 script path
-    QS_S3_SCRIPTS_PATH="${QS_S3_URL}/${QS_S3_BUCKET}/${QS_S3_KEY_PREFIX}/scripts"
+    QS_S3_SCRIPTS_PATH="${QS_S3_URL}/${QS_S3_BUCKET}/${QS_S3_KEY_PREFIX}/Scripts"
 else
     echo "Paramaters file not found or accessible."
     exit 1
@@ -160,6 +160,10 @@ YUM_PACKAGES=(
     httpd-devel 
     wget
     git
+    gcc
+    ruby-devel
+    rubygems
+    rake
 )
 
 echo QS_BEGIN_Install_YUM_Packages
@@ -185,10 +189,13 @@ ZABBIX_PACKAGES=(
   zabbix-java-gateway
   zabbix-sender
 
+
 )
 echo QS_BEGIN_Install_Zabbix_Packages
 install_packages ${ZABBIX_PACKAGES[@]}
+
 echo QS_END_Install_Zabbix_Packages
+
 
 
 cd /etc/zabbix/
@@ -200,13 +207,35 @@ sudo grep -A20 "### Option: HostMetadata" zabbix_agentd.conf | sed -i  "s/# Host
 sudo grep -A20 "### Option: DebugLevel" zabbix_agentd.conf | sed -i  's/# DebugLevel=3/DebugLevel=5/' zabbix_agentd.conf
 sudo grep -A20 "### Option: EnableRemoteCommands" zabbix_agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix_agentd.conf
 sudo grep -A20 "### Option: StartAgents" zabbix_agentd.conf | sed -i  's/# StartAgents=3/StartAgents=3/' zabbix_agentd.conf
+sudo grep -A20 "### Option: UnsafeUserParameters" zabbix_agentd.conf | sed -i  's/# UnsafeUserParameters=0/UnsafeUserParameters=1/' zabbix_agentd.conf
+sudo grep -A20 "### Option: UserParameter" zabbix_agentd.conf | sed -i  's/# UserParameter=/UserParameter=AWS-QS-TEST,sudo su && cd \/home\/ec2-user\/AWS-QS-TESTING\
+ / && .\/serverspec.sh/' zabbix_agentd.conf
+sudo grep -A20 "### Option: AllowRoot" zabbix_agentd.conf | sed -i  's/# AllowRoot=0/AllowRoot=1/' zabbix_agentd.conf
 
+
+cd /home/ec2-user
+
+sudo gem install io-console serverspec
+
+mkdir AWS-QS-TESTING
+
+cd AWS-QS-TESTING
+
+aws s3 cp s3://serverspec-test . --recursive
+
+aws s3 cp s3://${QS_S3_BUCKET}/${QS_S3_KEY_PREFIX}/Scripts/serverspec.sh .
+
+chmod 777 serverspec.sh
 
 echo "QS_Restart_All_Services"
 sudo service httpd restart
 sudo service zabbix-agent restart
 
 echo "QS_END_OF_SETUP_ZABBIX"
+
+
+
+
 # END SETUP script
 
 # Remove files used in bootstrapping
