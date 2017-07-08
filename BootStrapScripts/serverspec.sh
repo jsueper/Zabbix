@@ -2,6 +2,8 @@
 
 cd /home/ec2-user/AWS-QS-TESTING/
 
+aws s3 cp s3://serverspec-test . --recursive
+
 rake spec && python serverspec_output_reformater.py
 cat reformatted_test_results.json
 

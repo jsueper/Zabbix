@@ -392,9 +392,7 @@ sudo echo "INSERT INTO \`groups\`  (\`groupid\`,\`name\`,\`internal\`,\`flags\`)
 
 sudo echo "update zabbix.ids set nextid='8' where table_name='groups';"  >> create_aws_quickstart.sql
 
-sudo echo "INSERT INTO \`host_groups\`  (\`hostgroupid\`,\`hostid\`,\`groupid\`) values ('113', '10106', '1');"  >> create_aws_quickstart.sql
 
-sudo echo "update zabbix.ids set nextid='113' where table_name='host_groups';"  >> create_aws_quickstart.sql
 
 
 sudo echo "INSERT INTO \`actions\`  (\`actionid\`,\`name\`,\`eventsource\`,\`evaltype\`,\`status\`,\`esc_period\`,\`def_shortdata\`,\`def_longdata\`,\`r_shortdata\`,\`r_longdata\`,\`formula\`,\`maintenance_mode\`) values ('7', 'AWSQS Register Agent - Linux', '2', '1', '0', '0', 'Auto registration: {HOST.HOST}', 'Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}', '', '', '', '1');"  >> create_aws_quickstart.sql
@@ -409,6 +407,12 @@ sudo echo "INSERT INTO \`hosts\`  (\`hostid\`,\`proxy_hostid\`,\`host\`,\`status
 
 
 sudo echo "update zabbix.ids set nextid='10106' where table_name='hosts';"  >> create_aws_quickstart.sql
+
+
+sudo echo "INSERT INTO \`hosts_groups\`  (\`hostgroupid\`,\`hostid\`,\`groupid\`) values ('113', '10106', '1');"  >> create_aws_quickstart.sql
+
+sudo echo "update zabbix.ids set nextid='113' where table_name='hosts_groups';"  >> create_aws_quickstart.sql
+
 
 sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('12', '7', '6', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
 
@@ -479,7 +483,7 @@ sudo echo "update zabbix.ids set nextid='5965' where table_name='items_applicati
 
 
 
-sudo echo "INSERT INTO \`items_discovery\`  (\`itemdiscoveryid\`,\`itemid\`,\`parent_itemid\`,\`key_\`,\`lastcheck\`,\`ts_delete\`) values ('312', '25552', '25531', '', '0', '0');"  >> create_aws_quickstart.sql
+sudo echo "INSERT INTO \`item_discovery\`  (\`itemdiscoveryid\`,\`itemid\`,\`parent_itemid\`,\`key_\`,\`lastcheck\`,\`ts_delete\`) values ('312', '25552', '25531', '', '0', '0');"  >> create_aws_quickstart.sql
 
 sudo echo "update zabbix.ids set nextid='312' where table_name='item_discovery';"  >> create_aws_quickstart.sql
 

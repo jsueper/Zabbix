@@ -1,7 +1,7 @@
 [
   {
     "ParameterKey": "RemoteAccessCIDR",
-    "ParameterValue": ""
+    "ParameterValue": "71.205.193.40/32"
   },
   {
     "ParameterKey": "QSS3BucketName",
