@@ -245,6 +245,11 @@ sudo rpm -Uvh grafana-4.3.1-1.x86_64.rpm
 
 echo QS_BEGIN_Install_Grafana_Zabbix_Plugin
 sudo grafana-cli plugins install alexanderzobnin-zabbix-app
+
+sudo grafana-cli plugins install vonage-status-panel
+
+grafana-cli plugins install briangann-datatable-panel
+
 echo QS_END_Install_Grafana_Zabbix_Plugin
 
 #Creating Web Conf So User Doesn't have to go through web setup
