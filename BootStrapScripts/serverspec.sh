@@ -12,7 +12,7 @@ jq . reformatted_test_results.json
 
 cat /dev/null > /tmp/zdata.txt
 
-jq -r --arg foo $(hostname) '.data[] | $foo + " \"" + "test" + "[" + .["{#TEST}"] + "]" + "\" "  + .["{#TEST_RESULT}"]' reformatted_test_results.json | sed 's|"|\\"|g' | sed 's|\\"test|"test|g' | sed 's|]\\"|]"|g' > /tmp/zdata.txt
+jq -r --arg foo $(hostname) '.data[] | $foo + " \"" + "test" + "[" + .["{#TEST}"] + "]" + "\" "  + .["{#TEST_RESULT}"]' reformatted_test_results.json | sed 's|"|\\"|g' | sed 's|\\"test|"test|g' | sed 's|]\\"|]"|g'  | sed 's|passed|1|g'  | sed 's|failed|0|g' > /tmp/zdata.txt
 
 #cat /dev/null > /tmp/zsender.log
 
