@@ -471,46 +471,12 @@
           "Statement": [
             {
               "Action": [
-                "s3:GetObject"
+                "s3:Get*",
+                "s3:List*"
               ],
               "Effect": "Allow",
               "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Fn::FindInMap": [
-                          "AWSInfoRegionMap",
-                          {
-                            "Ref": "AWS::Region"
-                          },
-                          "Partition"
-                        ]
-                      },
-                      ":s3:::serverspec-test/*"
-                    ]
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Fn::FindInMap": [
-                          "AWSInfoRegionMap",
-                          {
-                            "Ref": "AWS::Region"
-                          },
-                          "Partition"
-                        ]
-                      },
-                      ":s3:::serverspec-test"
-                    ]
-                  ]
-                }
+                "*"
               ]
             }
           ]
