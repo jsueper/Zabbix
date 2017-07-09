@@ -213,7 +213,7 @@ sudo grep -A20 "### Option: DebugLevel" zabbix_agentd.conf | sed -i  's/# DebugL
 sudo grep -A20 "### Option: EnableRemoteCommands" zabbix_agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix_agentd.conf
 sudo grep -A20 "### Option: StartAgents" zabbix_agentd.conf | sed -i  's/# StartAgents=3/StartAgents=3/' zabbix_agentd.conf
 sudo grep -A20 "### Option: UnsafeUserParameters" zabbix_agentd.conf | sed -i  's/# UnsafeUserParameters=0/UnsafeUserParameters=1/' zabbix_agentd.conf
-sudo grep -A20 "### Option: UserParameter" zabbix_agentd.conf | sed -i  's/# UserParameter=/UserParameter=AWS-QS-TEST,/home/ec2-user/AWS-QS-TESTING/serverspec.sh' zabbix_agentd.conf
+sudo grep -A20 "### Option: UserParameter" zabbix_agentd.conf | sed -i  's/# UserParameter=/UserParameter=AWS-QS-TEST,\/home\/ec2-user\/AWS-QS-TESTING\/serverspec.sh/' zabbix_agentd.conf
 sudo grep -A20 "### Option: AllowRoot" zabbix_agentd.conf | sed -i  's/# AllowRoot=0/AllowRoot=1/' zabbix_agentd.conf
 
 

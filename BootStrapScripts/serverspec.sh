@@ -1,12 +1,19 @@
 #!/bin/bash -e
 
-cd /home/ec2-user/AWS-QS-TESTING/
+cd /home/ec2-user/AWS-QS-TESTING
 
-aws s3 cp s3://serverspec-test . --recursive
+#cat /dev/null > /tmp/rake.log
 
-rake spec && python serverspec_output_reformater.py
-cat reformatted_test_results.json
+rake spec >> /tmp/rake.log 2>&1
 
-jq -r --arg foo $(hostname) '.data[] | $foo + " \"" + "test" + "[" + .["{#TEST}"] + "]" + "\" "  + .["{#TEST_RESULT}"]' reformatted_test_results.json | sed 's|"|\\"|g' | sed 's|\\"test|"test|g' | sed 's|]\\"|]"|g' > /tmp/zsender.txt
+python serverspec_output_reformater.py
 
-zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -vv -i /tmp/zsender.txt >> /tmp/zsender.log
+jq . reformatted_test_results.json
+
+cat /dev/null > /tmp/zdata.txt
+
+jq -r --arg foo $(hostname) '.data[] | $foo + " \"" + "test" + "[" + .["{#TEST}"] + "]" + "\" "  + .["{#TEST_RESULT}"]' reformatted_test_results.json | sed 's|"|\\"|g' | sed 's|\\"test|"test|g' | sed 's|]\\"|]"|g' > /tmp/zdata.txt
+
+#cat /dev/null > /tmp/zsender.log
+
+zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -vv -i /tmp/zdata.txt >> /tmp/zsender.log 2>&1
