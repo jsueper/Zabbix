@@ -65,6 +65,9 @@
         "TestInstanceName": {
           "default": "DNS/Tag Name for Test Server"
         },
+        "MidServerInstanceName": {
+          "default": "DNS/Tag Name for Mid Server"
+        },
         "MasterPassword": {
           "default": "Zabbix/Grafana Database Master Password"
         },
@@ -176,6 +179,12 @@
       "AllowedPattern": "([A-Za-z0-9]{3,50})",
       "Default": "ZabbixTestAgent",
       "Description": "Name for Test EC2 Instance/Tag.",
+      "Type": "String"
+    },
+    "MidServerInstanceName": {
+      "AllowedPattern": "([A-Za-z0-9]{3,50})",
+      "Default": "MidServer",
+      "Description": "Name for Mid Server EC2 Instance/Tag.",
       "Type": "String"
     },
     "RemoteAccessCIDR": {
@@ -1325,6 +1334,19 @@
           "VPCStack",
           "Outputs.VPCId"
         ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "VPCID"
+            ]
+          ]
+        }
       }
     },
     "DatabaseEndpoint": {
@@ -1350,7 +1372,20 @@
           ]
         ]
       },
-      "Description": "Zabbix Web  URL"
+      "Description": "Zabbix Web  URL",
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "ZabbixURL"
+            ]
+          ]
+        }
+      }
     },
     "GrafanaWebURL": {
       "Value": {
@@ -1366,6 +1401,19 @@
             "login"
           ]
         ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "GrafanaURL"
+            ]
+          ]
+        }
       },
       "Description": "Zabbix Web  URL"
     },

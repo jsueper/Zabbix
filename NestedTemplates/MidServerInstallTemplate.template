@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "This is template deploys a Zabbix Test Subject Server.",
+  "Description": "This is template deploys a Mid Server.",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [
@@ -346,7 +346,7 @@
                 "owner": "root",
                 "group": "root"
               },
-              "/tmp/bootstrapZabbixAgent.sh": {
+              "/tmp/bootstrapZabbixMidServer.sh": {
                 "source": {
                   "Fn::Join": [
                     "/",
@@ -366,7 +366,7 @@
                       {
                         "Ref": "QSS3KeyPrefix"
                       },
-                      "Scripts/bootstrapZabbixAgent.sh"
+                      "Scripts/bootstrapZabbixMidServer.sh"
                     ]
                   ]
                 },
@@ -422,7 +422,7 @@
                 "cd /tmp \n",
                 "curl -O https://bootstrap.pypa.io/get-pip.py\n",
                 "python get-pip.py\n",
-                "echo DEBUGPipInstalled &> /tmp/bootstrapagent.log\n",
+                "echo DEBUGPipInstalled &> /tmp/bootstrapmidserver.log\n",
                 "pip install awscli\n",
                 "curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
                 "gunzip aws-cfn-bootstrap-latest.tar.gz\n",
@@ -443,7 +443,7 @@
                   "Ref": "AWS::Region"
                 },
                 "\n",
-                "/tmp/bootstrapZabbixAgent.sh -v --params_file /tmp/zabbix-agent-setup.txt &>> /tmp/bootstrapagent.log\n",
+                "/tmp/bootstrapZabbixMidServer.sh -v --params_file /tmp/zabbix-mid-server-setup.txt &>> /tmp/bootstrapmidserver.log\n",
                 "/usr/bin/cfn-signal -e $? ",
                 "         --stack ",
                 {
@@ -465,14 +465,6 @@
             "Value": {
               "Ref": "ServerName"
             }
-          },
-          {
-            "Key": "StackId",
-            "Value": "AWS-QS-ZABBIX"
-          },
-          {
-            "Key": "Purpose",
-            "Value": "AWS-QS-Zabbix-Agent"
           }
         ]
       },
@@ -488,7 +480,7 @@
       "Value": {
         "Ref": "ServerName"
       },
-      "Description": "Test Server Name"
+      "Description": "Mid Server Name"
     },
     "InstanceID": {
       "Value": {
@@ -503,7 +495,7 @@
           "PrivateIp"
         ]
       },
-      "Description": "Test Instance private IP"
+      "Description": "Mid Server Instance private IP"
     }
   }
 }

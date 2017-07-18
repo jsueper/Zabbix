@@ -135,7 +135,8 @@ fi
 # Start Zabbix Install and Database Setup
 #############################################################
 
-
+# Increase Ulimits
+ulimit -n 300000
 
 
 groupadd -g 54321 zinstall
@@ -175,12 +176,16 @@ YUM_PACKAGES=(
     php-bcmath
     php-mysql
     php-xml
+    MySQL-python
+
 )
 
 echo QS_BEGIN_Install_YUM_Packages
 install_packages ${YUM_PACKAGES[@]}
 echo QS_COMPLETE_Install_YUM_Packages
 
+pip install boto3
+pip install pyzabbix
 
 sudo wget http://dev.mysql.com/get/mysql57-community-release-el7-7.noarch.rpm
 
@@ -244,13 +249,16 @@ ZABBIX_PACKAGES=(
   zabbix-agent
   zabbix-java-gateway
   zabbix-sender
+  zabbix-get
 
 )
 echo QS_BEGIN_Install_Zabbix_Packages
 install_packages ${ZABBIX_PACKAGES[@]}
 echo QS_END_Install_Zabbix_Packages
 
-
+sudo wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+sudo chmod +x ./jq
+sudo cp jq /usr/bin
 
 #Need to set timezone as Zabbix install depends on it.
 
@@ -405,13 +413,17 @@ sudo echo "update zabbix.ids set nextid='8' where table_name='actions';"  >> cre
 
 sudo echo "INSERT INTO \`hosts\`  (\`hostid\`,\`proxy_hostid\`,\`host\`,\`status\`,\`disable_until\`,\`error\`,\`available\`,\`errors_from\`,\`lastaccess\`,\`ipmi_authtype\`,\`ipmi_privilege\`,\`ipmi_username\`,\`ipmi_password\`,\`ipmi_disable_until\`,\`ipmi_available\`,\`snmp_disable_until\`,\`snmp_available\`,\`maintenanceid\`,\`maintenance_status\`,\`maintenance_type\`,\`maintenance_from\`,\`ipmi_errors_from\`,\`snmp_errors_from\`,\`ipmi_error\`,\`snmp_error\`,\`jmx_disable_until\`,\`jmx_available\`,\`jmx_errors_from\`,\`jmx_error\`,\`name\`,\`flags\`,\`templateid\`,\`description\`,\`tls_connect\`,\`tls_accept\`,\`tls_issuer\`,\`tls_subject\`,\`tls_psk_identity\`,\`tls_psk\`) values ('10106', NULL, 'AWSQS-Linux-Template', '3', '0', '', '0', '0', '0', '0', '2', '', '', '0', '0', '0', '0', NULL, '0', '0', '0', '0', '0', '', '', '0', '0', '0', '', 'AWSQS-Template', '0', NULL, '', '1', '1', '', '', '', '');"  >> create_aws_quickstart.sql
 
+sudo echo "INSERT INTO \`hosts\`  (\`hostid\`,\`proxy_hostid\`,\`host\`,\`status\`,\`disable_until\`,\`error\`,\`available\`,\`errors_from\`,\`lastaccess\`,\`ipmi_authtype\`,\`ipmi_privilege\`,\`ipmi_username\`,\`ipmi_password\`,\`ipmi_disable_until\`,\`ipmi_available\`,\`snmp_disable_until\`,\`snmp_available\`,\`maintenanceid\`,\`maintenance_status\`,\`maintenance_type\`,\`maintenance_from\`,\`ipmi_errors_from\`,\`snmp_errors_from\`,\`ipmi_error\`,\`snmp_error\`,\`jmx_disable_until\`,\`jmx_available\`,\`jmx_errors_from\`,\`jmx_error\`,\`name\`,\`flags\`,\`templateid\`,\`description\`,\`tls_connect\`,\`tls_accept\`,\`tls_issuer\`,\`tls_subject\`,\`tls_psk_identity\`,\`tls_psk\`) values ('10107', NULL, 'Update_Host_Macros', '3', '0', '', '0', '0', '0', '0', '2', '', '', '0', '0', '0', '0', NULL, '0', '0', '0', '0', '0', '', '', '0', '0', '0', '', 'Host_Macros', '0', NULL, '', '1', '1', '', '', '', '');"  >> create_aws_quickstart.sql
 
-sudo echo "update zabbix.ids set nextid='10106' where table_name='hosts';"  >> create_aws_quickstart.sql
+
+sudo echo "update zabbix.ids set nextid='10107' where table_name='hosts';"  >> create_aws_quickstart.sql
 
 
 sudo echo "INSERT INTO \`hosts_groups\`  (\`hostgroupid\`,\`hostid\`,\`groupid\`) values ('113', '10106', '1');"  >> create_aws_quickstart.sql
 
-sudo echo "update zabbix.ids set nextid='113' where table_name='hosts_groups';"  >> create_aws_quickstart.sql
+sudo echo "INSERT INTO \`hosts_groups\`  (\`hostgroupid\`,\`hostid\`,\`groupid\`) values ('114', '10107', '5');"  >> create_aws_quickstart.sql
+
+sudo echo "update zabbix.ids set nextid='114' where table_name='hosts_groups';"  >> create_aws_quickstart.sql
 
 
 sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('12', '7', '6', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
@@ -470,10 +482,12 @@ sudo echo "INSERT INTO \`items\`  (\`itemid\`,\`type\`,\`snmp_community\`,\`snmp
 
 sudo echo "INSERT INTO \`items\`  (\`itemid\`,\`type\`,\`snmp_community\`,\`snmp_oid\`,\`hostid\`,\`name\`,\`key_\`,\`delay\`,\`history\`,\`trends\`,\`status\`,\`value_type\`,\`trapper_hosts\`,\`units\`,\`multiplier\`,\`delta\`,\`snmpv3_securityname\`,\`snmpv3_securitylevel\`,\`snmpv3_authpassphrase\`,\`snmpv3_privpassphrase\`,\`formula\`,\`error\`,\`lastlogsize\`,\`logtimefmt\`,\`templateid\`,\`valuemapid\`,\`delay_flex\`,\`params\`,\`ipmi_sensor\`,\`data_type\`,\`authtype\`,\`username\`,\`password\`,\`publickey\`,\`privatekey\`,\`mtime\`,\`flags\`,\`interfaceid\`,\`port\`,\`description\`,\`inventory_link\`,\`lifetime\`,\`snmpv3_authprotocol\`,\`snmpv3_privprotocol\`,\`state\`,\`snmpv3_contextname\`,\`evaltype\`) values ('25552', '2', '', '', '10106', 'Test - {#TEST}', 'test[{#TEST}]', '0', '90', '0', '0', '3', '', '', '0', '0', '', '0', '', '', '1', '', '0', '', NULL, NULL, '', '', '', '0', '0', '', '', '', '', '0', '2', NULL, '', '', '0', '30', '0', '0', '0', '', '0');"  >> create_aws_quickstart.sql
 
+sudo echo "INSERT INTO \`items\`  (\`itemid\`,\`type\`,\`snmp_community\`,\`snmp_oid\`,\`hostid\`,\`name\`,\`key_\`,\`delay\`,\`history\`,\`trends\`,\`status\`,\`value_type\`,\`trapper_hosts\`,\`units\`,\`multiplier\`,\`delta\`,\`snmpv3_securityname\`,\`snmpv3_securitylevel\`,\`snmpv3_authpassphrase\`,\`snmpv3_privpassphrase\`,\`formula\`,\`error\`,\`lastlogsize\`,\`logtimefmt\`,\`templateid\`,\`valuemapid\`,\`delay_flex\`,\`params\`,\`ipmi_sensor\`,\`data_type\`,\`authtype\`,\`username\`,\`password\`,\`publickey\`,\`privatekey\`,\`mtime\`,\`flags\`,\`interfaceid\`,\`port\`,\`description\`,\`inventory_link\`,\`lifetime\`,\`snmpv3_authprotocol\`,\`snmpv3_privprotocol\`,\`state\`,\`snmpv3_contextname\`,\`evaltype\`) values ('25553', '10', '', '', '10107', 'AWS-QS-HOST-UPDATER', 'get_account_and_stack.sh[{HOST.HOST}, {HOST.IP}]', '30', '90', '365', '0', '3', '', '', '0', '0', '', '0', '', '', '1', '', '0', '', NULL, NULL, '', '', '', '0', '0', '', '', '', '', '0', '0', NULL, '', '', '0', '30', '0', '0', '0', '', '0');"  >> create_aws_quickstart.sql
 
 
 
-sudo echo "update zabbix.ids set nextid='25552' where table_name='items';"  >> create_aws_quickstart.sql
+
+sudo echo "update zabbix.ids set nextid='25553' where table_name='items';"  >> create_aws_quickstart.sql
 
 
 sudo echo "INSERT INTO \`items_applications\`  (\`itemappid\`,\`applicationid\`,\`itemid\`) values ('5965', '469', '25552');"  >> create_aws_quickstart.sql
@@ -481,14 +495,9 @@ sudo echo "INSERT INTO \`items_applications\`  (\`itemappid\`,\`applicationid\`,
 sudo echo "update zabbix.ids set nextid='5965' where table_name='items_applications';"  >> create_aws_quickstart.sql
 
 
-
-
 sudo echo "INSERT INTO \`item_discovery\`  (\`itemdiscoveryid\`,\`itemid\`,\`parent_itemid\`,\`key_\`,\`lastcheck\`,\`ts_delete\`) values ('312', '25552', '25531', '', '0', '0');"  >> create_aws_quickstart.sql
 
 sudo echo "update zabbix.ids set nextid='312' where table_name='item_discovery';"  >> create_aws_quickstart.sql
-
-
-
 
 
 
@@ -499,10 +508,65 @@ fi
 echo QS_END_Create_Zabbix_Web_Conf_File
 
 
+
+cd /etc/zabbix/
+
+sudo grep -A20 "### Option: DebugLevel" zabbix_agentd.conf | sed -i  's/# DebugLevel=3/DebugLevel=5/' zabbix_agentd.conf
+sudo grep -A20 "### Option: EnableRemoteCommands" zabbix_agentd.conf | sed -i  's/# EnableRemoteCommands=0/EnableRemoteCommands=1/' zabbix_agentd.conf
+sudo grep -A20 "### Option: StartAgents" zabbix_agentd.conf | sed -i  's/# StartAgents=3/StartAgents=3/' zabbix_agentd.conf
+sudo grep -A20 "### Option: UnsafeUserParameters" zabbix_agentd.conf | sed -i  's/# UnsafeUserParameters=0/UnsafeUserParameters=1/' zabbix_agentd.conf
+sudo grep -A20 "### Option: AllowRoot" zabbix_agentd.conf | sed -i  's/# AllowRoot=0/AllowRoot=1/' zabbix_agentd.conf
+
+
 echo "QS_Restart_All_Services"
 sudo service httpd restart
 sudo service zabbix-server restart
 sudo service zabbix-agent restart
+
+
+
+mkdir -p /etc/zabbix/midscripts/zabbix-gnomes
+
+cd /etc/zabbix/midscripts/zabbix-gnomes
+
+aws s3 cp s3://${QS_S3_BUCKET}/${QS_S3_KEY_PREFIX}/Scripts/zhostupdater.py .
+
+aws s3 cp s3://${QS_S3_BUCKET}/${QS_S3_KEY_PREFIX}/Scripts/zhtmplfinder.py .
+
+cd /usr/lib/zabbix/externalscripts
+
+aws s3 cp s3://${QS_S3_BUCKET}/${QS_S3_KEY_PREFIX}/Scripts/get_account_and_stack.sh .
+
+chmod +x get_account_and_stack.sh
+
+mkdir -p /usr/lib/zabbix/scripts
+
+cd /usr/lib/zabbix/scripts
+
+aws s3 cp s3://${QS_S3_BUCKET}/${QS_S3_KEY_PREFIX}/Scripts/get_account_alias.sh  .
+
+chmod +x get_account_alias.sh
+
+aws s3 cp s3://${QS_S3_BUCKET}/${QS_S3_KEY_PREFIX}/Scripts/get_instance_stack.sh .
+
+chmod +x get_instance_stack.sh
+
+
+#create zabbix conf dir
+sudo mkdir -p /root
+cd /root
+
+cat <<EOF > .zbx.conf
+[Zabbix API]
+username=${DATABASE_USER}
+password=${DATABASE_PASS}
+api=http://localhost/zabbix
+no_verify=true
+EOF
+
+#midscript api config
+ln -s /root/.zbx.conf /etc/zabbix/midscripts/zabbix-gnomes/zbx.conf
+
 
 # Remove passwords from files
 sed -i s/${DATABASE_PASS}/xxxxx/g  /var/log/cloud-init.log

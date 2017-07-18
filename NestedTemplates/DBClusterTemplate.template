@@ -66,7 +66,7 @@
     }
   },
   "Resources": {
-    "DBCluster": {
+    "RDSCluster": {
       "Type": "AWS::RDS::DBCluster",
       "Properties": {
         "MasterUsername": {
@@ -87,8 +87,8 @@
             "Ref": "DBSecurityGroup"
           }
         ]
-      },
-      "DeletionPolicy": "Snapshot"
+      }
+
     },
     "DBSubnetGroup": {
       "Type": "AWS::RDS::DBSubnetGroup",
@@ -122,7 +122,7 @@
           "Ref": "DBParameterGroup"
         },
         "DBClusterIdentifier": {
-          "Ref": "DBCluster"
+          "Ref": "RDSCluster"
         },
         "PubliclyAccessible": "false",
         "Tags": [
@@ -131,7 +131,8 @@
             "Value": "Zabbix/Grafana Aurora Database"
           }
         ]
-      }
+      },
+      "DeletionPolicy": "Delete"
     },
     "DBClusterParameterGroup": {
       "Type": "AWS::RDS::DBClusterParameterGroup",
@@ -165,7 +166,7 @@
       "Description": "DB Cluster Endpoint Address",
       "Value": {
         "Fn::GetAtt": [
-          "DBCluster",
+          "RDSCluster",
           "Endpoint.Address"
         ]
       }

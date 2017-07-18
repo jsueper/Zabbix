@@ -493,6 +493,14 @@
             "Value": {
               "Ref": "ZabbixServerName"
             }
+          },
+          {
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "AWS-QS-Zabbix-Server"
           }
         ]
       },
