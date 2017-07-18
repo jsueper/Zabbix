@@ -24,7 +24,3 @@ describe port(8080) do
   it { should be_listening.with('tcp') }
 end
 
-# ping an address
-describe host('www.google.com') do
-  it { should be_reachable }
-end
