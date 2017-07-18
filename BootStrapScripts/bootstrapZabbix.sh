@@ -413,21 +413,20 @@ sudo echo "update zabbix.ids set nextid='8' where table_name='actions';"  >> cre
 
 sudo echo "INSERT INTO \`hosts\`  (\`hostid\`,\`proxy_hostid\`,\`host\`,\`status\`,\`disable_until\`,\`error\`,\`available\`,\`errors_from\`,\`lastaccess\`,\`ipmi_authtype\`,\`ipmi_privilege\`,\`ipmi_username\`,\`ipmi_password\`,\`ipmi_disable_until\`,\`ipmi_available\`,\`snmp_disable_until\`,\`snmp_available\`,\`maintenanceid\`,\`maintenance_status\`,\`maintenance_type\`,\`maintenance_from\`,\`ipmi_errors_from\`,\`snmp_errors_from\`,\`ipmi_error\`,\`snmp_error\`,\`jmx_disable_until\`,\`jmx_available\`,\`jmx_errors_from\`,\`jmx_error\`,\`name\`,\`flags\`,\`templateid\`,\`description\`,\`tls_connect\`,\`tls_accept\`,\`tls_issuer\`,\`tls_subject\`,\`tls_psk_identity\`,\`tls_psk\`) values ('10106', NULL, 'AWSQS-Linux-Template', '3', '0', '', '0', '0', '0', '0', '2', '', '', '0', '0', '0', '0', NULL, '0', '0', '0', '0', '0', '', '', '0', '0', '0', '', 'AWSQS-Template', '0', NULL, '', '1', '1', '', '', '', '');"  >> create_aws_quickstart.sql
 
-sudo echo "INSERT INTO \`hosts\`  (\`hostid\`,\`proxy_hostid\`,\`host\`,\`status\`,\`disable_until\`,\`error\`,\`available\`,\`errors_from\`,\`lastaccess\`,\`ipmi_authtype\`,\`ipmi_privilege\`,\`ipmi_username\`,\`ipmi_password\`,\`ipmi_disable_until\`,\`ipmi_available\`,\`snmp_disable_until\`,\`snmp_available\`,\`maintenanceid\`,\`maintenance_status\`,\`maintenance_type\`,\`maintenance_from\`,\`ipmi_errors_from\`,\`snmp_errors_from\`,\`ipmi_error\`,\`snmp_error\`,\`jmx_disable_until\`,\`jmx_available\`,\`jmx_errors_from\`,\`jmx_error\`,\`name\`,\`flags\`,\`templateid\`,\`description\`,\`tls_connect\`,\`tls_accept\`,\`tls_issuer\`,\`tls_subject\`,\`tls_psk_identity\`,\`tls_psk\`) values ('10107', NULL, 'Update_Host_Macros', '3', '0', '', '0', '0', '0', '0', '2', '', '', '0', '0', '0', '0', NULL, '0', '0', '0', '0', '0', '', '', '0', '0', '0', '', 'Host_Macros', '0', NULL, '', '1', '1', '', '', '', '');"  >> create_aws_quickstart.sql
+#sudo echo "INSERT INTO \`hosts\`  (\`hostid\`,\`proxy_hostid\`,\`host\`,\`status\`,\`disable_until\`,\`error\`,\`available\`,\`errors_from\`,\`lastaccess\`,\`ipmi_authtype\`,\`ipmi_privilege\`,\`ipmi_username\`,\`ipmi_password\`,\`ipmi_disable_until\`,\`ipmi_available\`,\`snmp_disable_until\`,\`snmp_available\`,\`maintenanceid\`,\`maintenance_status\`,\`maintenance_type\`,\`maintenance_from\`,\`ipmi_errors_from\`,\`snmp_errors_from\`,\`ipmi_error\`,\`snmp_error\`,\`jmx_disable_until\`,\`jmx_available\`,\`jmx_errors_from\`,\`jmx_error\`,\`name\`,\`flags\`,\`templateid\`,\`description\`,\`tls_connect\`,\`tls_accept\`,\`tls_issuer\`,\`tls_subject\`,\`tls_psk_identity\`,\`tls_psk\`) values ('10107', NULL, 'Update_Host_Macros', '3', '0', '', '0', '0', '0', '0', '2', '', '', '0', '0', '0', '0', NULL, '0', '0', '0', '0', '0', '', '', '0', '0', '0', '', 'Host_Macros', '0', NULL, '', '1', '1', '', '', '', '');"  >> create_aws_quickstart.sql
 
 
-sudo echo "update zabbix.ids set nextid='10107' where table_name='hosts';"  >> create_aws_quickstart.sql
+sudo echo "update zabbix.ids set nextid='10106' where table_name='hosts';"  >> create_aws_quickstart.sql
 
 
 sudo echo "INSERT INTO \`hosts_groups\`  (\`hostgroupid\`,\`hostid\`,\`groupid\`) values ('113', '10106', '1');"  >> create_aws_quickstart.sql
 
-sudo echo "INSERT INTO \`hosts_groups\`  (\`hostgroupid\`,\`hostid\`,\`groupid\`) values ('114', '10107', '5');"  >> create_aws_quickstart.sql
+#sudo echo "INSERT INTO \`hosts_groups\`  (\`hostgroupid\`,\`hostid\`,\`groupid\`) values ('114', '10107', '5');"  >> create_aws_quickstart.sql
 
-sudo echo "update zabbix.ids set nextid='114' where table_name='hosts_groups';"  >> create_aws_quickstart.sql
+sudo echo "update zabbix.ids set nextid='113' where table_name='hosts_groups';"  >> create_aws_quickstart.sql
 
 
 sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('12', '7', '6', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
-
 
 sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('13', '8', '6', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
 
@@ -437,7 +436,24 @@ sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operation
 
 sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('16', '7', '6', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
 
-sudo echo "update zabbix.ids set nextid='16' where table_name='operations';"  >> create_aws_quickstart.sql
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('17', '7', '1', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
+
+sudo echo "INSERT INTO \`operations\`  (\`operationid\`,\`actionid\`,\`operationtype\`,\`esc_period\`,\`esc_step_from\`,\`esc_step_to\`,\`evaltype\`,\`recovery\`) values ('18', '8', '1', '0', '1', '1', '0', '0');"  >> create_aws_quickstart.sql
+
+sudo echo "update zabbix.ids set nextid='18' where table_name='operations';"  >> create_aws_quickstart.sql
+
+
+sudo echo "INSERT INTO \`opcommand\`  (\`operationid\`,\`type\`,\`scriptid\`,\`execute_on\`,\`port\`,\`authtype\`,\`username\`,\`password\`,\`publickey\`,\`privatekey\`,\`command\`) values ('17', '0', NULL, '1', '', '0', '', '', '', '', 'sudo /usr/lib/zabbix/externalscripts/get_account_and_stack.sh {HOST.HOST}  {HOST.IP}');"  >> create_aws_quickstart.sql
+
+sudo echo "INSERT INTO \`opcommand\`  (\`operationid\`,\`type\`,\`scriptid\`,\`execute_on\`,\`port\`,\`authtype\`,\`username\`,\`password\`,\`publickey\`,\`privatekey\`,\`command\`) values ('18', '0', NULL, '1', '', '0', '', '', '', '', 'sudo /usr/lib/zabbix/externalscripts/get_account_and_stack.sh {HOST.HOST}  {HOST.IP}');"  >> create_aws_quickstart.sql
+
+
+sudo echo "INSERT INTO \`opcommand_hst\`  (\`opcommand_hstid\`,\`operationid\`,\`hostid\`) values ('1', '17', NULL);"  >> create_aws_quickstart.sql
+
+sudo echo "INSERT INTO \`opcommand_hst\`  (\`opcommand_hstid\`,\`operationid\`,\`hostid\`) values ('2', '18', NULL);"  >> create_aws_quickstart.sql
+
+sudo echo "update zabbix.ids set nextid='2' where table_name='opcommand_hst';"  >> create_aws_quickstart.sql
+
 
 
 sudo echo "INSERT INTO \`opgroup\`  (\`opgroupid\`,\`operationid\`,\`groupid\`) values ('3', '14', '8');"  >> create_aws_quickstart.sql
@@ -482,12 +498,12 @@ sudo echo "INSERT INTO \`items\`  (\`itemid\`,\`type\`,\`snmp_community\`,\`snmp
 
 sudo echo "INSERT INTO \`items\`  (\`itemid\`,\`type\`,\`snmp_community\`,\`snmp_oid\`,\`hostid\`,\`name\`,\`key_\`,\`delay\`,\`history\`,\`trends\`,\`status\`,\`value_type\`,\`trapper_hosts\`,\`units\`,\`multiplier\`,\`delta\`,\`snmpv3_securityname\`,\`snmpv3_securitylevel\`,\`snmpv3_authpassphrase\`,\`snmpv3_privpassphrase\`,\`formula\`,\`error\`,\`lastlogsize\`,\`logtimefmt\`,\`templateid\`,\`valuemapid\`,\`delay_flex\`,\`params\`,\`ipmi_sensor\`,\`data_type\`,\`authtype\`,\`username\`,\`password\`,\`publickey\`,\`privatekey\`,\`mtime\`,\`flags\`,\`interfaceid\`,\`port\`,\`description\`,\`inventory_link\`,\`lifetime\`,\`snmpv3_authprotocol\`,\`snmpv3_privprotocol\`,\`state\`,\`snmpv3_contextname\`,\`evaltype\`) values ('25552', '2', '', '', '10106', 'Test - {#TEST}', 'test[{#TEST}]', '0', '90', '0', '0', '3', '', '', '0', '0', '', '0', '', '', '1', '', '0', '', NULL, NULL, '', '', '', '0', '0', '', '', '', '', '0', '2', NULL, '', '', '0', '30', '0', '0', '0', '', '0');"  >> create_aws_quickstart.sql
 
-sudo echo "INSERT INTO \`items\`  (\`itemid\`,\`type\`,\`snmp_community\`,\`snmp_oid\`,\`hostid\`,\`name\`,\`key_\`,\`delay\`,\`history\`,\`trends\`,\`status\`,\`value_type\`,\`trapper_hosts\`,\`units\`,\`multiplier\`,\`delta\`,\`snmpv3_securityname\`,\`snmpv3_securitylevel\`,\`snmpv3_authpassphrase\`,\`snmpv3_privpassphrase\`,\`formula\`,\`error\`,\`lastlogsize\`,\`logtimefmt\`,\`templateid\`,\`valuemapid\`,\`delay_flex\`,\`params\`,\`ipmi_sensor\`,\`data_type\`,\`authtype\`,\`username\`,\`password\`,\`publickey\`,\`privatekey\`,\`mtime\`,\`flags\`,\`interfaceid\`,\`port\`,\`description\`,\`inventory_link\`,\`lifetime\`,\`snmpv3_authprotocol\`,\`snmpv3_privprotocol\`,\`state\`,\`snmpv3_contextname\`,\`evaltype\`) values ('25553', '10', '', '', '10107', 'AWS-QS-HOST-UPDATER', 'get_account_and_stack.sh[{HOST.HOST}, {HOST.IP}]', '30', '90', '365', '0', '3', '', '', '0', '0', '', '0', '', '', '1', '', '0', '', NULL, NULL, '', '', '', '0', '0', '', '', '', '', '0', '0', NULL, '', '', '0', '30', '0', '0', '0', '', '0');"  >> create_aws_quickstart.sql
+#sudo echo "INSERT INTO \`items\`  (\`itemid\`,\`type\`,\`snmp_community\`,\`snmp_oid\`,\`hostid\`,\`name\`,\`key_\`,\`delay\`,\`history\`,\`trends\`,\`status\`,\`value_type\`,\`trapper_hosts\`,\`units\`,\`multiplier\`,\`delta\`,\`snmpv3_securityname\`,\`snmpv3_securitylevel\`,\`snmpv3_authpassphrase\`,\`snmpv3_privpassphrase\`,\`formula\`,\`error\`,\`lastlogsize\`,\`logtimefmt\`,\`templateid\`,\`valuemapid\`,\`delay_flex\`,\`params\`,\`ipmi_sensor\`,\`data_type\`,\`authtype\`,\`username\`,\`password\`,\`publickey\`,\`privatekey\`,\`mtime\`,\`flags\`,\`interfaceid\`,\`port\`,\`description\`,\`inventory_link\`,\`lifetime\`,\`snmpv3_authprotocol\`,\`snmpv3_privprotocol\`,\`state\`,\`snmpv3_contextname\`,\`evaltype\`) values ('25553', '10', '', '', '10107', 'AWS-QS-HOST-UPDATER', 'get_account_and_stack.sh[{HOST.HOST}, {HOST.IP}]', '30', '90', '365', '0', '3', '', '', '0', '0', '', '0', '', '', '1', '', '0', '', NULL, NULL, '', '', '', '0', '0', '', '', '', '', '0', '0', NULL, '', '', '0', '30', '0', '0', '0', '', '0');"  >> create_aws_quickstart.sql
 
 
 
 
-sudo echo "update zabbix.ids set nextid='25553' where table_name='items';"  >> create_aws_quickstart.sql
+sudo echo "update zabbix.ids set nextid='25552' where table_name='items';"  >> create_aws_quickstart.sql
 
 
 sudo echo "INSERT INTO \`items_applications\`  (\`itemappid\`,\`applicationid\`,\`itemid\`) values ('5965', '469', '25552');"  >> create_aws_quickstart.sql
@@ -499,6 +515,8 @@ sudo echo "INSERT INTO \`item_discovery\`  (\`itemdiscoveryid\`,\`itemid\`,\`par
 
 sudo echo "update zabbix.ids set nextid='312' where table_name='item_discovery';"  >> create_aws_quickstart.sql
 
+
+sudo echo "INSERT INTO \`scripts\`  (\`scriptid\`,\`name\`,\`command\`,\`host_access\`,\`usrgrpid\`,\`groupid\`,\`description\`,\`confirmation\`,\`type\`,\`execute_on\`) values ('4', 'Update ServerSpec Test', 'cd /home/ec2-user/AWS-QS-TESTING && sudo aws s3 cp s3://serverspec-test . --recursive', '3', NULL, '8', '', 'Are you sure?', '0', '0');"  >> create_aws_quickstart.sql
 
 
 mysql --user=${DATABASE_USER} --host=${DATABASE_CONN_STRING} --port=3306 --password="${DATABASE_PASS}" zabbix < create_aws_quickstart.sql
