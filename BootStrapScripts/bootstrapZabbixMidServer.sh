@@ -243,7 +243,7 @@ aws s3 cp s3://serverspec-test . --recursive
 
 aws s3 cp s3://${QS_S3_BUCKET}/${QS_S3_KEY_PREFIX}/Scripts/serverspec.sh .
 
-chmod 777 serverspec.sh
+chmod +x serverspec.sh
 
 echo "QS_Restart_All_Services"
 sudo service zabbix-agent restart

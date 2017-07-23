@@ -91,6 +91,7 @@ QS_S3_URL='NONE'
 QS_S3_BUCKET='NONE'
 QS_S3_KEY_PREFIX='NONE'
 QS_S3_SCRIPTS_PATH='NONE'
+QS_S3_SERVERSPEC_BUCKET='NONE'
 ZABBIX_SERVER='NONE'
 
 
@@ -100,7 +101,7 @@ if [ -f ${PARAMS_FILE} ]; then
     QS_S3_BUCKET=`grep 'QSS3Bucket' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
     QS_S3_KEY_PREFIX=`grep 'QSS3KeyPrefix' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
     ZABBIX_SERVER=`grep 'ZabbixServer' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
-
+    QS_S3_SERVERSPEC_BUCKET=`grep 'QSServerSpecBucketName' ${PARAMS_FILE} | awk -F'|' '{print $2}' | sed -e 's/^ *//g;s/ *$//g'`
 
     # Strip leading slash
     if [[ ${QS_S3_KEY_PREFIX} == /* ]];then
@@ -217,7 +218,7 @@ mkdir AWS-QS-TESTING
 
 cd AWS-QS-TESTING
 
-aws s3 cp s3://serverspec-test . --recursive
+aws s3 cp s3://${QS_S3_SERVERSPEC_BUCKET} . --recursive
 
 aws s3 cp s3://${QS_S3_BUCKET}/${QS_S3_KEY_PREFIX}/Scripts/serverspec.sh .
 

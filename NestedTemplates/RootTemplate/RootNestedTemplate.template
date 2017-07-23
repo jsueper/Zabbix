@@ -19,6 +19,7 @@
           "Parameters": [
             "KeyPairName",
             "InstanceType",
+            "TestInstanceType",
             "ZabbixServerName",
             "GrafanaServerName",
             "TestInstanceName"
@@ -48,7 +49,10 @@
           },
           "Parameters": [
             "QSS3BucketName",
-            "QSS3KeyPrefix"
+            "QSS3KeyPrefix",
+            "QSServerSpecBucketName"
+
+
           ]
         }
       ],
@@ -65,9 +69,6 @@
         "TestInstanceName": {
           "default": "DNS/Tag Name for Test Server"
         },
-        "MidServerInstanceName": {
-          "default": "DNS/Tag Name for Mid Server"
-        },
         "MasterPassword": {
           "default": "Zabbix/Grafana Database Master Password"
         },
@@ -83,11 +84,17 @@
         "InstanceType": {
           "default": "Zabbix/Grafana Instance Type"
         },
+        "TestInstanceType": {
+          "default": "Zabbix Test Subject Instance Type"
+        },
         "QSS3BucketName": {
           "default": "Quick Start S3 Bucket Name"
         },
         "QSS3KeyPrefix": {
           "default": "Quick Start S3 Key Prefix"
+        },
+        "QSServerSpecBucketName": {
+          "default": "Quick Start ServerSpec Bucket"
         }
       }
     }
@@ -146,7 +153,36 @@
       ],
       "ConstraintDescription": "Must be a valid EC2 instance type.",
       "Default": "m4.xlarge",
-      "Description": "Choose your Custom Instance type for Zabbix/Grafana/Test Server",
+      "Description": "Choose your Custom Instance type for Zabbix/Grafana Server",
+      "Type": "String"
+    },
+    "TestInstanceType": {
+      "AllowedValues": [
+        "t2.medium",
+        "t2.large",
+        "m4.large",
+        "m4.xlarge",
+        "m4.2xlarge",
+        "m4.4xlarge",
+        "m4.10xlarge",
+        "r3.large",
+        "r3.xlarge",
+        "r3.2xlarge",
+        "r3.4xlarge",
+        "r3.8xlarge",
+        "r4.8xlarge",
+        "r4.16xlarge"
+      ],
+      "ConstraintDescription": "Must be a valid EC2 instance type.",
+      "Default": "m4.2xlarge",
+      "Description": "Choose your Custom Instance type for Zabbix Test Agent Server",
+      "Type": "String"
+    },
+    "QSServerSpecBucketName": {
+      "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+      "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Default": "serverspec-test",
+      "Description": "S3 bucket name for the Server Spec assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
       "Type": "String"
     },
     "QSS3BucketName": {
@@ -179,12 +215,6 @@
       "AllowedPattern": "([A-Za-z0-9]{3,50})",
       "Default": "ZabbixTestAgent",
       "Description": "Name for Test EC2 Instance/Tag.",
-      "Type": "String"
-    },
-    "MidServerInstanceName": {
-      "AllowedPattern": "([A-Za-z0-9]{3,50})",
-      "Default": "MidServer",
-      "Description": "Name for Mid Server EC2 Instance/Tag.",
       "Type": "String"
     },
     "RemoteAccessCIDR": {
@@ -1214,10 +1244,13 @@
           },
           "ZabbixAMIOS": "RHEL72HVM",
           "InstanceType": {
-            "Ref": "InstanceType"
+            "Ref": "TestInstanceType"
           },
           "ServerName": {
             "Ref": "TestInstanceName"
+          },
+          "QSServerSpecBucketName": {
+            "Ref": "QSServerSpecBucketName"
           },
           "QSS3BucketName": {
             "Ref": "QSS3BucketName"

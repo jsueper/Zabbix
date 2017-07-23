@@ -4,6 +4,10 @@
     "ParameterValue": "71.205.193.40/32"
   },
   {
+    "ParameterKey": "QSServerSpecBucketName",
+    "ParameterValue": "serverspec-test"
+  },
+  {
     "ParameterKey": "QSS3BucketName",
     "ParameterValue": "quickstart-reference-as"
   },
@@ -29,6 +33,10 @@
   },
   {
     "ParameterKey": "InstanceType",
+    "ParameterValue": "m4.2xlarge"
+  },
+  {
+    "ParameterKey": "TestInstanceType",
     "ParameterValue": "m4.2xlarge"
   },
   {

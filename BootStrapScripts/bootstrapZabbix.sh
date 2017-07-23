@@ -313,7 +313,7 @@ mysql -u root --password="${DATABASE_PASS}" -e "FLUSH PRIVILEGES;"
 echo QS_END_Create_Zabbix_MySql_Database
 
 #Move to Director where Zabbix Mysql Server is
-cd /usr/share/doc/zabbix-server-mysql-3.2.6/
+cd /usr/share/doc/zabbix-server-mysql-3.*/
 
 #Unzip Create.sql.gz file
 #Run create.sql file against zabbixdb we created above to create schema and data.
@@ -365,7 +365,7 @@ echo QS_END_Create_Zabbix_Aurora_Database
 
 
 #Move to Director where Zabbix Mysql Server is
-cd /usr/share/doc/zabbix-server-mysql-3.2.6/
+cd /usr/share/doc/zabbix-server-mysql-3.*/
 
 #Unzip Create.sql.gz file
 #Run create.sql file against zabbixdb we created above to create schema and data.
