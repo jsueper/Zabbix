@@ -9,10 +9,10 @@ key=zabbixgrafana/setup/latest
 aws s3api create-bucket --bucket ${bucket} --region us-east-1 --acl public-read
 
 
-aws s3 cp ../bootstrapZabbix.sh "s3://${bucket}/${key}/Scripts/bootstrapZabbix.sh" --acl public-read
-aws s3 cp ../bootstrapGrafana.sh "s3://${bucket}/${key}/Scripts/bootstrapGrafana.sh" --acl public-read
+aws s3 cp ../BootStrapScripts/bootstrapZabbix.sh "s3://${bucket}/${key}/Scripts/bootstrapZabbix.sh" --acl public-read
+aws s3 cp ../BootStrapScripts/bootstrapGrafana.sh "s3://${bucket}/${key}/Scripts/bootstrapGrafana.sh" --acl public-read
 
-aws s3 cp ../ZabbixGrafanaInstallTemplate.json "s3://${bucket}/${key}/ZabbixGrafanaInstallTemplate.json" --acl public-read
+aws s3 cp ../SinglemasterTemplate/ZabbixGrafanaInstallTemplate.json "s3://${bucket}/${key}/ZabbixGrafanaInstallTemplate.json" --acl public-read
 
 
 
