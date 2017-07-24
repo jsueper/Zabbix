@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "This is template deploys Elastic Loadbalancer.",
+  "Description": "This is template deploys Elastic Loadbalancer for Zabbix/Grafana QuickStart.",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [

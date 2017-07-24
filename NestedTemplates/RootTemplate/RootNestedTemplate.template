@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Master template that includes nested templates for installing a Zabbix, Grafana and RDS Aurora Cluster in a NEW VPC",
+  "Description": "Master template that includes nested templates for installing a Zabbix, Grafana, along with a Zabbix Test Subject and RDS Aurora Cluster in a NEW VPC",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [
@@ -67,7 +67,7 @@
           "default": "DNS/Tag Name for Grafana Server"
         },
         "TestInstanceName": {
-          "default": "DNS/Tag Name for Test Server"
+          "default": "DNS/Tag Name for Zabbix Test Subject"
         },
         "MasterPassword": {
           "default": "Zabbix/Grafana Database Master Password"
@@ -102,15 +102,15 @@
   "Parameters": {
     "MasterPassword": {
       "AllowedPattern": "([A-Za-z0-9_!@#$%^&*-.]{4,50})",
-      "ConstraintDescription": "Input your database Password, Min 4, Maximum of 30 characters.",
-      "Description": "Enter your Database Password, Min 4, maximum of 30 characters. This password is used for the admin user of Zabbix/Grafana Database.",
+      "ConstraintDescription": "Input your database Password, Min 8, Maximum of 30 characters.",
+      "Description": "Enter your Database Password, Min 8, maximum of 30 characters. This password is used for the admin user of Zabbix/Grafana Aurora Database.",
       "NoEcho": "true",
       "Type": "String",
       "Default": "dgGGk.juki78$$"
     },
     "MasterUser": {
       "AllowedPattern": "([A-Za-z0-9]{8,50})",
-      "ConstraintDescription": "Input your database Password, Min 8, Maximum of 30 characters.",
+      "ConstraintDescription": "Input your database UserName, Min 8, Maximum of 30 characters.",
       "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Zabbix/Grafana Aurora Database.",
       "Type": "String",
       "Default": "zabbixgrafana"
@@ -202,25 +202,25 @@
     "ZabbixServerName": {
       "AllowedPattern": "([A-Za-z0-9]{3,50})",
       "Default": "Zabbix",
-      "Description": "Name for Zabbix EC2 Instance/Tag.",
+      "Description": "Name for Zabbix EC2 Instance.",
       "Type": "String"
     },
     "GrafanaServerName": {
       "AllowedPattern": "([A-Za-z0-9]{3,50})",
       "Default": "Grafana",
-      "Description": "Name for Grafana EC2 Instance/Tag.",
+      "Description": "Name for Grafana EC2 Instance.",
       "Type": "String"
     },
     "TestInstanceName": {
       "AllowedPattern": "([A-Za-z0-9]{3,50})",
       "Default": "ZabbixTestAgent",
-      "Description": "Name for Test EC2 Instance/Tag.",
+      "Description": "Name for Zabbix Test Subject EC2 Instance.",
       "Type": "String"
     },
     "RemoteAccessCIDR": {
       "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
       "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
-      "Description": "Allowed CIDR block for external SSH access to the bastions",
+      "Description": "Allowed CIDR block for external SSH access to the bastion(s)",
       "Type": "String"
     }
   },

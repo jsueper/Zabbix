@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "This is template deploys a new VPC for a Zabbix and/or Grafana Setup.",
+  "Description": "This is template deploys a new VPC for a Zabbix/Grafana QuickStart.",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [

@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "This is template deploys Route53 Record Set.",
+  "Description": "This is template deploys Route53 Record Set for Zabbix/Grafana QuickStart.",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [

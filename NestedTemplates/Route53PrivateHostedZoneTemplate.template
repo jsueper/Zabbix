@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "This is template deploys Route53 Private Hosted Zone.",
+  "Description": "This is template deploys Route53 Private Hosted Zone for Zabbix/Grafana QuickStart.",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [

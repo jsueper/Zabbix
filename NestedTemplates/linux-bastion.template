@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "This template will create an auto-scaling group of Linux bastion instances in the public VPC Subnets.",
+  "Description": "This Template creates an auto-healing Linux bastion instance for Zabbix/Grafana QuickStart.",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [
