@@ -43,7 +43,8 @@
           },
           "Parameters": [
             "QSS3BucketName",
-            "QSS3KeyPrefix"
+            "QSS3KeyPrefix",
+            "QSServerSpecBucketName"
           ]
         }
       ],
@@ -86,6 +87,9 @@
         },
         "DBEndPoint": {
           "default": "Database Endpoint"
+        },
+        "QSServerSpecBucketName": {
+          "default": "Quick Start ServerSpec Bucket"
         }
       }
     }
@@ -136,6 +140,13 @@
     "PrivateSubnetID": {
       "Description": "ID of the private subnet aka Availability Zone needed for Zabbix Server(e.g., subnet-a0246dcd)",
       "Type": "AWS::EC2::Subnet::Id"
+    },
+    "QSServerSpecBucketName": {
+      "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+      "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Default": "serverspec-test",
+      "Description": "S3 bucket name for the Server Spec assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Type": "String"
     },
     "QSS3BucketName": {
       "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
@@ -347,6 +358,11 @@
                       "QSS3KeyPrefix|",
                       {
                         "Ref": "QSS3KeyPrefix"
+                      },
+                      "\n",
+                      "QSServerSpecBucketName|",
+                      {
+                        "Ref": "QSServerSpecBucketName"
                       },
                       "\n",
                       "DatabasePass|",
