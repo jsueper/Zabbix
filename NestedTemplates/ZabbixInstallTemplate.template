@@ -14,7 +14,8 @@
             "ZabbixAgentsSecurityGroup",
             "ZabbixServerSecurityGroup",
             "InstanceProfileZabbix",
-            "DBEndPoint"
+            "DBEndPoint",
+            "EnvironmentName"
           ]
         },
         {
@@ -51,6 +52,9 @@
       "ParameterLabels": {
         "ZabbixServerName": {
           "default": "DNS/Tag Name for Server"
+        },
+        "EnvironmentName": {
+          "default": "An environment name that will be prefixed to resource names"
         },
         "InstanceProfileZabbix": {
           "default": "Instance Profile"
@@ -109,6 +113,13 @@
       "Description": "Enter your Database Master UserName, Min 8, maximum of 30 characters. This user is used for the admin user of Zabbix Mysql/Aurora Database.",
       "Type": "String",
       "Default": "zabbix"
+    },
+    "EnvironmentName": {
+      "AllowedPattern": "([A-Za-z0-9]{2,15})",
+      "ConstraintDescription": "Environment Name must be between 2 and 15 characters with letters only.",
+      "Default": "QS",
+      "Description": "NName that is prefixed to all AWS Resources created by this template.",
+      "Type": "String"
     },
     "KeyPairName": {
       "ConstraintDescription": "must be the name of an existing EC2 KeyPair.",
@@ -506,6 +517,18 @@
         "Tags": [
           {
             "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixServer"
+            }
+          },
+          {
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            }
+          },
+          {
+            "Key": "DNS Name",
             "Value": {
               "Ref": "ZabbixServerName"
             }

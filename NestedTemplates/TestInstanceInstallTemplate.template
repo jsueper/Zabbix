@@ -12,7 +12,8 @@
             "VPCID",
             "PrivateSubnetID",
             "ZabbixAgentsSecurityGroup",
-            "InstanceProfileTestEC2"
+            "InstanceProfileTestEC2",
+            "EnvironmentName"
           ]
         },
         {
@@ -42,6 +43,9 @@
       "ParameterLabels": {
         "ServerName": {
           "default": "DNS/Tag Name for Server"
+        },
+        "EnvironmentName": {
+          "default": "An environment name that will be prefixed to resource names"
         },
         "ZabbixServerName": {
           "default": "DNS/Tag Name for Zabbix Server"
@@ -110,6 +114,13 @@
     "PrivateSubnetID": {
       "Description": "ID of the private subnet aka Availability Zone needed for Test Server(e.g., subnet-a0246dcd)",
       "Type": "AWS::EC2::Subnet::Id"
+    },
+    "EnvironmentName": {
+      "AllowedPattern": "([A-Za-z0-9]{2,15})",
+      "ConstraintDescription": "Environment Name must be between 2 and 15 characters with letters only.",
+      "Default": "QS",
+      "Description": "NName that is prefixed to all AWS Resources created by this template.",
+      "Type": "String"
     },
     "QSServerSpecBucketName": {
       "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
@@ -479,16 +490,28 @@
           {
             "Key": "Name",
             "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixTestSubject"
+            }
+          },
+          {
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            }
+          },
+          {
+            "Key": "DNS Name",
+            "Value": {
               "Ref": "ServerName"
             }
           },
           {
-            "Key": "StackId",
+            "Key": "StackID",
             "Value": "AWS-QS-ZABBIX"
           },
           {
             "Key": "Purpose",
-            "Value": "AWS-QS-Zabbix-Agent"
+            "Value": "AWS-QS-Zabbix-Test-Subject"
           }
         ]
       },

@@ -24,3 +24,6 @@ describe port(8080) do
   it { should be_listening.with('tcp') }
 end
 
+describe host('google.com') do
+  it { should be_resolvable }
+end

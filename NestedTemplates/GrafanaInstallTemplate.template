@@ -11,7 +11,8 @@
           "Parameters": [
             "VPCID",
             "PrivateSubnetID",
-            "GrafanaServerSecurityGroup"
+            "GrafanaServerSecurityGroup",
+            "EnvironmentName"
           ]
         },
         {
@@ -54,6 +55,9 @@
         },
         "DBEndPoint": {
           "default": "Database Endpoint"
+        },
+        "EnvironmentName": {
+          "default": "An environment name that will be prefixed to resource names"
         },
         "InstanceProfileGrafana": {
           "default": "Instance Profile"
@@ -114,6 +118,13 @@
       "ConstraintDescription": "Zabbix String domain name.",
       "Default": "graph",
       "Description": "Name of Private Route53 Domain to reach your Zabbix Endpoint after setup.",
+      "Type": "String"
+    },
+    "EnvironmentName": {
+      "AllowedPattern": "([A-Za-z0-9]{2,15})",
+      "ConstraintDescription": "Environment Name must be between 2 and 15 characters with letters only.",
+      "Default": "QS",
+      "Description": "NName that is prefixed to all AWS Resources created by this template.",
       "Type": "String"
     },
     "KeyPairName": {
@@ -518,8 +529,28 @@
           {
             "Key": "Name",
             "Value": {
+              "Fn::Sub": "${EnvironmentName}-GrafanaServer"
+            }
+          },
+          {
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            }
+          },
+          {
+            "Key": "DNS Name",
+            "Value": {
               "Ref": "GrafanaServerName"
             }
+          },
+          {
+            "Key": "StackID",
+            "Value": "AWS-QS-GRAFANA"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "AWS-QS-Grafana-Server"
           }
         ]
       },

@@ -13,7 +13,8 @@
             "PublicSubnet1ID",
             "PublicSubnet2ID",
             "RemoteAccessCIDR",
-            "BastionSecurityGroup"
+            "BastionSecurityGroup",
+            "EnvironmentName"
           ]
         },
         {
@@ -51,6 +52,9 @@
       "ParameterLabels": {
         "BastionAMIOS": {
           "default": "Bastion AMI Operating System"
+        },
+        "EnvironmentName": {
+          "default": "An environment name that will be prefixed to resource names"
         },
         "BastionSecurityGroup": {
           "default": "Bastion Security Group"
@@ -107,6 +111,13 @@
       ],
       "Default": "Amazon-Linux-HVM",
       "Description": "The Linux distribution for the AMI to be used for the bastion instances",
+      "Type": "String"
+    },
+    "EnvironmentName": {
+      "AllowedPattern": "([A-Za-z0-9]{2,15})",
+      "ConstraintDescription": "Environment Name must be between 2 and 15 characters with letters only.",
+      "Default": "QS",
+      "Description": "NName that is prefixed to all AWS Resources created by this template.",
       "Type": "String"
     },
     "BastionBanner": {
@@ -590,7 +601,26 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "LinuxBastion",
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-LinuxBastion"
+            },
+            "PropagateAtLaunch": "true"
+          },
+          {
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            },
+            "PropagateAtLaunch": "true"
+          },
+          {
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX",
+            "PropagateAtLaunch": "true"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "AWS-QS-Bastion-Server",
             "PropagateAtLaunch": "true"
           }
         ]

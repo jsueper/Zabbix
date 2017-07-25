@@ -8,6 +8,10 @@
     "ParameterValue": "serverspec-test"
   },
   {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "QS1"
+  },
+  {
     "ParameterKey": "QSS3BucketName",
     "ParameterValue": "quickstart-reference-as"
   },
