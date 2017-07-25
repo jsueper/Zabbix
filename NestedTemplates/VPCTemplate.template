@@ -15,8 +15,8 @@
             "PublicSubnetCidrAZ1",
             "PrivateSubnetCidrAZ1",
             "PublicSubnetCidrAZ2",
-            "PrivateSubnetCidrAZ2"
-
+            "PrivateSubnetCidrAZ2",
+            "EnvironmentName"
           ]
         }
       ],
@@ -24,13 +24,15 @@
         "VPCCIDR": {
           "default": "VPC CIDR Block"
         },
+        "EnvironmentName": {
+          "default": "An environment name that will be prefixed to resource names"
+        },
         "EnableDnsSupport": {
           "default": "Enable Dns Support"
         },
         "EnableDnsHostNames": {
           "default": "Enable Dns HostNames"
         }
-
       }
     }
   },
@@ -58,6 +60,13 @@
       "Description": "Specifies whether the instances launched in the VPC get DNS hostnames. If this attribute is true, instances in the VPC get DNS hostnames; otherwise, they do not. You can only set EnableDnsHostnames to true if you also set the EnableDnsSupport attribute to true.",
       "Type": "String",
       "Default": "true"
+    },
+    "EnvironmentName": {
+      "AllowedPattern": "([A-Za-z0-9]{2,15})",
+      "ConstraintDescription": "Environment Name must be between 2 and 15 characters with letters only.",
+      "Default": "QS",
+      "Description": "NName that is prefixed to all AWS Resources created by this template.",
+      "Type": "String"
     },
     "PublicSubnetCidrAZ1": {
       "Description": "CIDR block for subnet containing the Zabbix and Grafana Elastic Loadbalancers (e.g. 10.0.128.0/20)",
@@ -112,15 +121,23 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Zabbix-Grafana-QS"
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixGrafana VPC"
+            }
           },
           {
-            "Key": "App",
-            "Value": "QuickStart"
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            }
           },
           {
-            "Key": "Stack",
-            "Value": "Zabbix-Grafana"
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "AWS-QS-Zabbix-Grafana-VPC"
           },
           {
             "Key": "Layer",
@@ -135,15 +152,23 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Zabbix-Grafana-IGW"
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixGrafana IGW"
+            }
           },
           {
-            "Key": "App",
-            "Value": "QuickStart"
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            }
           },
           {
-            "Key": "Stack",
-            "Value": "Zabbix-Grafana"
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "AWS-QS-Zabbix-Grafana-IGW"
           },
           {
             "Key": "Layer",
@@ -203,20 +228,28 @@
         },
         "Tags": [
           {
-            "Key": "Purpose",
-            "Value": "ELB - Public Subnet AZ-1"
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixGrafana Public AZ-1"
+            }
           },
           {
-            "Key": "Stack",
-            "Value": "Zabbix-Grafana"
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            }
+          },
+          {
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "Public Subnet AZ-1"
           },
           {
             "Key": "Network",
             "Value": "Public"
-          },
-          {
-            "Key": "Name",
-            "Value": "Quickstart-Public AZ-1"
           }
         ],
         "MapPublicIpOnLaunch": true
@@ -241,20 +274,28 @@
         },
         "Tags": [
           {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixGrafana Private AZ-1"
+            }
+          },
+          {
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            }
+          },
+          {
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX"
+          },
+          {
             "Key": "Purpose",
             "Value": "Private Subnet AZ-1"
           },
           {
-            "Key": "Stack",
-            "Value": "Zabbix-Grafana"
-          },
-          {
             "Key": "Network",
-            "Value": "Internal"
-          },
-          {
-            "Key": "Name",
-            "Value": "Quickstart-Internal AZ-1"
+            "Value": "Private"
           }
         ]
       }
@@ -278,20 +319,28 @@
         },
         "Tags": [
           {
-            "Key": "Purpose",
-            "Value": "ELB Public Subnet AZ-2"
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixGrafana Public AZ-2"
+            }
           },
           {
-            "Key": "Stack",
-            "Value": "Zabbix-Grafana"
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            }
+          },
+          {
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "Public Subnet AZ-2"
           },
           {
             "Key": "Network",
             "Value": "Public"
-          },
-          {
-            "Key": "Name",
-            "Value": "Quickstart-Public AZ-2"
           }
         ],
         "MapPublicIpOnLaunch": true
@@ -316,20 +365,28 @@
         },
         "Tags": [
           {
-            "Key": "Purpose",
-            "Value": "Private Subnet AZ2"
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixGrafana Private AZ-2"
+            }
           },
           {
-            "Key": "Stack",
-            "Value": "Zabbix-Grafana"
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            }
+          },
+          {
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "Private Subnet AZ-2"
           },
           {
             "Key": "Network",
-            "Value": "Internal"
-          },
-          {
-            "Key": "Name",
-            "Value": "Quickstart-Internal AZ-2"
+            "Value": "Private"
           }
         ]
       }
@@ -344,15 +401,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Zabbix-Grafana Public Route Table"
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixGrafana Public Route Table"
+            }
           },
           {
             "Key": "Purpose",
             "Value": "Internet Access"
           },
           {
-            "Key": "Stack",
-            "Value": "Zabbix-Grafana"
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX"
           },
           {
             "Key": "Network",
@@ -370,15 +429,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Zabbix-Grafana Private Route Table"
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixGrafana Private Route Table"
+            }
           },
           {
             "Key": "Purpose",
             "Value": "Internal Access"
           },
           {
-            "Key": "Stack",
-            "Value": "Zabbix-Grafana"
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX"
           },
           {
             "Key": "Network",

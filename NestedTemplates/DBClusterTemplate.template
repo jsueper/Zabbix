@@ -13,13 +13,17 @@
             "PrivateSubnetID2",
             "MasterUser",
             "MasterPassword",
-            "DBSecurityGroup"
+            "DBSecurityGroup",
+            "EnvironmentName"
           ]
         }
       ],
       "ParameterLabels": {
         "PrivateSubnetID1": {
           "default": "Private Subnet ID1"
+        },
+        "EnvironmentName": {
+          "default": "An environment name that will be prefixed to resource names"
         },
         "PrivateSubnetID2": {
           "default": "Private Subnet ID2"
@@ -40,6 +44,13 @@
     "PrivateSubnetID1": {
       "Description": "Private Subnet ID1 for Aurora Cluster",
       "Type": "AWS::EC2::Subnet::Id"
+    },
+    "EnvironmentName": {
+      "AllowedPattern": "([A-Za-z0-9]{2,15})",
+      "ConstraintDescription": "Environment Name must be between 2 and 15 characters with letters only.",
+      "Default": "QS",
+      "Description": "NName that is prefixed to all AWS Resources created by this template.",
+      "Type": "String"
     },
     "PrivateSubnetID2": {
       "Description": "Private Subnet ID2 for Aurora Cluster",
@@ -88,7 +99,6 @@
           }
         ]
       }
-
     },
     "DBSubnetGroup": {
       "Type": "AWS::RDS::DBSubnetGroup",
@@ -105,7 +115,23 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Zabbix/Grafana DB Subnet Group"
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixGrafana DB Subnet"
+            }
+          },
+          {
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            }
+          },
+          {
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "AWS-QS-Zabbix-Grafana-DBSubnet"
           }
         ]
       }
@@ -128,7 +154,23 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Zabbix/Grafana Aurora Database"
+            "Value": {
+              "Fn::Sub": "${EnvironmentName}-ZabbixGrafana Database"
+            }
+          },
+          {
+            "Key": "Environment Name",
+            "Value": {
+              "Ref": "EnvironmentName"
+            }
+          },
+          {
+            "Key": "StackID",
+            "Value": "AWS-QS-ZABBIX"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "AWS-QS-Zabbix-Grafana-Database"
           }
         ]
       },

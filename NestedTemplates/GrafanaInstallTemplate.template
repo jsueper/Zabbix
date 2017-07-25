@@ -546,7 +546,7 @@
           },
           {
             "Key": "StackID",
-            "Value": "AWS-QS-GRAFANA"
+            "Value": "AWS-QS-ZABBIX"
           },
           {
             "Key": "Purpose",

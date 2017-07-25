@@ -1048,6 +1048,9 @@
               "Outputs.PrivateSubnetAZ1"
             ]
           },
+          "EnvironmentName": {
+            "Ref": "EnvironmentName"
+          },
           "PrivateSubnetID2": {
             "Fn::GetAtt": [
               "VPCStack",
@@ -1210,6 +1213,9 @@
           "ZabbixServerSecurityGroup": {
             "Ref": "ZabbixServerSecurityGroup"
           },
+          "EnvironmentName": {
+            "Ref": "EnvironmentName"
+          },
           "InstanceProfileZabbix": {
             "Ref": "InstanceProfile"
           },
@@ -1296,6 +1302,9 @@
               "Outputs.DBClusterEndpoint"
             ]
           },
+          "EnvironmentName": {
+            "Ref": "EnvironmentName"
+          },
           "KeyPairName": {
             "Ref": "KeyPairName"
           },
@@ -1361,6 +1370,9 @@
               "VPCStack",
               "Outputs.VPCId"
             ]
+          },
+          "EnvironmentName": {
+            "Ref": "EnvironmentName"
           },
           "PrivateSubnetID": {
             "Fn::GetAtt": [
@@ -1439,6 +1451,9 @@
           "EnableX11Forwarding": "true",
           "KeyPairName": {
             "Ref": "KeyPairName"
+          },
+          "EnvironmentName": {
+            "Ref": "EnvironmentName"
           },
           "NumBastionHosts": "1",
           "PublicSubnet1ID": {
