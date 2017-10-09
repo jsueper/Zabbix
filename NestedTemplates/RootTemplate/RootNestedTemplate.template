@@ -121,7 +121,7 @@
       "AllowedPattern": "([A-Za-z0-9]{2,15})",
       "ConstraintDescription": "Environment Name must be between 2 and 15 characters with letters only.",
       "Default": "QS",
-      "Description": "NName that is prefixed to all AWS Resources created by this template.",
+      "Description": "Name that is prefixed to all AWS Resources created by this template.",
       "Type": "String"
     },
     "ZabbixDomainName": {
@@ -815,6 +815,11 @@
               "VPCTemplate.template"
             ]
           ]
+        },
+        "Parameters": {
+          "EnvironmentName": {
+            "Ref": "EnvironmentName"
+          }
         },
         "TimeoutInMinutes": "90"
       }

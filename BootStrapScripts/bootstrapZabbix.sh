@@ -313,7 +313,7 @@ mysql -u root --password="${DATABASE_PASS}" -e "GRANT ALL PRIVILEGES on zabbix.*
 mysql -u root --password="${DATABASE_PASS}" -e "FLUSH PRIVILEGES;"
 echo QS_END_Create_Zabbix_MySql_Database
 
-#Move to Director where Zabbix Mysql Server is
+#Move to Directory where Zabbix Mysql Server is
 cd /usr/share/doc/zabbix-server-mysql-3.*/
 
 #Unzip Create.sql.gz file

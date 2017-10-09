@@ -1,0 +1,52 @@
+{
+  "data": [
+    {
+      "{#TEST_RESULT}": "failed",
+      "{#TEST}": "Service \"kafka\" should be running"
+    },
+    {
+      "{#TEST_RESULT}": "passed",
+      "{#TEST}": "File \"/dev/xvda1\" should be block device"
+    },
+    {
+      "{#TEST_RESULT}": "failed",
+      "{#TEST}": "Port \"2181\" should be listening with tcp"
+    },
+    {
+      "{#TEST_RESULT}": "failed",
+      "{#TEST}": "Port \"8080\" should be listening with tcp"
+    },
+    {
+      "{#TEST_RESULT}": "passed",
+      "{#TEST}": "Host \"www.google.com\" should be reachable"
+    }
+  ]
+}
+
+aws s3 cp s3://quickstart-reference-as/zabbixgrafananested/setup/latest/Scripts/serverspec.sh .
+
+
+{
+"Version": "2012-10-17",
+"Id": "Policy1499573297417",
+"Statement": [
+{
+"Sid": "perm1",
+"Effect": "Allow",
+"Principal": {
+"AWS": "*"
+},
+"Action": "s3:GetObject",
+"Resource": "arn:aws:s3:::serverspec-test/*"
+},
+{
+"Sid": "perm2",
+"Effect": "Allow",
+"Principal": {
+"AWS": "*"
+},
+"Action": "s3:ListBucket",
+"Resource": "arn:aws:s3:::serverspec-test"
+}
+]
+}

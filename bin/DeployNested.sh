@@ -16,4 +16,4 @@ aws s3 cp ../NestedTemplates/ "s3://${bucket}/${key}/" --recursive --acl public-
 
 aws s3 cp ../ServerSpecTests/ "s3://${serverspec_bucket}/" --recursive --acl public-read
 
-aws cloudformation create-stack --template-url https://s3.amazonaws.com/"${bucket}/${key}/RootTemplate"/RootNestedTemplate.template --stack-name ZG1  --parameters file://paramsNested.json --disable-rollback --capabilities CAPABILITY_IAM
+#aws cloudformation create-stack --template-url https://s3.amazonaws.com/"${bucket}/${key}/RootTemplate"/RootNestedTemplate.template --stack-name ZG2  --parameters file://paramsNested.json --disable-rollback --capabilities CAPABILITY_IAM

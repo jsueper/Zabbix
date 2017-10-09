@@ -1,0 +1,14 @@
+# dotenv environment variables file
+.env
+
+# idea settings
+
+.idea
+
+
+# VSCode settings
+
+.vscode
+
+
+.vscode/launch.json
