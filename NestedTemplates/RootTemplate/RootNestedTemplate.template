@@ -57,10 +57,10 @@
       ],
       "ParameterLabels": {
         "RemoteAccessCIDR": {
-          "default": "Allowed Bastion External Access CIDR"
+          "default": "Bastion External Access CIDR"
         },
         "EnvironmentName": {
-          "default": "An environment name that will be prefixed to resource names"
+          "default": "Environment Prefix"
         },
         "ZabbixServerName": {
           "default": "DNS/Tag Name for Zabbix Server"

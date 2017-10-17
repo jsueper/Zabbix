@@ -1,62 +1,61 @@
-[
-  {
-    "ParameterKey": "RemoteAccessCIDR",
-    "ParameterValue": "71.205.193.40/32"
-  },
-  {
-    "ParameterKey": "QSServerSpecBucketName",
-    "ParameterValue": "serverspec-test"
-  },
-  {
-    "ParameterKey": "EnvironmentName",
-    "ParameterValue": "QS1"
-  },
-  {
-    "ParameterKey": "QSS3BucketName",
-    "ParameterValue": "quickstart-reference-as"
-  },
-  {
-    "ParameterKey": "QSS3KeyPrefix",
-    "ParameterValue": "zabbixgrafananested/setup/latest"
-  },
-  {
-    "ParameterKey": "ZabbixServerName",
-    "ParameterValue": "Zabbix"
-  },
-  {
-    "ParameterKey": "GrafanaServerName",
-    "ParameterValue": "Grafana"
-  },
-  {
-    "ParameterKey": "TestInstanceName",
-    "ParameterValue": "ZabbixTestAgent"
-  },
-  {
-    "ParameterKey": "KeyPairName",
-    "ParameterValue": "private-az-key-oregon"
-  },
-  {
-    "ParameterKey": "InstanceType",
-    "ParameterValue": "m4.2xlarge"
-  },
-  {
-    "ParameterKey": "TestInstanceType",
-    "ParameterValue": "m4.2xlarge"
-  },
-  {
-    "ParameterKey": "ZabbixDomainName",
-    "ParameterValue": "mon"
-  },
-  {
-    "ParameterKey": "GrafanaDomainName",
-    "ParameterValue": "graph"
-  },
-  {
-    "ParameterKey": "MasterPassword",
-    "ParameterValue": "dgGGk.juki78$$"
-  },
-  {
-    "ParameterKey": "MasterUser",
-    "ParameterValue": "zabbixgrafana"
-  }
+[{
+        "ParameterKey": "RemoteAccessCIDR",
+        "ParameterValue": "Your IP Address Here"
+    },
+    {
+        "ParameterKey": "QSServerSpecBucketName",
+        "ParameterValue": "serverspec-test"
+    },
+    {
+        "ParameterKey": "EnvironmentName",
+        "ParameterValue": "QS1"
+    },
+    {
+        "ParameterKey": "QSS3BucketName",
+        "ParameterValue": "quickstart-reference-as"
+    },
+    {
+        "ParameterKey": "QSS3KeyPrefix",
+        "ParameterValue": "zabbixgrafananested/setup/latest"
+    },
+    {
+        "ParameterKey": "ZabbixServerName",
+        "ParameterValue": "Zabbix"
+    },
+    {
+        "ParameterKey": "GrafanaServerName",
+        "ParameterValue": "Grafana"
+    },
+    {
+        "ParameterKey": "TestInstanceName",
+        "ParameterValue": "ZabbixTestAgent"
+    },
+    {
+        "ParameterKey": "KeyPairName",
+        "ParameterValue": "private-az-key-oregon"
+    },
+    {
+        "ParameterKey": "InstanceType",
+        "ParameterValue": "m4.2xlarge"
+    },
+    {
+        "ParameterKey": "TestInstanceType",
+        "ParameterValue": "m4.2xlarge"
+    },
+    {
+        "ParameterKey": "ZabbixDomainName",
+        "ParameterValue": "mon"
+    },
+    {
+        "ParameterKey": "GrafanaDomainName",
+        "ParameterValue": "graph"
+    },
+    {
+        "ParameterKey": "MasterPassword",
+        "ParameterValue": "YOUR DATABASE PASSWORD HERE!!!"
+    },
+    {
+        "ParameterKey": "MasterUser",
+        "ParameterValue": "YOUR DATABASE USER NAME HERE!!!"
+    }
 ]
